@@ -3,7 +3,7 @@ use crate::{
     global::Global,
     hal_api::HalApi,
     hub::Token,
-    id::{AdapterId, DeviceId, SurfaceId, TextureId, Valid},
+    id::{AdapterId, DeviceId, SurfaceId, TextureId, Valid, CommandEncoderId, TextureViewId},
     identity::GlobalIdentityHandlerFactory,
     init_tracker::{BufferInitTracker, TextureInitTracker},
     track::TextureSelector,
