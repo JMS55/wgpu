@@ -813,6 +813,7 @@ impl Interface {
         let varying = match binding {
             Some(&naga::Binding::Location {
                 location,
+                second_blend_source: _, // TODO
                 interpolation,
                 sampling,
             }) => Varying::Local {
