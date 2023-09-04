@@ -128,7 +128,7 @@ features = ["clone"]
 [dev-dependencies.naga]
 git = "https://github.com/jms55/naga.git"
 branch = "solari"
-version = "0.13.0"
+version = "0.12.0"
 features = ["wgsl-in"]
 
 [dev-dependencies]
