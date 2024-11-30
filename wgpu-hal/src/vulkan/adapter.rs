@@ -635,7 +635,7 @@ impl PhysicalDeviceFeatures {
             ) {
                 features.insert(F::UNIFORM_BUFFER_AND_STORAGE_TEXTURE_ARRAY_NON_UNIFORM_INDEXING);
             }
-            if descriptor_indexing.descriptor_binding_partially_bound != 0 && !intel_windows {
+            if descriptor_indexing.descriptor_binding_partially_bound != 0 {
                 features |= F::PARTIALLY_BOUND_BINDING_ARRAY;
             }
         }
