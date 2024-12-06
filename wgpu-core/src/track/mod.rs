@@ -643,7 +643,7 @@ impl Tracker {
     /// bind group as a source of which IDs to look at. The bind groups
     /// must have first been added to the usage scope.
     ///
-    /// Only stateful things are merged in herell other resources are owned
+    /// Only stateful things are merged in here, all other resources are owned
     /// indirectly by the bind group.
     ///
     /// # Safety
