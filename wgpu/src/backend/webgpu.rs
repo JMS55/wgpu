@@ -3060,6 +3060,10 @@ impl dispatch::CommandEncoderInterface for WebCommandEncoder {
     ) {
         unimplemented!("Raytracing not implemented for web");
     }
+
+    fn transition_resources(&mut self, _buffer_transitions: &[()], _texture_transitions: &[()]) {
+        // no-op
+    }
 }
 impl Drop for WebCommandEncoder {
     fn drop(&mut self) {

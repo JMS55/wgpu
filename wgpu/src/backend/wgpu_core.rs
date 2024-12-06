@@ -2549,6 +2549,20 @@ impl dispatch::CommandEncoderInterface for CoreCommandEncoder {
             );
         }
     }
+
+    fn transition_resources(&mut self, buffer_transitions: &[()], texture_transitions: &[()]) {
+        if let Err(cause) = self.context.0.command_encoder_transition_resources(
+            self.id,
+            buffer_transitions,
+            texture_transitions,
+        ) {
+            self.context.handle_error_nolabel(
+                &self.error_sink,
+                cause,
+                "CommandEncoder::transition_resources",
+            );
+        }
+    }
 }
 
 impl Drop for CoreCommandEncoder {

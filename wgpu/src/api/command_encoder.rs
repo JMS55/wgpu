@@ -346,4 +346,49 @@ impl CommandEncoder {
             &mut tlas.into_iter(),
         );
     }
+
+    /// Transition resources to an underlying hal resource state.
+    ///
+    /// This is an advanced, native-only API (no-op on web) that has two main use cases:
+    ///
+    /// # Batching Barriers
+    ///
+    /// Wgpu does not have a global view of the frame when recording command buffers. When you submit multiple command buffers in a single queue submission, wgpu may need to record and
+    /// insert new command buffers (holding 1 or more barrier commands) in between the user-supplied command buffers in order to ensure that resources are transitioned to the correct state
+    /// for the start of the next user-supplied command buffer.
+    ///
+    /// Wgpu does not currently attempt to batch multiple of these generated command buffers/barriers together, which may lead to suboptimal barrier placement.
+    ///
+    /// Consider the following scenario, where the user does `queue.submit(&[a, b, c])`:
+    /// * CommandBuffer A: Use resource X as a render pass attachment
+    /// * CommandBuffer B: Use resource Y as a render pass attachment
+    /// * CommandBuffer C: Use resources X and Y in a bind group
+    ///
+    /// At submission time, wgpu will record and insert some new command buffers, resulting in a submission that looks like `queue.submit(&[0, a, 1, b, 2, c])`:
+    /// * CommandBuffer 0: Barrier to transition resource X from bind group access state (from last frame) to attachment state
+    /// * CommandBuffer A: Use resource X as a render pass attachment
+    /// * CommandBuffer 1: Barrier to transition resource Y from bind group access state (from last frame) to attachment state
+    /// * CommandBuffer B: Use resource Y as a render pass attachment
+    /// * CommandBuffer 2: Barrier to transition resource X and Y from attachment state to bind group access state
+    /// * CommandBuffer C: Use resources X and Y in a bind group
+    ///
+    /// To prevent this, after profiling their app, an advanced user might choose to instead do `queue.submit(&[a, b, c])`:
+    /// * CommandBuffer A:
+    ///     * Use [`CommandEncoder::transition_resources`] to transition resources X and Y from bind group access state (from last frame) to attachment state
+    ///     * Use resource X as a render pass attachment
+    /// * CommandBuffer B: Use resource Y as a render pass attachment
+    /// * CommandBuffer C:
+    ///     * Use [`CommandEncoder::transition_resources`] to transition resources X and Y from attachment state to bind group access state
+    ///     * Use resources X and Y in a bind group
+    ///
+    /// Which is a more optimal barrier placement, and eliminates the extra command buffers that wgpu would otherwise need to generate at submission time.
+    ///
+    /// # Native Interoperability
+    ///
+    /// A user wanting to interoperate with the underlying native graphics APIs (Vulkan, DirectX12, Metal, etc) can use this API to generate barriers between wgpu commands and
+    /// the native API commands, for synchronization and resource state transition purposes.
+    pub fn transition_resources(&mut self, buffer_transitions: &[()], texture_transitions: &[()]) {
+        self.inner
+            .transition_resources(buffer_transitions, texture_transitions);
+    }
 }
