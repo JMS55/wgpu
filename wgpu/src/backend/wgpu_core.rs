@@ -2564,10 +2564,10 @@ impl CoreCommandEncoder {
         let result = self.context.0.command_encoder_transition_resources(
             self.id,
             buffer_transitions
-                .into_iter()
+                .iter()
                 .map(|(buffer, state)| (buffer.inner.as_core().id, *state)),
             texture_transitions
-                .into_iter()
+                .iter()
                 .map(|(texture, selector, state)| {
                     (texture.inner.as_core().id, selector.clone(), *state)
                 }),
