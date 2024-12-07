@@ -2549,13 +2549,31 @@ impl dispatch::CommandEncoderInterface for CoreCommandEncoder {
             );
         }
     }
+}
 
-    fn transition_resources(&mut self, buffer_transitions: &[()], texture_transitions: &[()]) {
-        if let Err(cause) = self.context.0.command_encoder_transition_resources(
+impl CoreCommandEncoder {
+    pub fn transition_resources(
+        &mut self,
+        buffer_transitions: &[(&crate::Buffer, hal::BufferUses)],
+        texture_transitions: &[(
+            &crate::Texture,
+            Option<wgc::TextureSelector>,
+            hal::TextureUses,
+        )],
+    ) {
+        let result = self.context.0.command_encoder_transition_resources(
             self.id,
-            buffer_transitions,
-            texture_transitions,
-        ) {
+            buffer_transitions
+                .into_iter()
+                .map(|(buffer, state)| (buffer.inner.as_core().id, *state)),
+            texture_transitions
+                .into_iter()
+                .map(|(texture, selector, state)| {
+                    (texture.inner.as_core().id, selector.clone(), *state)
+                }),
+        );
+
+        if let Err(cause) = result {
             self.context.handle_error_nolabel(
                 &self.error_sink,
                 cause,

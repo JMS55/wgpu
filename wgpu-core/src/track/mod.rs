@@ -100,7 +100,7 @@ mod metadata;
 mod range;
 mod ray_tracing;
 mod stateless;
-mod texture;
+pub(crate) mod texture;
 
 use crate::{
     binding_model, command,

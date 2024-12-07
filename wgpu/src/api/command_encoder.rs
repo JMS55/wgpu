@@ -387,8 +387,13 @@ impl CommandEncoder {
     ///
     /// A user wanting to interoperate with the underlying native graphics APIs (Vulkan, DirectX12, Metal, etc) can use this API to generate barriers between wgpu commands and
     /// the native API commands, for synchronization and resource state transition purposes.
-    pub fn transition_resources(&mut self, buffer_transitions: &[()], texture_transitions: &[()]) {
-        self.inner
-            .transition_resources(buffer_transitions, texture_transitions);
+    pub fn transition_resources(
+        &mut self,
+        buffer_transitions: &[(&Buffer, hal::BufferUses)],
+        texture_transitions: &[(&Texture, Option<wgc::TextureSelector>, hal::TextureUses)],
+    ) {
+        if let Some(encoder) = self.inner.as_core_mut_opt() {
+            encoder.transition_resources(buffer_transitions, texture_transitions);
+        }
     }
 }

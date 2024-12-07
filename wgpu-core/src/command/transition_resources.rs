@@ -16,8 +16,8 @@ impl Global {
     pub fn command_encoder_transition_resources(
         &self,
         command_encoder_id: CommandEncoderId,
-        buffer_transitions: &[(BufferId, BufferUses)],
-        texture_transitions: &[(TextureId, Option<TextureSelector>, TextureUses)],
+        buffer_transitions: impl Iterator<Item = (BufferId, BufferUses)>,
+        texture_transitions: impl Iterator<Item = (TextureId, Option<TextureSelector>, TextureUses)>,
     ) -> Result<(), TransitionResourcesError> {
         profiling::scope!("CommandEncoder::transition_resources");
 
@@ -40,22 +40,21 @@ impl Global {
 
         // Process buffer transitions
         for (buffer_id, state) in buffer_transitions {
-            let buffer = hub.buffers.get(*buffer_id).get()?;
+            let buffer = hub.buffers.get(buffer_id).get()?;
             buffer.same_device_as(cmd_buf.as_ref())?;
 
-            usage_scope.buffers.merge_single(&buffer, *state)?;
+            usage_scope.buffers.merge_single(&buffer, state)?;
         }
 
         // Process texture transitions
-
         for (texture_id, selector, state) in texture_transitions {
-            let texture = hub.textures.get(*texture_id).get()?;
+            let texture = hub.textures.get(texture_id).get()?;
             texture.same_device_as(cmd_buf.as_ref())?;
 
             unsafe {
                 usage_scope
                     .textures
-                    .merge_single(&texture, selector.clone(), *state)
+                    .merge_single(&texture, selector.clone(), state)
             }?;
         }
 
