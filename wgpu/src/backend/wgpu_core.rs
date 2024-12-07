@@ -2554,23 +2554,17 @@ impl dispatch::CommandEncoderInterface for CoreCommandEncoder {
 impl CoreCommandEncoder {
     pub fn transition_resources(
         &mut self,
-        buffer_transitions: &[(&crate::Buffer, hal::BufferUses)],
-        texture_transitions: &[(
-            &crate::Texture,
-            Option<wgc::TextureSelector>,
-            hal::TextureUses,
-        )],
+        buffer_transitions: &[crate::BufferTransition<'_>],
+        texture_transitions: &[crate::TextureTransition<'_>],
     ) {
         let result = self.context.0.command_encoder_transition_resources(
             self.id,
             buffer_transitions
                 .iter()
-                .map(|(buffer, state)| (buffer.inner.as_core().id, *state)),
+                .map(|t| (t.buffer.inner.as_core().id, t.state)),
             texture_transitions
                 .iter()
-                .map(|(texture, selector, state)| {
-                    (texture.inner.as_core().id, selector.clone(), *state)
-                }),
+                .map(|t| (t.texture.inner.as_core().id, t.selector.clone(), t.state)),
         );
 
         if let Err(cause) = result {

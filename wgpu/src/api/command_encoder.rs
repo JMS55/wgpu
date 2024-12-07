@@ -365,23 +365,30 @@ impl CommandEncoder {
     /// * CommandBuffer C: Use resources X and Y in a bind group
     ///
     /// At submission time, wgpu will record and insert some new command buffers, resulting in a submission that looks like `queue.submit(&[0, a, 1, b, 2, c])`:
-    /// * CommandBuffer 0: Barrier to transition resource X from bind group access state (from last frame) to attachment state
+    /// * CommandBuffer 0: Barrier to transition resource X from TextureUses::RESOURCE (from last frame) to TextureUses::COLOR_TARGET
     /// * CommandBuffer A: Use resource X as a render pass attachment
-    /// * CommandBuffer 1: Barrier to transition resource Y from bind group access state (from last frame) to attachment state
+    /// * CommandBuffer 1: Barrier to transition resource Y from TextureUses::RESOURCE (from last frame) to TextureUses::COLOR_TARGET
     /// * CommandBuffer B: Use resource Y as a render pass attachment
-    /// * CommandBuffer 2: Barrier to transition resource X and Y from attachment state to bind group access state
+    /// * CommandBuffer 2: Barrier to transition resources X and Y from TextureUses::COLOR_TARGET to TextureUses::RESOURCE
     /// * CommandBuffer C: Use resources X and Y in a bind group
     ///
     /// To prevent this, after profiling their app, an advanced user might choose to instead do `queue.submit(&[a, b, c])`:
     /// * CommandBuffer A:
-    ///     * Use [`CommandEncoder::transition_resources`] to transition resources X and Y from bind group access state (from last frame) to attachment state
+    ///     * Use [`CommandEncoder::transition_resources`] to transition resources X and Y from TextureUses::RESOURCE (from last frame) to TextureUses::COLOR_TARGET
     ///     * Use resource X as a render pass attachment
     /// * CommandBuffer B: Use resource Y as a render pass attachment
     /// * CommandBuffer C:
-    ///     * Use [`CommandEncoder::transition_resources`] to transition resources X and Y from attachment state to bind group access state
+    ///     * Use [`CommandEncoder::transition_resources`] to transition resources X and Y from TextureUses::COLOR_TARGET to TextureUses::RESOURCE
     ///     * Use resources X and Y in a bind group
     ///
-    /// Which is a more optimal barrier placement, and eliminates the extra command buffers that wgpu would otherwise need to generate at submission time.
+    /// At submission time, wgpu will record and insert some new command buffers, resulting in a submission that looks like `queue.submit(&[0, a, b, 1, c])`:
+    /// * CommandBuffer 0: Barrier to transition resources X and Y from TextureUses::RESOURCE (from last frame) to TextureUses::COLOR_TARGET
+    /// * CommandBuffer A: Use resource X as a render pass attachment
+    /// * CommandBuffer B: Use resource Y as a render pass attachment
+    /// * CommandBuffer 1: Barrier to transition resources X and Y from TextureUses::COLOR_TARGET to TextureUses::RESOURCE
+    /// * CommandBuffer C: Use resources X and Y in a bind group
+    ///
+    /// Which eliminates the extra command buffer and barrier between command buffers A and B.
     ///
     /// # Native Interoperability
     ///
@@ -390,11 +397,35 @@ impl CommandEncoder {
     #[cfg(wgpu_core)]
     pub fn transition_resources(
         &mut self,
-        buffer_transitions: &[(&Buffer, hal::BufferUses)],
-        texture_transitions: &[(&Texture, Option<wgc::TextureSelector>, hal::TextureUses)],
+        buffer_transitions: &[BufferTransition<'_>],
+        texture_transitions: &[TextureTransition<'_>],
     ) {
         if let Some(encoder) = self.inner.as_core_mut_opt() {
             encoder.transition_resources(buffer_transitions, texture_transitions);
         }
     }
+}
+
+/// A buffer transition for use with [`CommandEncoder::transition_resources`].
+#[cfg(wgpu_core)]
+#[derive(Debug)]
+pub struct BufferTransition<'a> {
+    /// The buffer to transition.
+    pub buffer: &'a Buffer,
+    /// The new state to transition to.
+    pub state: hal::BufferUses,
+}
+
+/// A texture transition for use with [`CommandEncoder::transition_resources`].
+#[cfg(wgpu_core)]
+#[derive(Debug)]
+pub struct TextureTransition<'a> {
+    /// The texture to transition.
+    pub texture: &'a Texture,
+    /// An optional selector to transition only part of the texture.
+    ///
+    /// If None, the entire texture will be transitioned.
+    pub selector: Option<wgc::TextureSelector>,
+    /// The new state to transition to.
+    pub state: hal::TextureUses,
 }
