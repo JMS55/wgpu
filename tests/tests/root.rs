@@ -49,6 +49,7 @@ mod subgroup_operations;
 mod texture_bounds;
 mod texture_view_creation;
 mod transfer;
+#[cfg(all(feature = "wgc", feature = "hal"))]
 mod transition_resources;
 mod vertex_formats;
 mod vertex_indices;
