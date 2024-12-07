@@ -349,7 +349,7 @@ impl CommandEncoder {
 
     /// Transition resources to an underlying hal resource state.
     ///
-    /// This is an advanced, native-only API (no-op on web) that has two main use cases:
+    /// This is an advanced, native-only API that has two main use cases:
     ///
     /// # Batching Barriers
     ///
@@ -387,6 +387,7 @@ impl CommandEncoder {
     ///
     /// A user wanting to interoperate with the underlying native graphics APIs (Vulkan, DirectX12, Metal, etc) can use this API to generate barriers between wgpu commands and
     /// the native API commands, for synchronization and resource state transition purposes.
+    #[cfg(wgpu_core)]
     pub fn transition_resources(
         &mut self,
         buffer_transitions: &[(&Buffer, hal::BufferUses)],
