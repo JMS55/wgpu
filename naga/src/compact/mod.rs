@@ -63,6 +63,16 @@ pub fn compact(module: &mut crate::Module) {
         }
     }
 
+    for (_, ty) in module.types.iter() {
+        if let crate::TypeInner::Array {
+            size: crate::ArraySize::Pending(crate::PendingArraySize::Expression(size_expr)),
+            ..
+        } = ty.inner
+        {
+            module_tracer.global_expressions_used.insert(size_expr);
+        }
+    }
+
     for e in module.entry_points.iter() {
         if let Some(sizes) = e.workgroup_size_overrides {
             for size in sizes.iter().filter_map(|x| *x) {
