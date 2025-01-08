@@ -59,7 +59,7 @@ impl Global {
         }
 
         // Record any needed barriers based on tracker data
-        let cmd_buf_raw = cmd_buf_data.encoder.open(device)?;
+        let cmd_buf_raw = cmd_buf_data.encoder.open()?;
         CommandBuffer::insert_barriers_from_scope(
             cmd_buf_raw,
             &mut cmd_buf_data.trackers,
