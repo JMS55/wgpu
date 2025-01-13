@@ -2562,12 +2562,22 @@ impl CoreCommandEncoder {
     ) {
         let result = self.context.0.command_encoder_transition_resources(
             self.id,
-            buffer_transitions
-                .iter()
-                .map(|t| (t.buffer.inner.as_core().id, t.state)),
-            texture_transitions
-                .iter()
-                .map(|t| (t.texture.inner.as_core().id, t.selector.clone(), t.state)),
+            buffer_transitions.iter().map(|t| {
+                (
+                    t.buffer.inner.as_core().id,
+                    hal::BufferUses::from_bits(t.state.bits()).unwrap(),
+                )
+            }),
+            texture_transitions.iter().map(|t| {
+                (
+                    t.texture.inner.as_core().id,
+                    t.selector.clone().map(|s| wgc::TextureSelector {
+                        mips: s.mips,
+                        layers: s.layers,
+                    }),
+                    hal::TextureUses::from_bits(t.state.bits()).unwrap(),
+                )
+            }),
         );
 
         if let Err(cause) = result {

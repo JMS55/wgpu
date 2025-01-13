@@ -8,6 +8,8 @@ use crate::{
     *,
 };
 
+use wgt::{BufferUses, TextureSelector, TextureUses};
+
 /// Encodes a series of GPU operations.
 ///
 /// A command encoder can record [`RenderPass`]es, [`ComputePass`]es,
@@ -414,7 +416,7 @@ pub struct BufferTransition<'a> {
     /// The buffer to transition.
     pub buffer: &'a Buffer,
     /// The new state to transition to.
-    pub state: hal::BufferUses,
+    pub state: BufferUses,
 }
 
 /// A texture transition for use with [`CommandEncoder::transition_resources`].
@@ -426,7 +428,7 @@ pub struct TextureTransition<'a> {
     /// An optional selector to transition only part of the texture.
     ///
     /// If None, the entire texture will be transitioned.
-    pub selector: Option<wgc::TextureSelector>,
+    pub selector: Option<TextureSelector>,
     /// The new state to transition to.
-    pub state: hal::TextureUses,
+    pub state: TextureUses,
 }
