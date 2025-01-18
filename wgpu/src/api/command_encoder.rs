@@ -395,12 +395,21 @@ impl CommandEncoder {
     ///
     /// A user wanting to interoperate with the underlying native graphics APIs (Vulkan, DirectX12, Metal, etc) can use this API to generate barriers between wgpu commands and
     /// the native API commands, for synchronization and resource state transition purposes.
-    pub fn transition_resources(
+    pub fn transition_resources<'a>(
         &mut self,
-        buffer_transitions: &[wgt::BufferTransition<&Buffer>],
-        texture_transitions: &[wgt::TextureTransition<&Texture>],
+        buffer_transitions: impl Iterator<Item = wgt::BufferTransition<&'a Buffer>>,
+        texture_transitions: impl Iterator<Item = wgt::TextureTransition<&'a Texture>>,
     ) {
-        self.inner
-            .transition_resources(buffer_transitions, texture_transitions);
+        self.inner.transition_resources(
+            &mut buffer_transitions.map(|t| wgt::BufferTransition {
+                buffer: &t.buffer.inner,
+                state: t.state,
+            }),
+            &mut texture_transitions.map(|t| wgt::TextureTransition {
+                texture: &t.texture.inner,
+                selector: t.selector,
+                state: t.state,
+            }),
+        );
     }
 }

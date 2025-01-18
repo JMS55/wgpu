@@ -355,10 +355,10 @@ pub trait CommandEncoderInterface: CommonTraits {
         tlas: &mut dyn Iterator<Item = &'a crate::TlasPackage>,
     );
 
-    fn transition_resources(
+    fn transition_resources<'a>(
         &mut self,
-        buffer_transitions: &[wgt::BufferTransition<&DispatchBuffer>],
-        texture_transitions: &[wgt::TextureTransition<&DispatchTexture>],
+        buffer_transitions: &mut dyn Iterator<Item = wgt::BufferTransition<&'a DispatchBuffer>>,
+        texture_transitions: &mut dyn Iterator<Item = wgt::TextureTransition<&'a DispatchTexture>>,
     );
 }
 pub trait ComputePassInterface: CommonTraits {

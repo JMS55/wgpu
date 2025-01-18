@@ -3108,10 +3108,10 @@ impl dispatch::CommandEncoderInterface for WebCommandEncoder {
         unimplemented!("Raytracing not implemented for web");
     }
 
-    fn transition_resources(
+    fn transition_resources<'a>(
         &mut self,
-        _buffer_transitions: &[wgt::BufferTransition<&DispatchBuffer>],
-        _texture_transitions: &[wgt::TextureTransition<&DispatchTexture>],
+        _buffer_transitions: &mut dyn Iterator<Item = wgt::BufferTransition<&'a DispatchBuffer>>,
+        _texture_transitions: &mut dyn Iterator<Item = wgt::TextureTransition<&'a DispatchTexture>>,
     ) {
         // no-op
     }

@@ -2553,19 +2553,23 @@ impl dispatch::CommandEncoderInterface for CoreCommandEncoder {
         }
     }
 
-    fn transition_resources(
+    fn transition_resources<'a>(
         &mut self,
-        buffer_transitions: &[wgt::BufferTransition<&crate::Buffer>],
-        texture_transitions: &[wgt::TextureTransition<&crate::Texture>],
+        buffer_transitions: &mut dyn Iterator<
+            Item = wgt::BufferTransition<&'a dispatch::DispatchBuffer>,
+        >,
+        texture_transitions: &mut dyn Iterator<
+            Item = wgt::TextureTransition<&'a dispatch::DispatchTexture>,
+        >,
     ) {
         let result = self.context.0.command_encoder_transition_resources(
             self.id,
-            buffer_transitions.iter().map(|t| wgt::BufferTransition {
-                buffer: t.buffer.inner.as_core().id,
+            buffer_transitions.map(|t| wgt::BufferTransition {
+                buffer: t.buffer.as_core().id,
                 state: t.state,
             }),
-            texture_transitions.iter().map(|t| wgt::TextureTransition {
-                texture: t.texture.inner.as_core().id,
+            texture_transitions.map(|t| wgt::TextureTransition {
+                texture: t.texture.as_core().id,
                 selector: t.selector.clone(),
                 state: t.state,
             }),
