@@ -3106,8 +3106,12 @@ impl dispatch::CommandEncoderInterface for WebCommandEncoder {
 
     fn transition_resources<'a>(
         &mut self,
-        _buffer_transitions: &mut dyn Iterator<Item = wgt::BufferTransition<&'a DispatchBuffer>>,
-        _texture_transitions: &mut dyn Iterator<Item = wgt::TextureTransition<&'a DispatchTexture>>,
+        _buffer_transitions: &mut dyn Iterator<
+            Item = wgt::BufferTransition<&'a dispatch::DispatchBuffer>,
+        >,
+        _texture_transitions: &mut dyn Iterator<
+            Item = wgt::TextureTransition<&'a dispatch::DispatchTexture>,
+        >,
     ) {
         // no-op
     }

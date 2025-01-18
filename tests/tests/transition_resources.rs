@@ -26,12 +26,13 @@ static TRANSITION_RESOURCES: GpuTestConfiguration = GpuTestConfiguration::new().
         .create_command_encoder(&CommandEncoderDescriptor { label: None });
 
     encoder.transition_resources(
-        &[],
-        &[TextureTransition {
+        std::iter::empty(),
+        [TextureTransition {
             texture: &texture,
             selector: None,
             state: TextureUses::COLOR_TARGET,
-        }],
+        }]
+        .into_iter(),
     );
 
     ctx.queue.submit([encoder.finish()]);
