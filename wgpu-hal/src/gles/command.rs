@@ -287,11 +287,7 @@ impl crate::CommandEncoder for super::CommandEncoder {
         }
         for bar in barriers {
             // GLES only synchronizes storage -> anything explicitly
-            if !bar
-                .usage
-                .from
-                .contains(wgt::BufferUses::STORAGE_READ_WRITE)
-            {
+            if !bar.usage.from.contains(wgt::BufferUses::STORAGE_READ_WRITE) {
                 continue;
             }
             self.cmd_buffer
