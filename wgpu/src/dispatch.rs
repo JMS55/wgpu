@@ -354,6 +354,12 @@ pub trait CommandEncoderInterface: CommonTraits {
         blas: &mut dyn Iterator<Item = &'a crate::BlasBuildEntry<'a>>,
         tlas: &mut dyn Iterator<Item = &'a crate::TlasPackage>,
     );
+
+    fn transition_resources(
+        &mut self,
+        buffer_transitions: &[wgt::BufferTransition<&DispatchBuffer>],
+        texture_transitions: &[wgt::TextureTransition<&DispatchTexture>],
+    );
 }
 pub trait ComputePassInterface: CommonTraits {
     fn set_pipeline(&mut self, pipeline: &DispatchComputePipeline);

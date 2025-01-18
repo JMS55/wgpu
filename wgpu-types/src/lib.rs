@@ -5545,6 +5545,15 @@ bitflags::bitflags! {
     }
 }
 
+/// A buffer transition for use with `CommandEncoder::transition_resources`.
+#[derive(Debug)]
+pub struct BufferTransition<T> {
+    /// The buffer to transition.
+    pub buffer: T,
+    /// The new state to transition to.
+    pub state: BufferUses,
+}
+
 /// Describes a [`Buffer`](../wgpu/struct.Buffer.html).
 ///
 /// Corresponds to [WebGPU `GPUBufferDescriptor`](
@@ -5787,6 +5796,28 @@ bitflags::bitflags! {
         /// This is different from UNINITIALIZED as that says the tracker does know, but the texture has not been initialized.
         const UNKNOWN = 1 << 12;
     }
+}
+
+/// A texture transition for use with `CommandEncoder::transition_resources`.
+#[derive(Debug)]
+pub struct TextureTransition<T> {
+    /// The texture to transition.
+    pub texture: T,
+    /// An optional selector to transition only part of the texture.
+    ///
+    /// If None, the entire texture will be transitioned.
+    pub selector: Option<TextureSelector>,
+    /// The new state to transition to.
+    pub state: TextureUses,
+}
+
+/// Specifies a particular set of subresources in a texture.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TextureSelector {
+    /// Range of mips to use.
+    pub mips: Range<u32>,
+    /// Range of layers to use.
+    pub layers: Range<u32>,
 }
 
 /// Defines the capabilities of a given surface and adapter.
@@ -8094,13 +8125,4 @@ pub enum DeviceLostReason {
     Unknown = 0,
     /// After Device::destroy
     Destroyed = 1,
-}
-
-/// Specifies a particular set of subresources in a texture.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct TextureSelector {
-    /// Range of mips to use.
-    pub mips: Range<u32>,
-    /// Range of layers to use.
-    pub layers: Range<u32>,
 }

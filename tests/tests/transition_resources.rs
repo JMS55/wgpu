@@ -1,8 +1,7 @@
-use wgpu::{hal::TextureUses, TextureTransition};
 use wgpu_test::{gpu_test, GpuTestConfiguration};
 use wgt::{
     CommandEncoderDescriptor, Extent3d, TextureDescriptor, TextureDimension, TextureFormat,
-    TextureUsages,
+    TextureTransition, TextureUsages, TextureUses,
 };
 
 #[gpu_test]

@@ -1,4 +1,3 @@
-use hal::{BufferUses, TextureUses};
 use thiserror::Error;
 
 use crate::{
@@ -7,7 +6,7 @@ use crate::{
     global::Global,
     id::{BufferId, CommandEncoderId, TextureId},
     resource::{InvalidResourceError, ParentDevice},
-    track::{ResourceUsageCompatibilityError, TextureSelector},
+    track::ResourceUsageCompatibilityError,
 };
 
 use super::CommandEncoderError;
@@ -16,8 +15,8 @@ impl Global {
     pub fn command_encoder_transition_resources(
         &self,
         command_encoder_id: CommandEncoderId,
-        buffer_transitions: impl Iterator<Item = (BufferId, BufferUses)>,
-        texture_transitions: impl Iterator<Item = (TextureId, Option<TextureSelector>, TextureUses)>,
+        buffer_transitions: impl Iterator<Item = wgt::BufferTransition<BufferId>>,
+        texture_transitions: impl Iterator<Item = wgt::TextureTransition<TextureId>>,
     ) -> Result<(), TransitionResourcesError> {
         profiling::scope!("CommandEncoder::transition_resources");
 
@@ -37,24 +36,31 @@ impl Global {
         let snatch_guard = &device.snatchable_lock.read();
 
         let mut usage_scope = device.new_usage_scope();
+        let indices = &device.tracker_indices;
+        usage_scope.buffers.set_size(indices.buffers.size());
+        usage_scope.textures.set_size(indices.textures.size());
 
         // Process buffer transitions
-        for (buffer_id, state) in buffer_transitions {
-            let buffer = hub.buffers.get(buffer_id).get()?;
+        for buffer_transition in buffer_transitions {
+            let buffer = hub.buffers.get(buffer_transition.buffer).get()?;
             buffer.same_device_as(cmd_buf.as_ref())?;
 
-            usage_scope.buffers.merge_single(&buffer, state)?;
+            usage_scope
+                .buffers
+                .merge_single(&buffer, buffer_transition.state)?;
         }
 
         // Process texture transitions
-        for (texture_id, selector, state) in texture_transitions {
-            let texture = hub.textures.get(texture_id).get()?;
+        for texture_transition in texture_transitions {
+            let texture = hub.textures.get(texture_transition.texture).get()?;
             texture.same_device_as(cmd_buf.as_ref())?;
 
             unsafe {
-                usage_scope
-                    .textures
-                    .merge_single(&texture, selector.clone(), state)
+                usage_scope.textures.merge_single(
+                    &texture,
+                    texture_transition.selector,
+                    texture_transition.state,
+                )
             }?;
         }
 

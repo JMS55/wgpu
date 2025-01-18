@@ -8,8 +8,6 @@ use crate::{
     *,
 };
 
-use wgt::{BufferUses, TextureSelector, TextureUses};
-
 /// Encodes a series of GPU operations.
 ///
 /// A command encoder can record [`RenderPass`]es, [`ComputePass`]es,
@@ -352,7 +350,7 @@ impl CommandEncoder {
 
     /// Transition resources to an underlying hal resource state.
     ///
-    /// This is an advanced, native-only API that has two main use cases:
+    /// This is an advanced, native-only API (no-op on web) that has two main use cases:
     ///
     /// # Batching Barriers
     ///
@@ -397,38 +395,12 @@ impl CommandEncoder {
     ///
     /// A user wanting to interoperate with the underlying native graphics APIs (Vulkan, DirectX12, Metal, etc) can use this API to generate barriers between wgpu commands and
     /// the native API commands, for synchronization and resource state transition purposes.
-    #[cfg(wgpu_core)]
     pub fn transition_resources(
         &mut self,
-        buffer_transitions: &[BufferTransition<'_>],
-        texture_transitions: &[TextureTransition<'_>],
+        buffer_transitions: &[wgt::BufferTransition<&Buffer>],
+        texture_transitions: &[wgt::TextureTransition<&Texture>],
     ) {
-        if let Some(encoder) = self.inner.as_core_mut_opt() {
-            encoder.transition_resources(buffer_transitions, texture_transitions);
-        }
+        self.inner
+            .transition_resources(buffer_transitions, texture_transitions);
     }
-}
-
-/// A buffer transition for use with [`CommandEncoder::transition_resources`].
-#[cfg(wgpu_core)]
-#[derive(Debug)]
-pub struct BufferTransition<'a> {
-    /// The buffer to transition.
-    pub buffer: &'a Buffer,
-    /// The new state to transition to.
-    pub state: BufferUses,
-}
-
-/// A texture transition for use with [`CommandEncoder::transition_resources`].
-#[cfg(wgpu_core)]
-#[derive(Debug)]
-pub struct TextureTransition<'a> {
-    /// The texture to transition.
-    pub texture: &'a Texture,
-    /// An optional selector to transition only part of the texture.
-    ///
-    /// If None, the entire texture will be transitioned.
-    pub selector: Option<TextureSelector>,
-    /// The new state to transition to.
-    pub state: TextureUses,
 }
