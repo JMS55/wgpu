@@ -149,7 +149,7 @@ impl<A: hal::Api> Example<A> {
                 height: window_size.1,
                 depth_or_array_layers: 1,
             },
-            usage: hal::TextureUses::COLOR_TARGET,
+            usage: wgt::TextureUses::COLOR_TARGET,
             view_formats: vec![],
         };
         unsafe {
@@ -288,7 +288,7 @@ impl<A: hal::Api> Example<A> {
         let staging_buffer_desc = hal::BufferDescriptor {
             label: Some("stage"),
             size: texture_data.len() as wgt::BufferAddress,
-            usage: hal::BufferUses::MAP_WRITE | hal::BufferUses::COPY_SRC,
+            usage: wgt::BufferUses::MAP_WRITE | wgt::BufferUses::COPY_SRC,
             memory_flags: hal::MemoryFlags::TRANSIENT | hal::MemoryFlags::PREFER_COHERENT,
         };
         let staging_buffer = unsafe { device.create_buffer(&staging_buffer_desc).unwrap() };
@@ -316,7 +316,7 @@ impl<A: hal::Api> Example<A> {
             sample_count: 1,
             dimension: wgt::TextureDimension::D2,
             format: wgt::TextureFormat::Rgba8UnormSrgb,
-            usage: hal::TextureUses::COPY_DST | hal::TextureUses::RESOURCE,
+            usage: wgt::TextureUses::COPY_DST | wgt::TextureUses::RESOURCE,
             memory_flags: hal::MemoryFlags::empty(),
             view_formats: vec![],
         };
@@ -332,24 +332,24 @@ impl<A: hal::Api> Example<A> {
             let buffer_barrier = hal::BufferBarrier {
                 buffer: &staging_buffer,
                 usage: hal::StateTransition {
-                    from: hal::BufferUses::empty(),
-                    to: hal::BufferUses::COPY_SRC,
+                    from: wgt::BufferUses::empty(),
+                    to: wgt::BufferUses::COPY_SRC,
                 },
             };
             let texture_barrier1 = hal::TextureBarrier {
                 texture: &texture,
                 range: wgt::ImageSubresourceRange::default(),
                 usage: hal::StateTransition {
-                    from: hal::TextureUses::UNINITIALIZED,
-                    to: hal::TextureUses::COPY_DST,
+                    from: wgt::TextureUses::UNINITIALIZED,
+                    to: wgt::TextureUses::COPY_DST,
                 },
             };
             let texture_barrier2 = hal::TextureBarrier {
                 texture: &texture,
                 range: wgt::ImageSubresourceRange::default(),
                 usage: hal::StateTransition {
-                    from: hal::TextureUses::COPY_DST,
-                    to: hal::TextureUses::RESOURCE,
+                    from: wgt::TextureUses::COPY_DST,
+                    to: wgt::TextureUses::RESOURCE,
                 },
             };
             let copy = hal::BufferTextureCopy {
@@ -406,7 +406,7 @@ impl<A: hal::Api> Example<A> {
         let global_buffer_desc = hal::BufferDescriptor {
             label: Some("global"),
             size: size_of::<Globals>() as wgt::BufferAddress,
-            usage: hal::BufferUses::MAP_WRITE | hal::BufferUses::UNIFORM,
+            usage: wgt::BufferUses::MAP_WRITE | wgt::BufferUses::UNIFORM,
             memory_flags: hal::MemoryFlags::PREFER_COHERENT,
         };
         let global_buffer = unsafe {
@@ -431,7 +431,7 @@ impl<A: hal::Api> Example<A> {
         let local_buffer_desc = hal::BufferDescriptor {
             label: Some("local"),
             size: (MAX_BUNNIES as wgt::BufferAddress) * (local_alignment as wgt::BufferAddress),
-            usage: hal::BufferUses::MAP_WRITE | hal::BufferUses::UNIFORM,
+            usage: wgt::BufferUses::MAP_WRITE | wgt::BufferUses::UNIFORM,
             memory_flags: hal::MemoryFlags::PREFER_COHERENT,
         };
         let local_buffer = unsafe { device.create_buffer(&local_buffer_desc).unwrap() };
@@ -440,7 +440,7 @@ impl<A: hal::Api> Example<A> {
             label: None,
             format: texture_desc.format,
             dimension: wgt::TextureViewDimension::D2,
-            usage: hal::TextureUses::RESOURCE,
+            usage: wgt::TextureUses::RESOURCE,
             range: wgt::ImageSubresourceRange::default(),
         };
         let texture_view = unsafe { device.create_texture_view(&texture, &view_desc).unwrap() };
@@ -453,7 +453,7 @@ impl<A: hal::Api> Example<A> {
             };
             let texture_binding = hal::TextureBinding {
                 view: &texture_view,
-                usage: hal::TextureUses::RESOURCE,
+                usage: wgt::TextureUses::RESOURCE,
             };
             let global_group_desc = hal::BindGroupDescriptor {
                 label: Some("global"),
@@ -675,8 +675,8 @@ impl<A: hal::Api> Example<A> {
             texture: surface_tex.borrow(),
             range: wgt::ImageSubresourceRange::default(),
             usage: hal::StateTransition {
-                from: hal::TextureUses::UNINITIALIZED,
-                to: hal::TextureUses::COLOR_TARGET,
+                from: wgt::TextureUses::UNINITIALIZED,
+                to: wgt::TextureUses::COLOR_TARGET,
             },
         };
         unsafe {
@@ -688,7 +688,7 @@ impl<A: hal::Api> Example<A> {
             label: None,
             format: self.surface_format,
             dimension: wgt::TextureViewDimension::D2,
-            usage: hal::TextureUses::COLOR_TARGET,
+            usage: wgt::TextureUses::COLOR_TARGET,
             range: wgt::ImageSubresourceRange::default(),
         };
         let surface_tex_view = unsafe {
@@ -707,7 +707,7 @@ impl<A: hal::Api> Example<A> {
             color_attachments: &[Some(hal::ColorAttachment {
                 target: hal::Attachment {
                     view: &surface_tex_view,
-                    usage: hal::TextureUses::COLOR_TARGET,
+                    usage: wgt::TextureUses::COLOR_TARGET,
                 },
                 resolve_target: None,
                 ops: hal::AttachmentOps::STORE,
@@ -745,8 +745,8 @@ impl<A: hal::Api> Example<A> {
             texture: surface_tex.borrow(),
             range: wgt::ImageSubresourceRange::default(),
             usage: hal::StateTransition {
-                from: hal::TextureUses::COLOR_TARGET,
-                to: hal::TextureUses::PRESENT,
+                from: wgt::TextureUses::COLOR_TARGET,
+                to: wgt::TextureUses::PRESENT,
             },
         };
         unsafe {

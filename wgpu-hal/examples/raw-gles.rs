@@ -290,7 +290,7 @@ fn fill_screen(exposed: &hal::ExposedAdapter<hal::api::Gles>, width: u32, height
                     label: None,
                     format,
                     dimension: wgt::TextureViewDimension::D2,
-                    usage: hal::TextureUses::COLOR_TARGET,
+                    usage: wgt::TextureUses::COLOR_TARGET,
                     range: wgt::ImageSubresourceRange::default(),
                 },
             )
@@ -318,7 +318,7 @@ fn fill_screen(exposed: &hal::ExposedAdapter<hal::api::Gles>, width: u32, height
         color_attachments: &[Some(hal::ColorAttachment {
             target: hal::Attachment {
                 view: &view,
-                usage: hal::TextureUses::COLOR_TARGET,
+                usage: wgt::TextureUses::COLOR_TARGET,
             },
             resolve_target: None,
             ops: hal::AttachmentOps::STORE,

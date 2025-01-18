@@ -404,7 +404,7 @@ impl crate::Device for super::Device {
         desc: &crate::BufferDescriptor,
     ) -> Result<super::Buffer, crate::DeviceError> {
         let mut size = desc.size;
-        if desc.usage.contains(crate::BufferUses::UNIFORM) {
+        if desc.usage.contains(wgt::BufferUses::UNIFORM) {
             let align_mask = Direct3D12::D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT as u64 - 1;
             size = ((size - 1) | align_mask) + 1;
         }
@@ -565,7 +565,7 @@ impl crate::Device for super::Device {
                 texture.resource.clone(),
                 texture.calc_subresource(desc.range.base_mip_level, desc.range.base_array_layer, 0),
             ),
-            handle_srv: if desc.usage.intersects(crate::TextureUses::RESOURCE) {
+            handle_srv: if desc.usage.intersects(wgt::TextureUses::RESOURCE) {
                 match unsafe { view_desc.to_srv() } {
                     Some(raw_desc) => {
                         let handle = self.srv_uav_pool.lock().alloc_handle()?;
@@ -584,9 +584,9 @@ impl crate::Device for super::Device {
                 None
             },
             handle_uav: if desc.usage.intersects(
-                crate::TextureUses::STORAGE_READ_ONLY
-                    | crate::TextureUses::STORAGE_WRITE_ONLY
-                    | crate::TextureUses::STORAGE_READ_WRITE,
+                wgt::TextureUses::STORAGE_READ_ONLY
+                    | wgt::TextureUses::STORAGE_WRITE_ONLY
+                    | wgt::TextureUses::STORAGE_READ_WRITE,
             ) {
                 match unsafe { view_desc.to_uav() } {
                     Some(raw_desc) => {
@@ -606,7 +606,7 @@ impl crate::Device for super::Device {
             } else {
                 None
             },
-            handle_rtv: if desc.usage.intersects(crate::TextureUses::COLOR_TARGET) {
+            handle_rtv: if desc.usage.intersects(wgt::TextureUses::COLOR_TARGET) {
                 let raw_desc = unsafe { view_desc.to_rtv() };
                 let handle = self.rtv_pool.lock().alloc_handle()?;
                 unsafe {
@@ -617,10 +617,7 @@ impl crate::Device for super::Device {
             } else {
                 None
             },
-            handle_dsv_ro: if desc
-                .usage
-                .intersects(crate::TextureUses::DEPTH_STENCIL_READ)
-            {
+            handle_dsv_ro: if desc.usage.intersects(wgt::TextureUses::DEPTH_STENCIL_READ) {
                 let raw_desc = unsafe { view_desc.to_dsv(true) };
                 let handle = self.dsv_pool.lock().alloc_handle()?;
                 unsafe {
@@ -631,10 +628,7 @@ impl crate::Device for super::Device {
             } else {
                 None
             },
-            handle_dsv_rw: if desc
-                .usage
-                .intersects(crate::TextureUses::DEPTH_STENCIL_WRITE)
-            {
+            handle_dsv_rw: if desc.usage.intersects(wgt::TextureUses::DEPTH_STENCIL_WRITE) {
                 let raw_desc = unsafe { view_desc.to_dsv(false) };
                 let handle = self.dsv_pool.lock().alloc_handle()?;
                 unsafe {

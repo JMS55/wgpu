@@ -290,7 +290,7 @@ impl crate::CommandEncoder for super::CommandEncoder {
             if !bar
                 .usage
                 .from
-                .contains(crate::BufferUses::STORAGE_READ_WRITE)
+                .contains(wgt::BufferUses::STORAGE_READ_WRITE)
             {
                 continue;
             }
@@ -311,13 +311,13 @@ impl crate::CommandEncoder for super::CommandEncoder {
             return;
         }
 
-        let mut combined_usage = crate::TextureUses::empty();
+        let mut combined_usage = wgt::TextureUses::empty();
         for bar in barriers {
             // GLES only synchronizes storage -> anything explicitly
             if !bar
                 .usage
                 .from
-                .contains(crate::TextureUses::STORAGE_READ_WRITE)
+                .contains(wgt::TextureUses::STORAGE_READ_WRITE)
             {
                 continue;
             }
@@ -393,7 +393,7 @@ impl crate::CommandEncoder for super::CommandEncoder {
     unsafe fn copy_texture_to_texture<T>(
         &mut self,
         src: &super::Texture,
-        _src_usage: crate::TextureUses,
+        _src_usage: wgt::TextureUses,
         dst: &super::Texture,
         regions: T,
     ) where
@@ -439,7 +439,7 @@ impl crate::CommandEncoder for super::CommandEncoder {
     unsafe fn copy_texture_to_buffer<T>(
         &mut self,
         src: &super::Texture,
-        _src_usage: crate::TextureUses,
+        _src_usage: wgt::TextureUses,
         dst: &super::Buffer,
         regions: T,
     ) where

@@ -120,8 +120,8 @@ pub(crate) use buffer::{
 use metadata::{ResourceMetadata, ResourceMetadataProvider};
 pub(crate) use stateless::StatelessTracker;
 pub(crate) use texture::{
-    DeviceTextureTracker, TextureSelector, TextureTracker, TextureTrackerSetSingle,
-    TextureUsageScope, TextureViewBindGroupState,
+    DeviceTextureTracker, TextureTracker, TextureTrackerSetSingle, TextureUsageScope,
+    TextureViewBindGroupState,
 };
 use wgt::strict_assert_ne;
 
@@ -258,9 +258,9 @@ pub(crate) struct PendingTransition<S: ResourceUses> {
     pub usage: hal::StateTransition<S>,
 }
 
-pub(crate) type PendingTransitionList = Vec<PendingTransition<hal::TextureUses>>;
+pub(crate) type PendingTransitionList = Vec<PendingTransition<wgt::TextureUses>>;
 
-impl PendingTransition<hal::BufferUses> {
+impl PendingTransition<wgt::BufferUses> {
     /// Produce the hal barrier corresponding to the transition.
     pub fn into_hal<'a>(
         self,
@@ -275,15 +275,15 @@ impl PendingTransition<hal::BufferUses> {
     }
 }
 
-impl PendingTransition<hal::TextureUses> {
+impl PendingTransition<wgt::TextureUses> {
     /// Produce the hal barrier corresponding to the transition.
     pub fn into_hal(
         self,
         texture: &dyn hal::DynTexture,
     ) -> hal::TextureBarrier<'_, dyn hal::DynTexture> {
         // These showing up in a barrier is always a bug
-        strict_assert_ne!(self.usage.from, hal::TextureUses::UNKNOWN);
-        strict_assert_ne!(self.usage.to, hal::TextureUses::UNKNOWN);
+        strict_assert_ne!(self.usage.from, wgt::TextureUses::UNKNOWN);
+        strict_assert_ne!(self.usage.to, wgt::TextureUses::UNKNOWN);
 
         let mip_count = self.selector.mips.end - self.selector.mips.start;
         strict_assert_ne!(mip_count, 0);
@@ -343,7 +343,7 @@ pub enum ResourceUsageCompatibilityError {
     #[error("Attempted to use {res} with {invalid_use}.")]
     Buffer {
         res: ResourceErrorIdent,
-        invalid_use: InvalidUse<hal::BufferUses>,
+        invalid_use: InvalidUse<wgt::BufferUses>,
     },
     #[error(
         "Attempted to use {res} (mips {mip_levels:?} layers {array_layers:?}) with {invalid_use}."
@@ -352,15 +352,15 @@ pub enum ResourceUsageCompatibilityError {
         res: ResourceErrorIdent,
         mip_levels: ops::Range<u32>,
         array_layers: ops::Range<u32>,
-        invalid_use: InvalidUse<hal::TextureUses>,
+        invalid_use: InvalidUse<wgt::TextureUses>,
     },
 }
 
 impl ResourceUsageCompatibilityError {
     fn from_buffer(
         buffer: &resource::Buffer,
-        current_state: hal::BufferUses,
-        new_state: hal::BufferUses,
+        current_state: wgt::BufferUses,
+        new_state: wgt::BufferUses,
     ) -> Self {
         Self::Buffer {
             res: buffer.error_ident(),
@@ -373,9 +373,9 @@ impl ResourceUsageCompatibilityError {
 
     fn from_texture(
         texture: &resource::Texture,
-        selector: TextureSelector,
-        current_state: hal::TextureUses,
-        new_state: hal::TextureUses,
+        selector: wgt::TextureSelector,
+        current_state: wgt::TextureUses,
+        new_state: wgt::TextureUses,
     ) -> Self {
         Self::Texture {
             res: texture.error_ident(),

@@ -2566,7 +2566,7 @@ impl dispatch::CommandEncoderInterface for CoreCommandEncoder {
             }),
             texture_transitions.iter().map(|t| wgt::TextureTransition {
                 texture: t.texture.inner.as_core().id,
-                selector: t.selector,
+                selector: t.selector.clone(),
                 state: t.state,
             }),
         );

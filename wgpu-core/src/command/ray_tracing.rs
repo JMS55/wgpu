@@ -20,7 +20,7 @@ use crate::{
 use wgt::{math::align_to, BufferUsages, Features};
 
 use super::CommandBufferMutable;
-use hal::BufferUses;
+use wgt::BufferUses;
 use std::{
     cmp::max,
     num::NonZeroU64,
