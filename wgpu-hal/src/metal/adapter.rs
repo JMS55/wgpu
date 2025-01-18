@@ -109,6 +109,18 @@ impl crate::Adapter for super::Adapter {
             ],
         );
 
+        let image_atomic_if = if pc.msl_version >= MTLLanguageVersion::V3_1 {
+            Tfc::STORAGE_ATOMIC
+        } else {
+            Tfc::empty()
+        };
+
+        let image_64_atomic_if = if pc.int64_atomics {
+            Tfc::STORAGE_ATOMIC
+        } else {
+            Tfc::empty()
+        };
+
         // Metal defined pixel format capabilities
         let all_caps = Tfc::SAMPLED_LINEAR
             | Tfc::STORAGE_WRITE_ONLY
@@ -154,7 +166,11 @@ impl crate::Adapter for super::Adapter {
                 Tfc::STORAGE_WRITE_ONLY | Tfc::COLOR_ATTACHMENT | msaa_count
             }
             Tf::R32Uint | Tf::R32Sint => {
-                read_write_tier1_if | Tfc::STORAGE_WRITE_ONLY | Tfc::COLOR_ATTACHMENT | msaa_count
+                read_write_tier1_if
+                    | Tfc::STORAGE_WRITE_ONLY
+                    | Tfc::COLOR_ATTACHMENT
+                    | msaa_count
+                    | image_atomic_if
             }
             Tf::R32Float => {
                 let flags = if pc.format_r32float_all {
@@ -189,6 +205,12 @@ impl crate::Adapter for super::Adapter {
                 let mut flags = all_caps;
                 flags.set(Tfc::STORAGE_WRITE_ONLY, pc.format_rg11b10_all);
                 flags
+            }
+            Tf::R64Uint => {
+                Tfc::COLOR_ATTACHMENT
+                    | Tfc::STORAGE_WRITE_ONLY
+                    | image_64_atomic_if
+                    | read_write_tier1_if
             }
             Tf::Rg32Uint | Tf::Rg32Sint => {
                 Tfc::COLOR_ATTACHMENT | Tfc::STORAGE_WRITE_ONLY | msaa_count
@@ -918,6 +940,14 @@ impl super::PrivateCapabilities {
             self.int64_atomics && self.msl_version >= MTLLanguageVersion::V2_4,
         );
         features.set(
+            F::TEXTURE_INT64_ATOMIC,
+            self.int64_atomics && self.msl_version >= MTLLanguageVersion::V3_1,
+        );
+        features.set(
+            F::TEXTURE_ATOMIC,
+            self.msl_version >= MTLLanguageVersion::V3_1,
+        );
+        features.set(
             F::SHADER_FLOAT32_ATOMIC,
             self.float_atomics && self.msl_version >= MTLLanguageVersion::V3_0,
         );
@@ -1056,6 +1086,8 @@ impl super::PrivateCapabilities {
             Tf::Rgb10a2Uint => RGB10A2Uint,
             Tf::Rgb10a2Unorm => RGB10A2Unorm,
             Tf::Rg11b10Ufloat => RG11B10Float,
+            // Ruint64 textures are emulated on metal
+            Tf::R64Uint => RG32Uint,
             Tf::Rg32Uint => RG32Uint,
             Tf::Rg32Sint => RG32Sint,
             Tf::Rg32Float => RG32Float,

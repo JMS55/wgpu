@@ -30,9 +30,12 @@ use {
 
 pub mod assertions;
 mod counters;
+mod env;
+pub mod instance;
 pub mod math;
 
 pub use counters::*;
+pub use instance::*;
 
 /// Integral type used for buffer offsets.
 pub type BufferAddress = u64;
@@ -123,6 +126,19 @@ pub enum PowerPreference {
     HighPerformance = 2,
 }
 
+impl PowerPreference {
+    /// Get a power preference from the environment variable `WGPU_POWER_PREF`.
+    pub fn from_env() -> Option<Self> {
+        let env = crate::env::var("WGPU_POWER_PREF")?;
+        match env.to_lowercase().as_str() {
+            "low" => Some(Self::LowPower),
+            "high" => Some(Self::HighPerformance),
+            "none" => Some(Self::None),
+            _ => None,
+        }
+    }
+}
+
 bitflags::bitflags! {
     /// Represents the backends that wgpu will use.
     #[repr(transparent)]
@@ -173,6 +189,60 @@ impl Default for Backends {
 impl From<Backend> for Backends {
     fn from(backend: Backend) -> Self {
         Self::from_bits(1 << backend as u32).unwrap()
+    }
+}
+
+impl Backends {
+    /// Gets a set of backends from the environment variable `WGPU_BACKEND`.
+    ///
+    /// See [`Self::from_comma_list()`] for the format of the string.
+    pub fn from_env() -> Option<Self> {
+        let env = crate::env::var("WGPU_BACKEND")?;
+        Some(Self::from_comma_list(&env))
+    }
+
+    /// Takes the given options, modifies them based on the `WGPU_BACKEND` environment variable, and returns the result.
+    pub fn with_env(&self) -> Self {
+        if let Some(env) = Self::from_env() {
+            env
+        } else {
+            *self
+        }
+    }
+
+    /// Generates a set of backends from a comma separated list of case-insensitive backend names.
+    ///
+    /// Whitespace is stripped, so both 'gl, dx12' and 'gl,dx12' are valid.
+    ///
+    /// Always returns WEBGPU on wasm over webgpu.
+    ///
+    /// Names:
+    /// - vulkan = "vulkan" or "vk"
+    /// - dx12   = "dx12" or "d3d12"
+    /// - metal  = "metal" or "mtl"
+    /// - gles   = "opengl" or "gles" or "gl"
+    /// - webgpu = "webgpu"
+    pub fn from_comma_list(string: &str) -> Self {
+        let mut backends = Self::empty();
+        for backend in string.to_lowercase().split(',') {
+            backends |= match backend.trim() {
+                "vulkan" | "vk" => Self::VULKAN,
+                "dx12" | "d3d12" => Self::DX12,
+                "metal" | "mtl" => Self::METAL,
+                "opengl" | "gles" | "gl" => Self::GL,
+                "webgpu" => Self::BROWSER_WEBGPU,
+                b => {
+                    log::warn!("unknown backend string '{}'", b);
+                    continue;
+                }
+            }
+        }
+
+        if backends.is_empty() {
+            log::warn!("no valid backend strings found!");
+        }
+
+        backends
     }
 }
 
@@ -406,7 +476,7 @@ bitflags::bitflags! {
         /// This is a web and native feature.
         const FLOAT32_FILTERABLE = 1 << 11;
 
-        // Bits 12-19 available for webgpu features. Should you chose to use some of them for
+        // Bits 12-18 available for webgpu features. Should you chose to use some of them for
         // for native features, don't forget to update `all_webgpu_mask` and `all_native_mask`
         // accordingly.
 
@@ -415,6 +485,16 @@ bitflags::bitflags! {
         //
         // Native Features:
         //
+
+        /// Enables R64Uint image atomic min and max.
+        ///
+        /// Supported platforms:
+        /// - Vulkan (with VK_EXT_shader_image_atomic_int64)
+        /// - DX12 (with SM 6.6+)
+        /// - Metal (with MSL 3.1+)
+        ///
+        /// This is a native only feature.
+        const TEXTURE_INT64_ATOMIC = 1 << 18;
 
         /// Allows shaders to use f32 atomic load, store, add, sub, and exchange.
         ///
@@ -811,6 +891,15 @@ bitflags::bitflags! {
         ///
         /// This is a native only feature.
         const VERTEX_ATTRIBUTE_64BIT = 1 << 45;
+        /// Enables image atomic fetch add, and, xor, or, min, and max for R32Uint and R32Sint textures.
+        ///
+        /// Supported platforms:
+        /// - Vulkan
+        /// - DX12
+        /// - Metal (with MSL 3.1+)
+        ///
+        /// This is a native only feature.
+        const TEXTURE_ATOMIC = 1 << 46;
         /// Allows for creation of textures of format [`TextureFormat::NV12`]
         ///
         /// Supported platforms:
@@ -986,7 +1075,7 @@ impl Features {
     /// Mask of all features which are part of the upstream WebGPU standard.
     #[must_use]
     pub const fn all_webgpu_mask() -> Self {
-        Self::from_bits_truncate(0x7FFFF)
+        Self::from_bits_truncate(0x3FFFF)
     }
 
     /// Mask of all features that are only available when targeting native (not web).
@@ -1003,118 +1092,6 @@ impl Features {
             formats.push(VertexFormat::Float32x3);
         }
         formats
-    }
-}
-
-bitflags::bitflags! {
-    /// Instance debugging flags.
-    ///
-    /// These are not part of the webgpu standard.
-    ///
-    /// Defaults to enabling debugging-related flags if the build configuration has `debug_assertions`.
-    #[repr(transparent)]
-    #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
-    pub struct InstanceFlags: u32 {
-        /// Generate debug information in shaders and objects.
-        const DEBUG = 1 << 0;
-        /// Enable validation, if possible.
-        const VALIDATION = 1 << 1;
-        /// Don't pass labels to wgpu-hal.
-        const DISCARD_HAL_LABELS = 1 << 2;
-        /// Whether wgpu should expose adapters that run on top of non-compliant adapters.
-        ///
-        /// Turning this on might mean that some of the functionality provided by the wgpu
-        /// adapter/device is not working or is broken. It could be that all the functionality
-        /// wgpu currently exposes works but we can't tell for sure since we have no additional
-        /// transparency into what is working and what is not on the underlying adapter.
-        ///
-        /// This mainly applies to a Vulkan driver's compliance version. If the major compliance version
-        /// is `0`, then the driver is ignored. This flag allows that driver to be enabled for testing.
-        const ALLOW_UNDERLYING_NONCOMPLIANT_ADAPTER = 1 << 3;
-        /// Enable GPU-based validation. Implies [`Self::VALIDATION`]. Currently, this only changes
-        /// behavior on the DX12 and Vulkan backends.
-        ///
-        /// Supported platforms:
-        ///
-        /// - D3D12; called ["GPU-based validation", or
-        ///   "GBV"](https://web.archive.org/web/20230206120404/https://learn.microsoft.com/en-us/windows/win32/direct3d12/using-d3d12-debug-layer-gpu-based-validation)
-        /// - Vulkan, via the `VK_LAYER_KHRONOS_validation` layer; called ["GPU-Assisted
-        ///   Validation"](https://github.com/KhronosGroup/Vulkan-ValidationLayers/blob/e45aeb85079e0835694cb8f03e6681fd18ae72c9/docs/gpu_validation.md#gpu-assisted-validation)
-        const GPU_BASED_VALIDATION = 1 << 4;
-    }
-}
-
-impl Default for InstanceFlags {
-    fn default() -> Self {
-        Self::from_build_config()
-    }
-}
-
-impl InstanceFlags {
-    /// Enable recommended debugging and validation flags.
-    #[must_use]
-    pub fn debugging() -> Self {
-        InstanceFlags::DEBUG | InstanceFlags::VALIDATION
-    }
-
-    /// Enable advanced debugging and validation flags (potentially very slow).
-    #[must_use]
-    pub fn advanced_debugging() -> Self {
-        Self::debugging() | InstanceFlags::GPU_BASED_VALIDATION
-    }
-
-    /// Infer good defaults from the build type
-    ///
-    /// Returns the default flags and add debugging flags if the build configuration has `debug_assertions`.
-    #[must_use]
-    pub fn from_build_config() -> Self {
-        if cfg!(debug_assertions) {
-            return InstanceFlags::debugging();
-        }
-
-        InstanceFlags::empty()
-    }
-
-    /// Returns this set of flags, affected by environment variables.
-    ///
-    /// The presence of an environment variable implies that the corresponding flag should be set
-    /// unless the value is "0" in which case the flag is unset. If the environment variable is
-    /// not present, then the flag is unaffected.
-    ///
-    /// For example `let flags = InstanceFlags::debugging().with_env();` with `WGPU_VALIDATION=0`
-    /// does not contain `InstanceFlags::VALIDATION`.
-    ///
-    /// The environment variables are named after the flags prefixed with "WGPU_". For example:
-    /// - WGPU_DEBUG
-    /// - WGPU_VALIDATION
-    #[must_use]
-    pub fn with_env(mut self) -> Self {
-        fn env(_key: &str) -> Option<bool> {
-            #[cfg(feature = "std")]
-            return std::env::var(_key).ok().map(|s| match s.as_str() {
-                "0" => false,
-                _ => true,
-            });
-
-            // Without access to std, environment variables are considered unset
-            #[cfg(not(feature = "std"))]
-            return None;
-        }
-
-        if let Some(bit) = env("WGPU_VALIDATION") {
-            self.set(Self::VALIDATION, bit);
-        }
-        if let Some(bit) = env("WGPU_DEBUG") {
-            self.set(Self::DEBUG, bit);
-        }
-        if let Some(bit) = env("WGPU_ALLOW_UNDERLYING_NONCOMPLIANT_ADAPTER") {
-            self.set(Self::ALLOW_UNDERLYING_NONCOMPLIANT_ADAPTER, bit);
-        }
-        if let Some(bit) = env("WGPU_GPU_BASED_VALIDATION") {
-            self.set(Self::GPU_BASED_VALIDATION, bit);
-        }
-
-        self
     }
 }
 
@@ -2424,8 +2401,11 @@ bitflags::bitflags! {
         /// When used as a STORAGE texture, then a texture with this format can be bound with
         /// [`StorageTextureAccess::ReadWrite`].
         const STORAGE_READ_WRITE = 1 << 8;
+        /// When used as a STORAGE texture, then a texture with this format can be bound with
+        /// [`StorageTextureAccess::Atomic`].
+        const STORAGE_ATOMIC = 1 << 9;
         /// If not present, the texture can't be blended into the render target.
-        const BLENDABLE = 1 << 9;
+        const BLENDABLE = 1 << 10;
     }
 }
 
@@ -2615,6 +2595,10 @@ pub enum TextureFormat {
     Rg11b10Ufloat,
 
     // Normal 64 bit formats
+    /// Red channel only. 64 bit integer per channel. Unsigned in shader.
+    ///
+    /// [`Features::TEXTURE_INT64_ATOMIC`] must be enabled to use this texture format.
+    R64Uint,
     /// Red and green channels. 32 bit integer per channel. Unsigned in shader.
     Rg32Uint,
     /// Red and green channels. 32 bit integer per channel. Signed in shader.
@@ -2901,6 +2885,7 @@ impl<'de> Deserialize<'de> for TextureFormat {
                     "rgb10a2uint" => TextureFormat::Rgb10a2Uint,
                     "rgb10a2unorm" => TextureFormat::Rgb10a2Unorm,
                     "rg11b10ufloat" => TextureFormat::Rg11b10Ufloat,
+                    "r64uint" => TextureFormat::R64Uint,
                     "rg32uint" => TextureFormat::Rg32Uint,
                     "rg32sint" => TextureFormat::Rg32Sint,
                     "rg32float" => TextureFormat::Rg32Float,
@@ -3029,6 +3014,7 @@ impl Serialize for TextureFormat {
             TextureFormat::Rgb10a2Uint => "rgb10a2uint",
             TextureFormat::Rgb10a2Unorm => "rgb10a2unorm",
             TextureFormat::Rg11b10Ufloat => "rg11b10ufloat",
+            TextureFormat::R64Uint => "r64uint",
             TextureFormat::Rg32Uint => "rg32uint",
             TextureFormat::Rg32Sint => "rg32sint",
             TextureFormat::Rg32Float => "rg32float",
@@ -3271,6 +3257,7 @@ impl TextureFormat {
             | Self::Rgb10a2Uint
             | Self::Rgb10a2Unorm
             | Self::Rg11b10Ufloat
+            | Self::R64Uint
             | Self::Rg32Uint
             | Self::Rg32Sint
             | Self::Rg32Float
@@ -3394,6 +3381,8 @@ impl TextureFormat {
             | Self::Depth24PlusStencil8
             | Self::Depth32Float => Features::empty(),
 
+            Self::R64Uint => Features::TEXTURE_INT64_ATOMIC,
+
             Self::Depth32FloatStencil8 => Features::DEPTH32FLOAT_STENCIL8,
 
             Self::NV12 => Features::TEXTURE_FORMAT_NV12,
@@ -3458,7 +3447,13 @@ impl TextureFormat {
         let attachment = basic | TextureUsages::RENDER_ATTACHMENT;
         let storage = basic | TextureUsages::STORAGE_BINDING;
         let binding = TextureUsages::TEXTURE_BINDING;
-        let all_flags = TextureUsages::all();
+        let all_flags = attachment | storage | binding;
+        let atomic_64 = if device_features.contains(Features::TEXTURE_ATOMIC) {
+            storage | binding | TextureUsages::STORAGE_ATOMIC
+        } else {
+            storage | binding
+        };
+        let atomic = attachment | atomic_64;
         let rg11b10f = if device_features.contains(Features::RG11B10UFLOAT_RENDERABLE) {
             attachment
         } else {
@@ -3489,8 +3484,8 @@ impl TextureFormat {
             Self::Rg8Snorm =>             (        none,      basic),
             Self::Rg8Uint =>              (        msaa, attachment),
             Self::Rg8Sint =>              (        msaa, attachment),
-            Self::R32Uint =>              (       s_all,  all_flags),
-            Self::R32Sint =>              (       s_all,  all_flags),
+            Self::R32Uint =>              (       s_all,     atomic),
+            Self::R32Sint =>              (       s_all,     atomic),
             Self::R32Float =>             (msaa | s_all,  all_flags),
             Self::Rg16Uint =>             (        msaa, attachment),
             Self::Rg16Sint =>             (        msaa, attachment),
@@ -3505,6 +3500,7 @@ impl TextureFormat {
             Self::Rgb10a2Uint =>          (        msaa, attachment),
             Self::Rgb10a2Unorm =>         (msaa_resolve, attachment),
             Self::Rg11b10Ufloat =>        (        msaa,   rg11b10f),
+            Self::R64Uint =>              (     s_ro_wo,  atomic_64),
             Self::Rg32Uint =>             (     s_ro_wo,  all_flags),
             Self::Rg32Sint =>             (     s_ro_wo,  all_flags),
             Self::Rg32Float =>            (     s_ro_wo,  all_flags),
@@ -3573,6 +3569,10 @@ impl TextureFormat {
 
         flags.set(TextureFormatFeatureFlags::FILTERABLE, is_filterable);
         flags.set(TextureFormatFeatureFlags::BLENDABLE, is_blendable);
+        flags.set(
+            TextureFormatFeatureFlags::STORAGE_ATOMIC,
+            allowed_usages.contains(TextureUsages::STORAGE_ATOMIC),
+        );
 
         TextureFormatFeatures {
             allowed_usages,
@@ -3626,6 +3626,7 @@ impl TextureFormat {
             | Self::Rg16Uint
             | Self::Rgba16Uint
             | Self::R32Uint
+            | Self::R64Uint
             | Self::Rg32Uint
             | Self::Rgba32Uint
             | Self::Rgb10a2Uint => Some(uint),
@@ -3756,7 +3757,7 @@ impl TextureFormat {
             | Self::Rgba16Uint
             | Self::Rgba16Sint
             | Self::Rgba16Float => Some(8),
-            Self::Rg32Uint | Self::Rg32Sint | Self::Rg32Float => Some(8),
+            Self::R64Uint | Self::Rg32Uint | Self::Rg32Sint | Self::Rg32Float => Some(8),
 
             Self::Rgba32Uint | Self::Rgba32Sint | Self::Rgba32Float => Some(16),
 
@@ -3850,6 +3851,7 @@ impl TextureFormat {
             | Self::Rgba16Unorm
             | Self::Rgba16Snorm
             | Self::Rgba16Float
+            | Self::R64Uint
             | Self::Rg32Uint
             | Self::Rg32Sint
             | Self::Rg32Float
@@ -3931,6 +3933,7 @@ impl TextureFormat {
             Self::R32Uint
             | Self::R32Sint
             | Self::R32Float
+            | Self::R64Uint
             | Self::Rg32Uint
             | Self::Rg32Sint
             | Self::Rg32Float
@@ -3999,7 +4002,8 @@ impl TextureFormat {
             | Self::R16Float
             | Self::R32Uint
             | Self::R32Sint
-            | Self::R32Float => 1,
+            | Self::R32Float
+            | Self::R64Uint => 1,
 
             Self::Rg8Unorm
             | Self::Rg8Snorm
@@ -4252,6 +4256,10 @@ fn texture_format_serialize() {
     assert_eq!(
         serde_json::to_string(&TextureFormat::Rg11b10Ufloat).unwrap(),
         "\"rg11b10ufloat\"".to_string()
+    );
+    assert_eq!(
+        serde_json::to_string(&TextureFormat::R64Uint).unwrap(),
+        "\"r64uint\"".to_string()
     );
     assert_eq!(
         serde_json::to_string(&TextureFormat::Rg32Uint).unwrap(),
@@ -4548,6 +4556,10 @@ fn texture_format_deserialize() {
     assert_eq!(
         serde_json::from_str::<TextureFormat>("\"rg11b10ufloat\"").unwrap(),
         TextureFormat::Rg11b10Ufloat
+    );
+    assert_eq!(
+        serde_json::from_str::<TextureFormat>("\"r64uint\"").unwrap(),
+        TextureFormat::R64Uint
     );
     assert_eq!(
         serde_json::from_str::<TextureFormat>("\"rg32uint\"").unwrap(),
@@ -5081,6 +5093,16 @@ pub enum IndexFormat {
     /// Indices are 32 bit unsigned integers.
     #[default]
     Uint32 = 1,
+}
+
+impl IndexFormat {
+    /// Returns the size in bytes of the index format
+    pub fn byte_size(&self) -> usize {
+        match self {
+            IndexFormat::Uint16 => 2,
+            IndexFormat::Uint32 => 4,
+        }
+    }
 }
 
 /// Operation to perform on the stencil value.
@@ -5740,6 +5762,11 @@ bitflags::bitflags! {
     #[cfg_attr(feature = "serde", serde(transparent))]
     #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
     pub struct TextureUsages: u32 {
+        //
+        // ---- Start numbering at 1 << 0 ----
+        //
+        // WebGPU features:
+        //
         /// Allows a texture to be the source in a [`CommandEncoder::copy_texture_to_buffer`] or
         /// [`CommandEncoder::copy_texture_to_texture`] operation.
         const COPY_SRC = 1 << 0;
@@ -5752,6 +5779,14 @@ bitflags::bitflags! {
         const STORAGE_BINDING = 1 << 3;
         /// Allows a texture to be an output attachment of a render pass.
         const RENDER_ATTACHMENT = 1 << 4;
+
+        //
+        // ---- Restart Numbering for Native Features ---
+        //
+        // Native Features:
+        //
+        /// Allows a texture to be used with image atomics. Requires [`Features::TEXTURE_ATOMIC`].
+        const STORAGE_ATOMIC = 1 << 16;
     }
 }
 
@@ -5781,20 +5816,22 @@ bitflags::bitflags! {
         const STORAGE_WRITE_ONLY = 1 << 9;
         /// Read-write storage texture usage.
         const STORAGE_READ_WRITE = 1 << 10;
+        /// Image atomic enabled storage.
+        const STORAGE_ATOMIC = 1 << 11;
         /// The combination of states that a texture may be in _at the same time_.
         const INCLUSIVE = Self::COPY_SRC.bits() | Self::RESOURCE.bits() | Self::DEPTH_STENCIL_READ.bits();
         /// The combination of states that a texture must exclusively be in.
-        const EXCLUSIVE = Self::COPY_DST.bits() | Self::COLOR_TARGET.bits() | Self::DEPTH_STENCIL_WRITE.bits() | Self::STORAGE_READ_ONLY.bits() | Self::STORAGE_WRITE_ONLY.bits() | Self::STORAGE_READ_WRITE.bits() | Self::PRESENT.bits();
+        const EXCLUSIVE = Self::COPY_DST.bits() | Self::COLOR_TARGET.bits() | Self::DEPTH_STENCIL_WRITE.bits() | Self::STORAGE_READ_ONLY.bits() | Self::STORAGE_WRITE_ONLY.bits() | Self::STORAGE_READ_WRITE.bits() | Self::STORAGE_ATOMIC.bits() | Self::PRESENT.bits();
         /// The combination of all usages that the are guaranteed to be be ordered by the hardware.
         /// If a usage is ordered, then if the texture state doesn't change between draw calls, there
         /// are no barriers needed for synchronization.
         const ORDERED = Self::INCLUSIVE.bits() | Self::COLOR_TARGET.bits() | Self::DEPTH_STENCIL_WRITE.bits() | Self::STORAGE_READ_ONLY.bits();
 
         /// Flag used by the wgpu-core texture tracker to say a texture is in different states for every sub-resource
-        const COMPLEX = 1 << 11;
+        const COMPLEX = 1 << 12;
         /// Flag used by the wgpu-core texture tracker to say that the tracker does not know the state of the sub-resource.
         /// This is different from UNINITIALIZED as that says the tracker does know, but the texture has not been initialized.
-        const UNKNOWN = 1 << 12;
+        const UNKNOWN = 1 << 13;
     }
 }
 
@@ -7001,6 +7038,18 @@ pub enum StorageTextureAccess {
     /// layout(set=0, binding=0, r32f) uniform image2D myStorageImage;
     /// ```
     ReadWrite,
+    /// The texture can be both read and written in the shader via atomics and must be annotated
+    /// with `read_write` in WGSL.
+    ///
+    /// [`Features::TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES`] must be enabled to use this access
+    /// mode.  This is a nonstandard, native-only extension.
+    ///
+    /// Example WGSL syntax:
+    /// ```rust,ignore
+    /// @group(0) @binding(0)
+    /// var my_storage_image: texture_storage_2d<r32uint, atomic>;
+    /// ```
+    Atomic,
 }
 
 /// Specific type of a sampler binding.
@@ -7815,84 +7864,6 @@ impl ShaderRuntimeChecks {
 impl Default for ShaderRuntimeChecks {
     fn default() -> Self {
         Self::checked()
-    }
-}
-
-/// Selects which DX12 shader compiler to use.
-///
-/// If the `Dxc` option is selected, but `dxcompiler.dll` and `dxil.dll` files aren't found,
-/// then this will fall back to the Fxc compiler at runtime and log an error.
-///
-/// `wgpu::utils::init::dx12_shader_compiler_from_env` can be used to set the compiler
-/// from the `WGPU_DX12_SHADER_COMPILER` environment variable, but this should only be used for testing.
-#[derive(Clone, Debug, Default)]
-pub enum Dx12Compiler {
-    /// The Fxc compiler (default) is old, slow and unmaintained.
-    ///
-    /// However, it doesn't require any additional .dlls to be shipped with the application.
-    #[default]
-    Fxc,
-    /// The Dxc compiler is new, fast and maintained.
-    ///
-    /// However, it requires both `dxcompiler.dll` and `dxil.dll` to be shipped with the application.
-    /// These files can be downloaded from <https://github.com/microsoft/DirectXShaderCompiler/releases>.
-    ///
-    /// Minimum supported version: [v1.5.2010](https://github.com/microsoft/DirectXShaderCompiler/releases/tag/v1.5.2010)
-    ///
-    /// It also requires WDDM 2.1 (Windows 10 version 1607).
-    DynamicDxc {
-        /// Path to `dxcompiler.dll`.
-        dxc_path: String,
-        /// Path to `dxil.dll`.
-        dxil_path: String,
-    },
-    /// The statically-linked variant of Dxc.
-    ///
-    /// The `static-dxc` feature is required for this setting to be used successfully on DX12.
-    /// Not available on `windows-aarch64-pc-*` targets.
-    StaticDxc,
-}
-
-/// Selects which OpenGL ES 3 minor version to request.
-///
-/// When using ANGLE as an OpenGL ES/EGL implementation, explicitly requesting `Version1` can provide a non-conformant ES 3.1 on APIs like D3D11.
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Hash)]
-pub enum Gles3MinorVersion {
-    /// No explicit minor version is requested, the driver automatically picks the highest available.
-    #[default]
-    Automatic,
-
-    /// Request an ES 3.0 context.
-    Version0,
-
-    /// Request an ES 3.1 context.
-    Version1,
-
-    /// Request an ES 3.2 context.
-    Version2,
-}
-
-/// Options for creating an instance.
-#[derive(Clone, Debug)]
-pub struct InstanceDescriptor {
-    /// Which `Backends` to enable.
-    pub backends: Backends,
-    /// Flags to tune the behavior of the instance.
-    pub flags: InstanceFlags,
-    /// Which DX12 shader compiler to use.
-    pub dx12_shader_compiler: Dx12Compiler,
-    /// Which OpenGL ES 3 minor version to request. Will be ignored if OpenGL is available.
-    pub gles_minor_version: Gles3MinorVersion,
-}
-
-impl Default for InstanceDescriptor {
-    fn default() -> Self {
-        Self {
-            backends: Backends::all(),
-            flags: InstanceFlags::default(),
-            dx12_shader_compiler: Dx12Compiler::default(),
-            gles_minor_version: Gles3MinorVersion::default(),
-        }
     }
 }
 

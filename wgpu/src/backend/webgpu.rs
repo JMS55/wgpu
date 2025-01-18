@@ -1931,6 +1931,10 @@ impl dispatch::DeviceInterface for WebDevice {
                             wgt::StorageTextureAccess::ReadWrite => {
                                 webgpu_sys::GpuStorageTextureAccess::ReadWrite
                             }
+                            wgt::StorageTextureAccess::Atomic => {
+                                // Validated out by `BindGroupLayoutEntryError::StorageTextureAtomic`
+                                unreachable!()
+                            }
                         };
                         let storage_texture = webgpu_sys::GpuStorageTextureBindingLayout::new(
                             map_texture_format(format),
@@ -2740,22 +2744,14 @@ impl Drop for WebTexture {
     }
 }
 
-impl dispatch::BlasInterface for WebBlas {
-    fn destroy(&self) {
-        unimplemented!("Raytracing not implemented for web");
-    }
-}
+impl dispatch::BlasInterface for WebBlas {}
 impl Drop for WebBlas {
     fn drop(&mut self) {
         // no-op
     }
 }
 
-impl dispatch::TlasInterface for WebTlas {
-    fn destroy(&self) {
-        unimplemented!("Raytracing not implemented for web");
-    }
-}
+impl dispatch::TlasInterface for WebTlas {}
 impl Drop for WebTlas {
     fn drop(&mut self) {
         // no-op

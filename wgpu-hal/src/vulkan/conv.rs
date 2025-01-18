@@ -37,6 +37,7 @@ impl super::PrivateCapabilities {
             Tf::Rgb10a2Uint => F::A2B10G10R10_UINT_PACK32,
             Tf::Rgb10a2Unorm => F::A2B10G10R10_UNORM_PACK32,
             Tf::Rg11b10Ufloat => F::B10G11R11_UFLOAT_PACK32,
+            Tf::R64Uint => F::R64_UINT,
             Tf::Rg32Uint => F::R32G32_UINT,
             Tf::Rg32Sint => F::R32G32_SINT,
             Tf::Rg32Float => F::R32G32_SFLOAT,
@@ -217,10 +218,7 @@ impl crate::ColorAttachment<'_, super::TextureView> {
     }
 }
 
-pub fn derive_image_layout(
-    usage: wgt::TextureUses,
-    format: wgt::TextureFormat,
-) -> vk::ImageLayout {
+pub fn derive_image_layout(usage: wgt::TextureUses, format: wgt::TextureFormat) -> vk::ImageLayout {
     // Note: depth textures are always sampled with RODS layout
     let is_color = !format.is_depth_stencil_format();
     match usage {
@@ -229,9 +227,7 @@ pub fn derive_image_layout(
         wgt::TextureUses::COPY_DST => vk::ImageLayout::TRANSFER_DST_OPTIMAL,
         wgt::TextureUses::RESOURCE if is_color => vk::ImageLayout::SHADER_READ_ONLY_OPTIMAL,
         wgt::TextureUses::COLOR_TARGET => vk::ImageLayout::COLOR_ATTACHMENT_OPTIMAL,
-        wgt::TextureUses::DEPTH_STENCIL_WRITE => {
-            vk::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-        }
+        wgt::TextureUses::DEPTH_STENCIL_WRITE => vk::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
         _ => {
             if usage == wgt::TextureUses::PRESENT {
                 vk::ImageLayout::PRESENT_SRC_KHR
@@ -258,15 +254,16 @@ pub fn map_texture_usage(usage: wgt::TextureUses) -> vk::ImageUsageFlags {
     if usage.contains(wgt::TextureUses::COLOR_TARGET) {
         flags |= vk::ImageUsageFlags::COLOR_ATTACHMENT;
     }
-    if usage.intersects(
-        wgt::TextureUses::DEPTH_STENCIL_READ | wgt::TextureUses::DEPTH_STENCIL_WRITE,
-    ) {
+    if usage
+        .intersects(wgt::TextureUses::DEPTH_STENCIL_READ | wgt::TextureUses::DEPTH_STENCIL_WRITE)
+    {
         flags |= vk::ImageUsageFlags::DEPTH_STENCIL_ATTACHMENT;
     }
     if usage.intersects(
         wgt::TextureUses::STORAGE_READ_ONLY
             | wgt::TextureUses::STORAGE_WRITE_ONLY
-            | wgt::TextureUses::STORAGE_READ_WRITE,
+            | wgt::TextureUses::STORAGE_READ_WRITE
+            | wgt::TextureUses::STORAGE_ATOMIC,
     ) {
         flags |= vk::ImageUsageFlags::STORAGE;
     }
@@ -309,15 +306,19 @@ pub fn map_texture_usage_to_barrier(
         access |= vk::AccessFlags::DEPTH_STENCIL_ATTACHMENT_READ
             | vk::AccessFlags::DEPTH_STENCIL_ATTACHMENT_WRITE;
     }
-    if usage
-        .intersects(wgt::TextureUses::STORAGE_READ_ONLY | wgt::TextureUses::STORAGE_READ_WRITE)
-    {
+    if usage.intersects(
+        wgt::TextureUses::STORAGE_READ_ONLY
+            | wgt::TextureUses::STORAGE_READ_WRITE
+            | wgt::TextureUses::STORAGE_ATOMIC,
+    ) {
         stages |= shader_stages;
         access |= vk::AccessFlags::SHADER_READ;
     }
-    if usage
-        .intersects(wgt::TextureUses::STORAGE_WRITE_ONLY | wgt::TextureUses::STORAGE_READ_WRITE)
-    {
+    if usage.intersects(
+        wgt::TextureUses::STORAGE_WRITE_ONLY
+            | wgt::TextureUses::STORAGE_READ_WRITE
+            | wgt::TextureUses::STORAGE_ATOMIC,
+    ) {
         stages |= shader_stages;
         access |= vk::AccessFlags::SHADER_WRITE;
     }
@@ -352,7 +353,8 @@ pub fn map_vk_image_usage(usage: vk::ImageUsageFlags) -> wgt::TextureUses {
     if usage.contains(vk::ImageUsageFlags::STORAGE) {
         bits |= wgt::TextureUses::STORAGE_READ_ONLY
             | wgt::TextureUses::STORAGE_WRITE_ONLY
-            | wgt::TextureUses::STORAGE_READ_WRITE;
+            | wgt::TextureUses::STORAGE_READ_WRITE
+            | wgt::TextureUses::STORAGE_ATOMIC;
     }
     bits
 }

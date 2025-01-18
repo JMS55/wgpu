@@ -1042,38 +1042,8 @@ impl<'source, 'temp> Lowerer<'source, 'temp> {
                         v.ty.map(|ast| self.resolve_ast_type(ast, &mut ctx))
                             .transpose()?;
 
-                    let mut ectx = ctx.as_override();
-
-                    let ty;
-                    let initializer;
-                    match (v.init, explicit_ty) {
-                        (Some(init), Some(explicit_ty)) => {
-                            let init = self.expression_for_abstract(init, &mut ectx)?;
-                            let ty_res = crate::proc::TypeResolution::Handle(explicit_ty);
-                            let init = ectx
-                                .try_automatic_conversions(init, &ty_res, v.name.span)
-                                .map_err(|error| match error {
-                                Error::AutoConversion(e) => Error::InitializationTypeMismatch {
-                                    name: v.name.span,
-                                    expected: e.dest_type,
-                                    got: e.source_type,
-                                },
-                                other => other,
-                            })?;
-                            ty = explicit_ty;
-                            initializer = Some(init);
-                        }
-                        (Some(init), None) => {
-                            let concretized = self.expression(init, &mut ectx)?;
-                            ty = ectx.register_type(concretized)?;
-                            initializer = Some(concretized);
-                        }
-                        (None, Some(explicit_ty)) => {
-                            ty = explicit_ty;
-                            initializer = None;
-                        }
-                        (None, None) => return Err(Error::DeclMissingTypeAndInit(v.name.span)),
-                    }
+                    let (ty, initializer) =
+                        self.type_and_init(v.name, v.init, explicit_ty, &mut ctx.as_override())?;
 
                     let binding = if let Some(ref binding) = v.binding {
                         Some(crate::ResourceBinding {
@@ -1136,17 +1106,13 @@ impl<'source, 'temp> Lowerer<'source, 'temp> {
                         .insert(c.name.name, LoweredGlobalDecl::Const(handle));
                 }
                 ast::GlobalDeclKind::Override(ref o) => {
-                    let init = o
-                        .init
-                        .map(|init| self.expression(init, &mut ctx.as_override()))
-                        .transpose()?;
-                    let inferred_type = init
-                        .map(|init| ctx.as_const().register_type(init))
-                        .transpose()?;
-
                     let explicit_ty =
-                        o.ty.map(|ty| self.resolve_ast_type(ty, &mut ctx))
+                        o.ty.map(|ast| self.resolve_ast_type(ast, &mut ctx))
                             .transpose()?;
+
+                    let mut ectx = ctx.as_override();
+
+                    let (ty, init) = self.type_and_init(o.name, o.init, explicit_ty, &mut ectx)?;
 
                     let id =
                         o.id.map(|id| self.const_u32(id, &mut ctx.as_const()))
@@ -1159,26 +1125,6 @@ impl<'source, 'temp> Lowerer<'source, 'temp> {
                         )
                     } else {
                         None
-                    };
-
-                    let ty = match (explicit_ty, inferred_type) {
-                        (Some(explicit_ty), Some(inferred_type)) => {
-                            if explicit_ty == inferred_type {
-                                explicit_ty
-                            } else {
-                                let gctx = ctx.module.to_ctx();
-                                return Err(Error::InitializationTypeMismatch {
-                                    name: o.name.span,
-                                    expected: explicit_ty.to_wgsl(&gctx).into(),
-                                    got: inferred_type.to_wgsl(&gctx).into(),
-                                });
-                            }
-                        }
-                        (Some(explicit_ty), None) => explicit_ty,
-                        (None, Some(inferred_type)) => inferred_type,
-                        (None, None) => {
-                            return Err(Error::DeclMissingTypeAndInit(o.name.span));
-                        }
                     };
 
                     let handle = ctx.module.overrides.append(
@@ -1231,6 +1177,47 @@ impl<'source, 'temp> Lowerer<'source, 'temp> {
         crate::compact::compact(&mut module);
 
         Ok(module)
+    }
+
+    /// Obtain (inferred) type and initializer after automatic conversion
+    fn type_and_init(
+        &mut self,
+        name: ast::Ident<'source>,
+        init: Option<Handle<ast::Expression<'source>>>,
+        explicit_ty: Option<Handle<crate::Type>>,
+        ectx: &mut ExpressionContext<'source, '_, '_>,
+    ) -> Result<(Handle<crate::Type>, Option<Handle<crate::Expression>>), Error<'source>> {
+        let ty;
+        let initializer;
+        match (init, explicit_ty) {
+            (Some(init), Some(explicit_ty)) => {
+                let init = self.expression_for_abstract(init, ectx)?;
+                let ty_res = crate::proc::TypeResolution::Handle(explicit_ty);
+                let init = ectx
+                    .try_automatic_conversions(init, &ty_res, name.span)
+                    .map_err(|error| match error {
+                        Error::AutoConversion(e) => Error::InitializationTypeMismatch {
+                            name: name.span,
+                            expected: e.dest_type,
+                            got: e.source_type,
+                        },
+                        other => other,
+                    })?;
+                ty = explicit_ty;
+                initializer = Some(init);
+            }
+            (Some(init), None) => {
+                let concretized = self.expression(init, ectx)?;
+                ty = ectx.register_type(concretized)?;
+                initializer = Some(concretized);
+            }
+            (None, Some(explicit_ty)) => {
+                ty = explicit_ty;
+                initializer = None;
+            }
+            (None, None) => return Err(Error::DeclMissingTypeAndInit(name.span)),
+        }
+        Ok((ty, initializer))
     }
 
     fn function(
@@ -2424,6 +2411,50 @@ impl<'source, 'temp> Lowerer<'source, 'temp> {
                                 span,
                             );
                             return Ok(Some(result));
+                        }
+                        "textureAtomicMin" | "textureAtomicMax" | "textureAtomicAdd"
+                        | "textureAtomicAnd" | "textureAtomicOr" | "textureAtomicXor" => {
+                            let mut args = ctx.prepare_args(arguments, 3, span);
+
+                            let image = args.next()?;
+                            let image_span = ctx.ast_expressions.get_span(image);
+                            let image = self.expression(image, ctx)?;
+
+                            let coordinate = self.expression(args.next()?, ctx)?;
+
+                            let (_, arrayed) = ctx.image_data(image, image_span)?;
+                            let array_index = arrayed
+                                .then(|| {
+                                    args.min_args += 1;
+                                    self.expression(args.next()?, ctx)
+                                })
+                                .transpose()?;
+
+                            let value = self.expression(args.next()?, ctx)?;
+
+                            args.finish()?;
+
+                            let rctx = ctx.runtime_expression_ctx(span)?;
+                            rctx.block
+                                .extend(rctx.emitter.finish(&rctx.function.expressions));
+                            rctx.emitter.start(&rctx.function.expressions);
+                            let stmt = crate::Statement::ImageAtomic {
+                                image,
+                                coordinate,
+                                array_index,
+                                fun: match function.name {
+                                    "textureAtomicMin" => crate::AtomicFunction::Min,
+                                    "textureAtomicMax" => crate::AtomicFunction::Max,
+                                    "textureAtomicAdd" => crate::AtomicFunction::Add,
+                                    "textureAtomicAnd" => crate::AtomicFunction::And,
+                                    "textureAtomicOr" => crate::AtomicFunction::InclusiveOr,
+                                    "textureAtomicXor" => crate::AtomicFunction::ExclusiveOr,
+                                    _ => unreachable!(),
+                                },
+                                value,
+                            };
+                            rctx.block.push(stmt, span);
+                            return Ok(None);
                         }
                         "storageBarrier" => {
                             ctx.prepare_args(arguments, 0, span).finish()?;

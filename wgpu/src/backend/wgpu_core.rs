@@ -1465,7 +1465,7 @@ impl dispatch::DeviceInterface for CoreDevice {
             global.device_create_tlas(self.id, &desc.map_label(|l| l.map(Borrowed)), None);
         if let Some(cause) = error {
             self.context
-                .handle_error(&self.error_sink, cause, desc.label, "Device::create_blas");
+                .handle_error(&self.error_sink, cause, desc.label, "Device::create_tlas");
         }
         CoreTlas {
             context: self.context.clone(),
@@ -2004,12 +2004,7 @@ impl Drop for CoreTexture {
     }
 }
 
-impl dispatch::BlasInterface for CoreBlas {
-    fn destroy(&self) {
-        // Per spec, no error to report. Even calling destroy multiple times is valid.
-        let _ = self.context.0.blas_destroy(self.id);
-    }
-}
+impl dispatch::BlasInterface for CoreBlas {}
 
 impl Drop for CoreBlas {
     fn drop(&mut self) {
@@ -2017,12 +2012,7 @@ impl Drop for CoreBlas {
     }
 }
 
-impl dispatch::TlasInterface for CoreTlas {
-    fn destroy(&self) {
-        // Per spec, no error to report. Even calling destroy multiple times is valid.
-        let _ = self.context.0.tlas_destroy(self.id);
-    }
-}
+impl dispatch::TlasInterface for CoreTlas {}
 
 impl Drop for CoreTlas {
     fn drop(&mut self) {
@@ -2457,7 +2447,7 @@ impl dispatch::CommandEncoderInterface for CoreCommandEncoder {
                             transform_buffer_offset: tg.transform_buffer_offset,
                             first_vertex: tg.first_vertex,
                             vertex_stride: tg.vertex_stride,
-                            index_buffer_offset: tg.index_buffer_offset,
+                            first_index: tg.first_index,
                         }
                     });
                     wgc::ray_tracing::BlasGeometries::TriangleGeometries(Box::new(iter))
@@ -2507,7 +2497,7 @@ impl dispatch::CommandEncoderInterface for CoreCommandEncoder {
                             transform_buffer_offset: tg.transform_buffer_offset,
                             first_vertex: tg.first_vertex,
                             vertex_stride: tg.vertex_stride,
-                            index_buffer_offset: tg.index_buffer_offset,
+                            first_index: tg.first_index,
                         }
                     });
                     wgc::ray_tracing::BlasGeometries::TriangleGeometries(Box::new(iter))

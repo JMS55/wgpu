@@ -145,6 +145,10 @@ pub fn map_texture_usage(
         wgt::TextureUses::DEPTH_STENCIL_READ | wgt::TextureUses::DEPTH_STENCIL_WRITE,
         usage.contains(wgt::TextureUsages::RENDER_ATTACHMENT) && !is_color,
     );
+    u.set(
+        wgt::TextureUses::STORAGE_ATOMIC,
+        usage.contains(wgt::TextureUsages::STORAGE_ATOMIC),
+    );
     u
 }
 
@@ -199,6 +203,10 @@ pub fn map_texture_usage_from_hal(uses: wgt::TextureUses) -> wgt::TextureUsages 
     u.set(
         wgt::TextureUsages::RENDER_ATTACHMENT,
         uses.contains(wgt::TextureUses::COLOR_TARGET),
+    );
+    u.set(
+        wgt::TextureUsages::STORAGE_ATOMIC,
+        uses.contains(wgt::TextureUses::STORAGE_ATOMIC),
     );
     u
 }

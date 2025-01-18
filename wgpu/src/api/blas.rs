@@ -33,8 +33,7 @@ static_assertions::assert_impl_all!(CreateBlasDescriptor<'_>: Send, Sync);
 ///
 /// Each one contains:
 /// - A reference to a BLAS, this ***must*** be interacted with using [TlasInstance::new] or [TlasInstance::set_blas], a
-///   TlasInstance that references a BLAS keeps that BLAS from being dropped, but if the BLAS is explicitly destroyed (e.g.
-///   using [Blas::destroy]) the TlasInstance becomes invalid
+///   TlasInstance that references a BLAS keeps that BLAS from being dropped
 /// - A user accessible transformation matrix
 /// - A user accessible mask
 /// - A user accessible custom index
@@ -102,8 +101,8 @@ pub struct BlasTriangleGeometry<'a> {
     pub vertex_stride: wgt::BufferAddress,
     /// Index buffer (optional).
     pub index_buffer: Option<&'a Buffer>,
-    /// Index buffer offset in bytes (optional, required if index buffer is present).
-    pub index_buffer_offset: Option<wgt::BufferAddress>,
+    /// Number of indexes to skip in the index buffer (optional, required if index buffer is present).
+    pub first_index: Option<u32>,
     /// Transform buffer containing 3x4 (rows x columns, row major) affine transform matrices `[f32; 12]` (optional).
     pub transform_buffer: Option<&'a Buffer>,
     /// Transform buffer offset in bytes (optional, required if transform buffer is present).
@@ -147,10 +146,6 @@ impl Blas {
     /// Raw handle to the acceleration structure, used inside raw instance buffers.
     pub fn handle(&self) -> Option<u64> {
         self.handle
-    }
-    /// Destroy the associated native resources as soon as possible.
-    pub fn destroy(&self) {
-        self.inner.destroy();
     }
 }
 
