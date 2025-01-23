@@ -33,20 +33,25 @@ mod sampler;
 
 use std::{
     borrow::Borrow,
-    collections::HashSet,
     ffi::{CStr, CString},
     fmt, mem,
     num::NonZeroU32,
+    ops::DerefMut,
     sync::Arc,
 };
 
 use arrayvec::ArrayVec;
 use ash::{ext, khr, vk};
+use hashbrown::{HashMap, HashSet};
 use parking_lot::{Mutex, RwLock};
+use rustc_hash::FxHasher;
 use wgt::InternalCounter;
 
 const MILLIS_TO_NANOS: u64 = 1_000_000;
 const MAX_TOTAL_ATTACHMENTS: usize = crate::MAX_COLOR_ATTACHMENTS * 2 + 1;
+
+// NOTE: This type alias is similar to rustc_hash::FxHashMap but works with hashbrown.
+type FxHashMap<T, U> = HashMap<T, U, core::hash::BuildHasherDefault<FxHasher>>;
 
 #[derive(Clone, Debug)]
 pub struct Api;
@@ -641,8 +646,8 @@ struct DeviceShared {
     private_caps: PrivateCapabilities,
     workarounds: Workarounds,
     features: wgt::Features,
-    render_passes: Mutex<rustc_hash::FxHashMap<RenderPassKey, vk::RenderPass>>,
-    framebuffers: Mutex<rustc_hash::FxHashMap<FramebufferKey, vk::Framebuffer>>,
+    render_passes: Mutex<FxHashMap<RenderPassKey, vk::RenderPass>>,
+    framebuffers: Mutex<FxHashMap<FramebufferKey, vk::Framebuffer>>,
     sampler_cache: Mutex<sampler::SamplerCache>,
     memory_allocations_counter: InternalCounter,
 }
@@ -761,6 +766,7 @@ pub struct Queue {
     device: Arc<DeviceShared>,
     family_index: u32,
     relay_semaphores: Mutex<RelaySemaphores>,
+    signal_semaphores: Mutex<(Vec<vk::Semaphore>, Vec<u64>)>,
 }
 
 impl Drop for Queue {
@@ -1212,6 +1218,15 @@ impl crate::Queue for Queue {
             signal_values.push(!0);
         }
 
+        let mut guards = self.signal_semaphores.lock();
+        let (ref mut pending_signal_semaphores, ref mut pending_signal_semaphore_values) =
+            guards.deref_mut();
+        assert!(pending_signal_semaphores.len() == pending_signal_semaphore_values.len());
+        if !pending_signal_semaphores.is_empty() {
+            signal_semaphores.append(pending_signal_semaphores);
+            signal_values.append(pending_signal_semaphore_values);
+        }
+
         // In order for submissions to be strictly ordered, we encode a dependency between each submission
         // using a pair of semaphores. This adds a wait if it is needed, and signals the next semaphore.
         let semaphore_state = self.relay_semaphores.lock().advance(&self.device)?;
@@ -1337,6 +1352,19 @@ impl crate::Queue for Queue {
 
     unsafe fn get_timestamp_period(&self) -> f32 {
         self.device.timestamp_period
+    }
+}
+
+impl Queue {
+    pub fn raw_device(&self) -> &ash::Device {
+        &self.device.raw
+    }
+
+    pub fn add_signal_semaphore(&self, semaphore: vk::Semaphore, semaphore_value: Option<u64>) {
+        let mut guards = self.signal_semaphores.lock();
+        let (ref mut semaphores, ref mut semaphore_values) = guards.deref_mut();
+        semaphores.push(semaphore);
+        semaphore_values.push(semaphore_value.unwrap_or(!0));
     }
 }
 

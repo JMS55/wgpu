@@ -30,6 +30,7 @@ use crate::{
 };
 
 use arrayvec::ArrayVec;
+use bitflags::Flags;
 use smallvec::SmallVec;
 use wgt::{
     math::align_to, DeviceLostReason, TextureFormat, TextureSampleType, TextureSelector,
@@ -191,11 +192,11 @@ impl Device {
         raw_device: Box<dyn hal::DynDevice>,
         adapter: &Arc<Adapter>,
         desc: &DeviceDescriptor,
-        trace_path: Option<&std::path::Path>,
+        trace_dir_name: Option<&str>,
         instance_flags: wgt::InstanceFlags,
     ) -> Result<Self, DeviceError> {
         #[cfg(not(feature = "trace"))]
-        if let Some(_) = trace_path {
+        if let Some(_) = trace_dir_name {
             log::error!("Feature 'trace' is not enabled");
         }
         let fence = unsafe { raw_device.create_fence() }.map_err(DeviceError::from_hal)?;
@@ -254,7 +255,7 @@ impl Device {
             #[cfg(feature = "trace")]
             trace: Mutex::new(
                 rank::DEVICE_TRACE,
-                trace_path.and_then(|path| match trace::Trace::new(path) {
+                trace_dir_name.and_then(|dir_path_name| match trace::Trace::new(dir_path_name) {
                     Ok(mut trace) => {
                         trace.add(trace::Action::Init {
                             desc: desc.clone(),
@@ -263,7 +264,7 @@ impl Device {
                         Some(trace)
                     }
                     Err(e) => {
-                        log::error!("Unable to start a trace in '{path:?}': {e}");
+                        log::error!("Unable to start a trace in '{dir_path_name:?}': {e}");
                         None
                     }
                 }),
@@ -493,9 +494,7 @@ impl Device {
             self.require_downlevel_flags(wgt::DownlevelFlags::UNRESTRICTED_INDEX_BUFFER)?;
         }
 
-        if desc.usage.is_empty()
-            || desc.usage | wgt::BufferUsages::all() != wgt::BufferUsages::all()
-        {
+        if desc.usage.is_empty() || desc.usage.contains_unknown_bits() {
             return Err(resource::CreateBufferError::InvalidUsage(desc.usage));
         }
 
@@ -729,9 +728,7 @@ impl Device {
 
         self.check_is_valid()?;
 
-        if desc.usage.is_empty()
-            || desc.usage | wgt::TextureUsages::all() != wgt::TextureUsages::all()
-        {
+        if desc.usage.is_empty() || desc.usage.contains_unknown_bits() {
             return Err(CreateTextureError::InvalidUsage(desc.usage));
         }
 
@@ -1519,9 +1516,9 @@ impl Device {
         };
         for (_, var) in module.global_variables.iter() {
             match var.binding {
-                Some(ref br) if br.group >= self.limits.max_bind_groups => {
+                Some(br) if br.group >= self.limits.max_bind_groups => {
                     return Err(pipeline::CreateShaderModuleError::InvalidGroupIndex {
-                        bind: br.clone(),
+                        bind: br,
                         group: br.group,
                         limit: self.limits.max_bind_groups,
                     });
@@ -1846,7 +1843,7 @@ impl Device {
                     })?;
             }
 
-            if entry.visibility | wgt::ShaderStages::all() != wgt::ShaderStages::all() {
+            if entry.visibility.contains_unknown_bits() {
                 return Err(
                     binding_model::CreateBindGroupLayoutError::InvalidVisibility(entry.visibility),
                 );
@@ -1905,6 +1902,9 @@ impl Device {
         count_validator
             .validate(&self.limits)
             .map_err(binding_model::CreateBindGroupLayoutError::TooManyBindings)?;
+
+        // Validate that binding arrays don't conflict with dynamic offsets.
+        count_validator.validate_binding_arrays()?;
 
         let bgl = BindGroupLayout {
             raw: ManuallyDrop::new(raw),
@@ -2710,8 +2710,8 @@ impl Device {
             .map(|mut bgl_entry_map| {
                 bgl_entry_map.sort();
                 match unique_bind_group_layouts.entry(bgl_entry_map) {
-                    std::collections::hash_map::Entry::Occupied(v) => Ok(Arc::clone(v.get())),
-                    std::collections::hash_map::Entry::Vacant(e) => {
+                    hashbrown::hash_map::Entry::Occupied(v) => Ok(Arc::clone(v.get())),
+                    hashbrown::hash_map::Entry::Vacant(e) => {
                         match self.create_bind_group_layout(
                             &None,
                             e.key().clone(),
@@ -3072,7 +3072,7 @@ impl Device {
             if let Some(cs) = cs.as_ref() {
                 target_specified = true;
                 let error = 'error: {
-                    if cs.write_mask | wgt::ColorWrites::all() != wgt::ColorWrites::all() {
+                    if cs.write_mask.contains_unknown_bits() {
                         break 'error Some(pipeline::ColorStateError::InvalidWriteMask(
                             cs.write_mask,
                         ));
