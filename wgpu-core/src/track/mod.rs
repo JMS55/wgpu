@@ -99,7 +99,7 @@ mod buffer;
 mod metadata;
 mod range;
 mod stateless;
-pub(crate) mod texture;
+mod texture;
 
 use crate::{
     binding_model, command,
