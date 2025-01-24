@@ -1550,7 +1550,7 @@ impl crate::Device for super::Device {
             let buffer_desc = crate::BufferDescriptor {
                 label: None,
                 size: buffer_size,
-                usage: crate::BufferUses::STORAGE_READ_ONLY | crate::BufferUses::MAP_WRITE,
+                usage: wgt::BufferUses::STORAGE_READ_ONLY | wgt::BufferUses::MAP_WRITE,
                 // D3D12 backend doesn't care about the memory flags
                 memory_flags: crate::MemoryFlags::empty(),
             };
