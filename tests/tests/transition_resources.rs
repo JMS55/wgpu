@@ -23,10 +23,10 @@ static TRANSITION_RESOURCES: GpuTestConfiguration = GpuTestConfiguration::new().
 
     encoder.transition_resources(
         std::iter::empty(),
-        [wgpu::wgt::TextureTransition {
+        [wgpu::TextureTransition {
             texture: &texture,
             selector: None,
-            state: wgpu::wgt::TextureUses::COLOR_TARGET,
+            state: wgpu::TextureUses::COLOR_TARGET,
         }]
         .into_iter(),
     );
