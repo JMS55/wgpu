@@ -287,7 +287,7 @@ impl<A: hal::Api> Example<A> {
         let staging_buffer_desc = hal::BufferDescriptor {
             label: Some("stage"),
             size: texture_data.len() as wgpu_types::BufferAddress,
-            usage: hal::wgpu_types::MAP_WRITE | hal::wgpu_types::COPY_SRC,
+            usage: wgpu_types::BufferUses::MAP_WRITE | wgpu_types::BufferUses::COPY_SRC,
             memory_flags: hal::MemoryFlags::TRANSIENT | hal::MemoryFlags::PREFER_COHERENT,
         };
         let staging_buffer = unsafe { device.create_buffer(&staging_buffer_desc).unwrap() };
