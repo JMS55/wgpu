@@ -40,6 +40,42 @@ Bottom level categories:
 
 ## Unreleased
 
+## v27.0.4 (2025-10-23)
+
+This release includes `wgpu-hal` version `27.0.4`. All other crates remain at their previous versions.
+
+### Bug Fixes
+
+#### Vulkan
+
+- Work around extremely poor frame pacing from AMD and Nvidia cards on Windows in `Fifo` and `FifoRelaxed` present modes. This is due to the drivers implicitly using a DXGI (Direct3D) swapchain to implement these modes and it having vastly different timing properties. See https://github.com/gfx-rs/wgpu/issues/8310 and https://github.com/gfx-rs/wgpu/issues/8354 for more information. By @cwfitzgerald in [#8420](https://github.com/gfx-rs/wgpu/pull/8420).
+
+## v27.0.3 (2025-10-22)
+
+This release includes `naga`, `wgpu-core` and `wgpu-hal` version `27.0.3`. All other crates remain at their previous versions.
+
+### Bug Fixes
+
+#### naga
+
+- Fix a bug that resulted in the Metal error `program scope variable must reside in constant address space` in some cases. Backport of [#8311](https://github.com/gfx-rs/wgpu/pull/8311) by @teoxoy.
+
+#### General
+
+- Remove an assertion that causes problems if `CommandEncoder::as_hal_mut` is used. By @andyleiserson in [#8387](https://github.com/gfx-rs/wgpu/pull/8387).
+
+#### DX12
+
+- Align copies b/w textures and buffers via a single intermediate buffer per copy when `D3D12_FEATURE_DATA_D3D12_OPTIONS13.UnrestrictedBufferTextureCopyPitchSupported` is `false`. By @ErichDonGubler in [#7721](https://github.com/gfx-rs/wgpu/pull/7721), backported in [#8374](https://github.com/gfx-rs/wgpu/pull/8374).
+
+## v27.0.2 (2025-10-03)
+
+### Bug Fixes
+
+#### DX12
+
+- Fix device creation failures for devices that do not support mesh shaders. By @vorporeal in [#8297](https://github.com/gfx-rs/wgpu/pull/8297).
+
 ## v27.0.1 (2025-10-02)
 
 ### Bug Fixes
@@ -52,7 +88,7 @@ Bottom level categories:
 
 #### Deferred command buffer actions: `map_buffer_on_submit` and `on_submitted_work_done`
 
-You may schedule buffer mapping and a submission-complete callback to run automatically after you submit, directly from encoders, command buffers, and passes. 
+You may schedule buffer mapping and a submission-complete callback to run automatically after you submit, directly from encoders, command buffers, and passes.
 
 ```rust
 // Record some GPU work so the submission isn't empty and touches `buffer`.
@@ -109,6 +145,7 @@ By @Vecvec in [#7913](https://github.com/gfx-rs/wgpu/pull/7913).
 We have added `Features::EXPERIMENTAL_PRECOMPILED_SHADERS`, replacing existing passthrough types with a unified `CreateShaderModuleDescriptorPassthrough` which allows passing multiple shader codes for different backends. By @SupaMaggie70Incorporated in [#7834](https://github.com/gfx-rs/wgpu/pull/7834)
 
 Difference for SPIR-V passthrough:
+
 ```diff
 - device.create_shader_module_passthrough(wgpu::ShaderModuleDescriptorPassthrough::SpirV(
 -     wgpu::ShaderModuleDescriptorSpirV {
@@ -123,6 +160,7 @@ Difference for SPIR-V passthrough:
 +     ..Default::default()
 })
 ```
+
 This allows using precompiled shaders without manually checking which backend's code to pass, for example if you have shaders precompiled for both DXIL and SPIR-V.
 
 #### Buffer mapping apis no longer have lifetimes
@@ -159,13 +197,13 @@ By @cwfitzgerald in [#8163](https://github.com/gfx-rs/wgpu/pull/8163).
 
 #### Multi-draw indirect is now unconditionally supported when indirect draws are supported
 
-We have removed `Features::MULTI_DRAW_INDIRECT` as it was unconditionally available on all platforms. 
+We have removed `Features::MULTI_DRAW_INDIRECT` as it was unconditionally available on all platforms.
 `RenderPass::multi_draw_indirect` is now available if the device supports downlevel flag `DownlevelFlags::INDIRECT_EXECUTION`.
 
-The `Feature::MULTI_DRAW_INDIRECT_COUNT` feature can be used to determine if multi-draw is supported natively on the device. This is helpful to know if you are using spirv-passthrough and `gl_DrawID` in your shaders.
+If you are using spirv-passthrough with multi-draw indirect and `gl_DrawID`, you can know if `MULTI_DRAW_INDIRECT` is being emulated
+by if the `Feature::MULTI_DRAW_INDIRECT_COUNT` feature is available on the device, this feature cannot be emulated efficicently.
 
 By @cwfitzgerald in [#8162](https://github.com/gfx-rs/wgpu/pull/8162).
-
 
 #### `wgpu::PollType::Wait` has now an optional timeout
 
@@ -196,8 +234,8 @@ Before/after for `wgpu::PollType::WaitForSubmissionIndex`:
 
 ⚠️ Previously, both `wgpu::PollType::WaitForSubmissionIndex` and `wgpu::PollType::Wait` had a hard-coded timeout of 60 seconds.
 
-
 To wait indefinitely on the latest submission, you can also use the `wait_indefinitely` convenience function:
+
 ```rust
 device.poll(wgpu::PollType::wait_indefinitely());
 ```
@@ -419,7 +457,7 @@ By @Vecvec in [#7829](https://github.com/gfx-rs/wgpu/pull/7829).
 #### naga
 
 - naga now infers the correct binding layout when a resource appears only in an assignment to `_`. By @andyleiserson in [#7540](https://github.com/gfx-rs/wgpu/pull/7540).
-- Implement `dot4U8Packed` and `dot4I8Packed` for all backends, using specialized intrinsics on SPIR-V, HSLS, and Metal if available, and polyfills everywhere else. By @robamler in [#7494](https://github.com/gfx-rs/wgpu/pull/7494), [#7574](https://github.com/gfx-rs/wgpu/pull/7574), and [#7653](https://github.com/gfx-rs/wgpu/pull/7653).
+- Implement `dot4U8Packed` and `dot4I8Packed` for all backends, using specialized intrinsics on SPIR-V, HLSL, and Metal if available, and polyfills everywhere else. By @robamler in [#7494](https://github.com/gfx-rs/wgpu/pull/7494), [#7574](https://github.com/gfx-rs/wgpu/pull/7574), and [#7653](https://github.com/gfx-rs/wgpu/pull/7653).
 - Add polyfilled `pack4x{I,U}8Clamped` built-ins to all backends and WGSL frontend. By @ErichDonGubler in [#7546](https://github.com/gfx-rs/wgpu/pull/7546).
 - Allow textureLoad's sample index arg to be unsigned. By @jimblandy in [#7625](https://github.com/gfx-rs/wgpu/pull/7625).
 - Properly convert arguments to atomic operations. By @jimblandy in [#7573](https://github.com/gfx-rs/wgpu/pull/7573).
@@ -3921,7 +3959,7 @@ DeviceDescriptor {
 
 - Explicitly set Vulkan debug message types instead of !empty() by @victorvde in [#2321](https://github.com/gfx-rs/wgpu/pull/2321)
 - Use stencil read/write masks by @kvark in [#2382](https://github.com/gfx-rs/wgpu/pull/2382)
-- Vulkan: correctly set INDEPENDENT_BLEND，make runable on Android 8.x by @jinleili in [#2498](https://github.com/gfx-rs/wgpu/pull/2498)
+- Vulkan: correctly set INDEPENDENT_BLEND，make runnable on Android 8.x by @jinleili in [#2498](https://github.com/gfx-rs/wgpu/pull/2498)
 - Fix ASTC format mapping by @kvark in [#2476](https://github.com/gfx-rs/wgpu/pull/2476)
 - Support flipped Y on VK 1.1 devices by @cwfitzgerald in [#2512](https://github.com/gfx-rs/wgpu/pull/2512)
 - Fixed builtin(primitive_index) for vulkan backend by @kwillemsen in [#2716](https://github.com/gfx-rs/wgpu/pull/2716)
