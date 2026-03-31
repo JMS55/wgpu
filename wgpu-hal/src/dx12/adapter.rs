@@ -1000,6 +1000,7 @@ impl super::Adapter {
                     max_acceleration_structures_per_shader_stage,
                     max_binding_array_acceleration_structure_elements_per_shader_stage:
                         max_acceleration_structures_per_shader_stage,
+                    max_ray_tracing_pipeline_recursion_depth: 0,
                     max_multiview_view_count,
                 }),
                 alignments: crate::Alignments {

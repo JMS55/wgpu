@@ -140,6 +140,10 @@ pub fn features_to_naga_capabilities(
         features.intersects(wgt::Features::EXPERIMENTAL_RAY_HIT_VERTEX_RETURN),
     );
     caps.set(
+        Caps::RAY_TRACING_PIPELINE,
+        features.intersects(wgt::Features::EXPERIMENTAL_RAY_TRACING_PIPELINE),
+    );
+    caps.set(
         Caps::TEXTURE_EXTERNAL,
         features.intersects(wgt::Features::EXTERNAL_TEXTURE),
     );

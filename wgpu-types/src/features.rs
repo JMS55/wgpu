@@ -1046,7 +1046,7 @@ bitflags_array! {
         /// Supported platforms:
         /// - Vulkan
         ///
-        /// This is a native-only feature.
+        /// This is a native only feature.
         #[name("wgpu-ray-query")]
         const EXPERIMENTAL_RAY_QUERY = 1 << 32;
         /// Enables 64-bit floating point types in SPIR-V shaders.
@@ -1069,7 +1069,21 @@ bitflags_array! {
         #[name("wgpu-shader-i16", "shader-i16")]
         const SHADER_I16 = 1 << 34;
 
-        // Bit 35 (formerly SHADER_PRIMITIVE_INDEX) is available.
+        /// ***THIS IS EXPERIMENTAL:*** Features enabled by this may have
+        /// major bugs in it and are expected to be subject to breaking changes, suggestions
+        /// for the API exposed by this should be posted on [the ray-tracing issue](https://github.com/gfx-rs/wgpu/issues/1040)
+        ///
+        /// Allows the use of ray tracing pipelines with dedicated shader stages
+        /// (`@ray_generation`, `@miss`, `@any_hit`, `@closest_hit`) and `trace_rays` dispatch.
+        ///
+        /// Requires [`EXPERIMENTAL_RAY_QUERY`] for acceleration structure support.
+        ///
+        /// Supported platforms:
+        /// - Vulkan (with [`VK_KHR_ray_tracing_pipeline`](https://registry.khronos.org/vulkan/specs/latest/man/html/VK_KHR_ray_tracing_pipeline.html))
+        ///
+        /// This is a native only feature.
+        #[name("wgpu-ray-tracing-pipeline")]
+        const EXPERIMENTAL_RAY_TRACING_PIPELINE = 1 << 35;
 
         /// Allows shaders to use the `early_depth_test` attribute.
         ///
@@ -1813,6 +1827,7 @@ impl Features {
                 | FeaturesWGPU::EXPERIMENTAL_MESH_SHADER_MULTIVIEW.bits()
                 | FeaturesWGPU::EXPERIMENTAL_MESH_SHADER_POINTS.bits()
                 | FeaturesWGPU::EXPERIMENTAL_RAY_QUERY.bits()
+                | FeaturesWGPU::EXPERIMENTAL_RAY_TRACING_PIPELINE.bits()
                 | FeaturesWGPU::EXPERIMENTAL_RAY_HIT_VERTEX_RETURN.bits()
                 | FeaturesWGPU::EXPERIMENTAL_COOPERATIVE_MATRIX.bits(),
             FeaturesWebGPU::empty().bits(),

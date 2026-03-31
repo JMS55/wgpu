@@ -1104,6 +1104,10 @@ pub struct PhysicalDeviceProperties {
     acceleration_structure: Option<vk::PhysicalDeviceAccelerationStructurePropertiesKHR<'static>>,
 
     /// Additional `vk::PhysicalDevice` properties from the
+    /// `VK_KHR_ray_tracing_pipeline` extension.
+    ray_tracing_pipeline: Option<vk::PhysicalDeviceRayTracingPipelinePropertiesKHR<'static>>,
+
+    /// Additional `vk::PhysicalDevice` properties from the
     /// `VK_KHR_driver_properties` extension, promoted to Vulkan 1.2.
     driver: Option<vk::PhysicalDeviceDriverPropertiesKHR<'static>>,
 
@@ -1682,6 +1686,9 @@ impl PhysicalDeviceProperties {
             max_blas_geometry_count,
             max_tlas_instance_count,
             max_acceleration_structures_per_shader_stage,
+            max_ray_tracing_pipeline_recursion_depth: self
+                .ray_tracing_pipeline
+                .map_or(0, |p| p.max_ray_recursion_depth),
 
             max_multiview_view_count,
         })
@@ -1766,6 +1773,8 @@ impl super::InstanceShared {
 
                 let supports_acceleration_structure =
                     capabilities.supports_extension(khr::acceleration_structure::NAME);
+                let supports_ray_tracing_pipeline =
+                    capabilities.supports_extension(khr::ray_tracing_pipeline::NAME);
 
                 let supports_mesh_shader = capabilities.supports_extension(ext::mesh_shader::NAME);
 
@@ -1795,6 +1804,13 @@ impl super::InstanceShared {
                     let next = capabilities
                         .acceleration_structure
                         .insert(vk::PhysicalDeviceAccelerationStructurePropertiesKHR::default());
+                    properties2 = properties2.push_next(next);
+                }
+
+                if supports_ray_tracing_pipeline {
+                    let next = capabilities
+                        .ray_tracing_pipeline
+                        .insert(vk::PhysicalDeviceRayTracingPipelinePropertiesKHR::default());
                     properties2 = properties2.push_next(next);
                 }
 

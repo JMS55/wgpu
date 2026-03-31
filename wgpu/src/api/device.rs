@@ -272,6 +272,18 @@ impl Device {
         ComputePipeline { inner: pipeline }
     }
 
+    /// Creates a [`RayTracingPipeline`].
+    ///
+    /// [`Features::EXPERIMENTAL_RAY_TRACING_PIPELINE`] must be enabled on the device in order to call this function.
+    #[must_use]
+    pub fn create_ray_tracing_pipeline(
+        &self,
+        desc: &RayTracingPipelineDescriptor<'_>,
+    ) -> RayTracingPipeline {
+        let pipeline = self.inner.create_ray_tracing_pipeline(desc);
+        RayTracingPipeline { inner: pipeline }
+    }
+
     /// Creates a [`Buffer`].
     #[must_use]
     pub fn create_buffer(&self, desc: &BufferDescriptor<'_>) -> Buffer {

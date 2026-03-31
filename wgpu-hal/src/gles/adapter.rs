@@ -834,6 +834,7 @@ impl super::Adapter {
             max_blas_geometry_count: 0,
             max_tlas_instance_count: 0,
             max_acceleration_structures_per_shader_stage: 0,
+            max_ray_tracing_pipeline_recursion_depth: 0,
 
             max_multiview_view_count: 0,
         });

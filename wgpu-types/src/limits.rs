@@ -84,6 +84,7 @@ macro_rules! with_limits {
         $macro_name!(max_blas_geometry_count, Ordering::Less);
         $macro_name!(max_tlas_instance_count, Ordering::Less);
         $macro_name!(max_acceleration_structures_per_shader_stage, Ordering::Less);
+        $macro_name!(max_ray_tracing_pipeline_recursion_depth, Ordering::Less);
 
         $macro_name!(max_multiview_view_count, Ordering::Less);
     };
@@ -299,6 +300,11 @@ pub struct Limits {
     /// Requesting more than 0 during device creation only makes sense if [`Features::EXPERIMENTAL_RAY_QUERY`]
     /// is enabled.
     pub max_acceleration_structures_per_shader_stage: u32,
+    /// The maximum ray recursion depth for ray tracing pipelines. A value of 1 means only
+    /// the initial `traceRay` call from the ray generation shader is allowed (no recursive
+    /// tracing from hit/miss shaders). Requesting more than 0 during device creation only
+    /// makes sense if [`Features::EXPERIMENTAL_RAY_TRACING_PIPELINE`] is enabled.
+    pub max_ray_tracing_pipeline_recursion_depth: u32,
 
     /// The maximum number of views that can be used in multiview rendering
     pub max_multiview_view_count: u32,
@@ -368,6 +374,7 @@ impl Limits {
     ///     max_blas_geometry_count: 0,
     ///     max_tlas_instance_count: 0,
     ///     max_acceleration_structures_per_shader_stage: 0,
+    ///     max_ray_tracing_pipeline_recursion_depth: 0,
     ///     max_multiview_view_count: 0,
     /// });
     /// ```
@@ -429,6 +436,7 @@ impl Limits {
             max_blas_geometry_count: 0,
             max_tlas_instance_count: 0,
             max_acceleration_structures_per_shader_stage: 0,
+            max_ray_tracing_pipeline_recursion_depth: 0,
 
             max_multiview_view_count: 0,
         }
@@ -666,6 +674,7 @@ impl Limits {
             max_blas_geometry_count: ALLOC_MAX_U32,
             max_tlas_instance_count: ALLOC_MAX_U32,
             max_acceleration_structures_per_shader_stage: ALLOC_MAX_U32,
+            max_ray_tracing_pipeline_recursion_depth: ALLOC_MAX_U32,
 
             max_multiview_view_count: ALLOC_MAX_U32,
         }
@@ -720,6 +729,27 @@ impl Limits {
             max_blas_primitive_count: other.max_blas_primitive_count,
             max_acceleration_structures_per_shader_stage: other
                 .max_acceleration_structures_per_shader_stage,
+            ..self
+        }
+    }
+
+    /// The minimum guaranteed limits for ray tracing pipelines if you enable
+    /// [`Features::EXPERIMENTAL_RAY_TRACING_PIPELINE`].
+    #[must_use]
+    pub const fn using_minimum_supported_ray_tracing_pipeline_values(self) -> Self {
+        Self {
+            max_ray_tracing_pipeline_recursion_depth: 1, // Vulkan's minimum
+            ..self
+        }
+    }
+
+    /// Modify the current limits to use the ray tracing pipeline limits of `other` (`other` could
+    /// be the limits of the adapter).
+    #[must_use]
+    pub const fn using_ray_tracing_pipeline_values(self, other: Self) -> Self {
+        Self {
+            max_ray_tracing_pipeline_recursion_depth: other
+                .max_ray_tracing_pipeline_recursion_depth,
             ..self
         }
     }
