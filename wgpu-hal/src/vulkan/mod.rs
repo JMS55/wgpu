@@ -92,6 +92,7 @@ impl crate::Api for Api {
     type ShaderModule = ShaderModule;
     type RenderPipeline = RenderPipeline;
     type ComputePipeline = ComputePipeline;
+    type RayTracingPipeline = RayTracingPipeline;
 }
 
 crate::impl_dyn_resource!(
@@ -103,6 +104,7 @@ crate::impl_dyn_resource!(
     CommandBuffer,
     CommandEncoder,
     ComputePipeline,
+    RayTracingPipeline,
     Device,
     Fence,
     Instance,
@@ -304,6 +306,7 @@ struct DeviceExtensionFunctions {
 struct RayTracingDeviceExtensionFunctions {
     acceleration_structure: khr::acceleration_structure::Device,
     buffer_device_address: khr::buffer_device_address::Device,
+    ray_tracing_pipeline: Option<khr::ray_tracing_pipeline::Device>,
 }
 
 /// Set of internal capabilities, which don't show up in the exposed
@@ -1074,6 +1077,13 @@ pub struct ComputePipeline {
 }
 
 impl crate::DynComputePipeline for ComputePipeline {}
+
+#[derive(Debug)]
+pub struct RayTracingPipeline {
+    raw: vk::Pipeline,
+}
+
+impl crate::DynRayTracingPipeline for RayTracingPipeline {}
 
 #[derive(Debug)]
 pub struct PipelineCache {

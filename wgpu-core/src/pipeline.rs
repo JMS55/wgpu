@@ -313,6 +313,128 @@ impl ComputePipeline {
     }
 }
 
+// --- Ray Tracing Pipeline ---
+
+/// Describes a hit group in a ray tracing pipeline.
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct RayTracingHitGroupDescriptor<'a, SM = ShaderModuleId> {
+    /// The closest-hit shader.
+    pub closest_hit: ProgrammableStageDescriptor<'a, SM>,
+    /// An optional any-hit shader.
+    pub any_hit: Option<ProgrammableStageDescriptor<'a, SM>>,
+}
+
+/// cbind   
+pub type ResolvedRayTracingHitGroupDescriptor<'a> =
+    RayTracingHitGroupDescriptor<'a, Arc<ShaderModule>>;
+
+/// Describes a ray tracing pipeline.
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct RayTracingPipelineDescriptor<
+    'a,
+    PLL = PipelineLayoutId,
+    SM = ShaderModuleId,
+    PLC = PipelineCacheId,
+> {
+    pub label: Label<'a>,
+    /// The layout of bind groups for this pipeline.
+    pub layout: Option<PLL>,
+    /// The ray generation shader entry point.
+    pub ray_generation: ProgrammableStageDescriptor<'a, SM>,
+    /// Miss shaders.
+    pub miss: Vec<ProgrammableStageDescriptor<'a, SM>>,
+    /// Hit groups, each containing a closest-hit and optional any-hit shader.
+    pub hit_groups: Vec<RayTracingHitGroupDescriptor<'a, SM>>,
+    /// Maximum ray recursion depth.
+    pub max_recursion_depth: u32,
+    /// The pipeline cache to use when creating this pipeline.
+    pub cache: Option<PLC>,
+}
+
+/// cbindgen:ignore
+pub type ResolvedRayTracingPipelineDescriptor<'a> =
+    RayTracingPipelineDescriptor<'a, Arc<PipelineLayout>, Arc<ShaderModule>, Arc<PipelineCache>>;
+
+#[derive(Clone, Debug, Error)]
+#[non_exhaustive]
+pub enum CreateRayTracingPipelineError {
+    #[error(transparent)]
+    Device(#[from] DeviceError),
+    #[error("Unable to derive an implicit layout")]
+    Implicit(#[from] ImplicitLayoutError),
+    #[error("Error matching shader requirements against the pipeline")]
+    Stage(#[from] validation::StageError),
+    #[error("Internal error: {0}")]
+    Internal(String),
+    #[error("Pipeline constant error: {0}")]
+    PipelineConstants(String),
+    #[error(transparent)]
+    MissingDownlevelFlags(#[from] MissingDownlevelFlags),
+    #[error(transparent)]
+    MissingFeatures(#[from] MissingFeatures),
+    #[error(transparent)]
+    InvalidResource(#[from] InvalidResourceError),
+}
+
+impl WebGpuError for CreateRayTracingPipelineError {
+    fn webgpu_error_type(&self) -> ErrorType {
+        match self {
+            Self::Device(e) => e.webgpu_error_type(),
+            Self::InvalidResource(e) => e.webgpu_error_type(),
+            Self::MissingDownlevelFlags(e) => e.webgpu_error_type(),
+            Self::MissingFeatures(e) => e.webgpu_error_type(),
+            Self::Implicit(e) => e.webgpu_error_type(),
+            Self::Stage(e) => e.webgpu_error_type(),
+            Self::Internal(_) => ErrorType::Internal,
+            Self::PipelineConstants(_) => ErrorType::Validation,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RayTracingPipeline {
+    pub(crate) raw: ManuallyDrop<Box<dyn hal::DynRayTracingPipeline>>,
+    pub(crate) layout: Arc<PipelineLayout>,
+    pub(crate) device: Arc<Device>,
+    pub(crate) _shader_modules: Vec<Arc<ShaderModule>>,
+    pub(crate) late_sized_buffer_groups: ArrayVec<LateSizedBufferGroup, { hal::MAX_BIND_GROUPS }>,
+    /// The `label` from the descriptor used to create the resource.
+    pub(crate) label: String,
+    pub(crate) tracking_data: TrackingData,
+}
+
+impl Drop for RayTracingPipeline {
+    fn drop(&mut self) {
+        resource_log!("Destroy raw {}", self.error_ident());
+        // SAFETY: We are in the Drop impl and we don't use self.raw anymore after this point.
+        let raw = unsafe { ManuallyDrop::take(&mut self.raw) };
+        unsafe {
+            self.device.raw().destroy_ray_tracing_pipeline(raw);
+        }
+    }
+}
+
+crate::impl_resource_type!(RayTracingPipeline);
+crate::impl_labeled!(RayTracingPipeline);
+crate::impl_parent_device!(RayTracingPipeline);
+crate::impl_storage_item!(RayTracingPipeline);
+crate::impl_trackable!(RayTracingPipeline);
+
+impl RayTracingPipeline {
+    pub(crate) fn raw(&self) -> &dyn hal::DynRayTracingPipeline {
+        self.raw.as_ref()
+    }
+
+    pub fn get_bind_group_layout(
+        self: &Arc<Self>,
+        index: u32,
+    ) -> Result<Arc<BindGroupLayout>, GetBindGroupLayoutError> {
+        self.layout.get_bind_group_layout(index)
+    }
+}
+
 #[derive(Clone, Debug, Error)]
 #[non_exhaustive]
 pub enum CreatePipelineCacheError {

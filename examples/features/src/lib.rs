@@ -25,6 +25,7 @@ pub mod ray_cube_normals;
 pub mod ray_scene;
 pub mod ray_shadows;
 pub mod ray_traced_triangle;
+pub mod ray_tracing_pipeline;
 pub mod render_to_texture;
 pub mod render_with_compute;
 pub mod repeated_compute;

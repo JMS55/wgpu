@@ -1259,6 +1259,15 @@ impl crate::CommandEncoder for super::CommandEncoder {
         });
     }
 
+    unsafe fn begin_ray_tracing_pass(
+        &mut self,
+        _desc: &crate::RayTracingPassDescriptor<super::QuerySet>,
+    ) {
+    }
+    unsafe fn end_ray_tracing_pass(&mut self) {}
+    unsafe fn set_ray_tracing_pipeline(&mut self, _pipeline: &super::RayTracingPipeline) {}
+    unsafe fn trace_rays(&mut self, _width: u32, _height: u32, _depth: u32) {}
+
     unsafe fn build_acceleration_structures<'a, T>(
         &mut self,
         _descriptor_count: u32,

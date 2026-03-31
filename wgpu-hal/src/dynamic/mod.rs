@@ -115,6 +115,7 @@ pub trait DynFence: DynResource + fmt::Debug {}
 pub trait DynPipelineCache: DynResource + fmt::Debug {}
 pub trait DynPipelineLayout: DynResource + fmt::Debug {}
 pub trait DynQuerySet: DynResource + fmt::Debug {}
+pub trait DynRayTracingPipeline: DynResource + fmt::Debug {}
 pub trait DynRenderPipeline: DynResource + fmt::Debug {}
 pub trait DynSampler: DynResource + fmt::Debug {}
 pub trait DynShaderModule: DynResource + fmt::Debug {}

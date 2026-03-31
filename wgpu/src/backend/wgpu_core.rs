@@ -574,6 +574,19 @@ pub struct CoreRenderPipeline {
 }
 
 #[derive(Debug)]
+pub struct CoreRayTracingPipeline {
+    pub(crate) context: ContextWgpuCore,
+    id: wgc::id::RayTracingPipelineId,
+    error_sink: ErrorSink,
+}
+
+#[derive(Debug)]
+pub struct CoreRayTracingPass {
+    context: ContextWgpuCore,
+    id: crate::cmp::Identifier,
+}
+
+#[derive(Debug)]
 pub struct CoreComputePass {
     pub(crate) context: ContextWgpuCore,
     pass: wgc::command::ComputePass,
@@ -759,6 +772,8 @@ crate::cmp::impl_eq_ord_hash_proxy!(CoreQuerySet => .id);
 crate::cmp::impl_eq_ord_hash_proxy!(CorePipelineLayout => .id);
 crate::cmp::impl_eq_ord_hash_proxy!(CoreRenderPipeline => .id);
 crate::cmp::impl_eq_ord_hash_proxy!(CoreComputePipeline => .id);
+crate::cmp::impl_eq_ord_hash_proxy!(CoreRayTracingPipeline => .id);
+crate::cmp::impl_eq_ord_hash_proxy!(CoreRayTracingPass => .id);
 crate::cmp::impl_eq_ord_hash_proxy!(CorePipelineCache => .id);
 crate::cmp::impl_eq_ord_hash_proxy!(CoreCommandEncoder => .id);
 crate::cmp::impl_eq_ord_hash_proxy!(CoreComputePass => .id);
@@ -1567,6 +1582,67 @@ impl dispatch::DeviceInterface for CoreDevice {
             );
         }
         CoreComputePipeline {
+            context: self.context.clone(),
+            id,
+            error_sink: Arc::clone(&self.error_sink),
+        }
+        .into()
+    }
+
+    fn create_ray_tracing_pipeline(
+        &self,
+        desc: &crate::RayTracingPipelineDescriptor<'_>,
+    ) -> dispatch::DispatchRayTracingPipeline {
+        use wgc::pipeline as pipe;
+
+        macro_rules! map_stage {
+            ($stage:expr) => {{
+                let s = $stage;
+                let constants = s
+                    .compilation_options
+                    .constants
+                    .iter()
+                    .map(|&(key, value)| (String::from(key), value))
+                    .collect();
+                pipe::ProgrammableStageDescriptor {
+                    module: s.module.inner.as_core().id,
+                    entry_point: s.entry_point.map(Borrowed),
+                    constants,
+                    zero_initialize_workgroup_memory: false,
+                }
+            }};
+        }
+
+        let descriptor = pipe::RayTracingPipelineDescriptor {
+            label: desc.label.map(Borrowed),
+            layout: desc.layout.map(|pll| pll.inner.as_core().id),
+            ray_generation: map_stage!(&desc.ray_generation),
+            miss: desc.miss.iter().map(|m| map_stage!(m)).collect(),
+            hit_groups: desc
+                .hit_groups
+                .iter()
+                .map(|hg| pipe::RayTracingHitGroupDescriptor {
+                    closest_hit: map_stage!(&hg.closest_hit),
+                    any_hit: hg.any_hit.as_ref().map(|ah| map_stage!(ah)),
+                })
+                .collect(),
+            max_recursion_depth: desc.max_recursion_depth,
+            cache: desc.cache.map(|cache| cache.inner.as_core().id),
+        };
+
+        let (id, error) =
+            self.context
+                .0
+                .device_create_ray_tracing_pipeline(self.id, &descriptor, None);
+        if let Some(cause) = error {
+            self.context.handle_error(
+                &self.error_sink,
+                cause,
+                desc.label,
+                "Device::create_ray_tracing_pipeline",
+            );
+        }
+        CoreRayTracingPipeline {
             context: self.context.clone(),
             id,
             error_sink: Arc::clone(&self.error_sink),
@@ -2447,6 +2523,60 @@ impl Drop for CoreComputePipeline {
     }
 }
 
+impl dispatch::RayTracingPipelineInterface for CoreRayTracingPipeline {
+    fn get_bind_group_layout(&self, index: u32) -> dispatch::DispatchBindGroupLayout {
+        let (id, error) = self
+            .context
+            .0
+            .ray_tracing_pipeline_get_bind_group_layout(self.id, index, None);
+        if let Some(err) = error {
+            self.context.handle_error_nolabel(
+                &self.error_sink,
+                err,
+                "RayTracingPipeline::get_bind_group_layout",
+            )
+        }
+        CoreBindGroupLayout {
+            context: self.context.clone(),
+            id,
+        }
+        .into()
+    }
+}
+
+impl Drop for CoreRayTracingPipeline {
+    fn drop(&mut self) {
+        self.context.0.ray_tracing_pipeline_drop(self.id)
+    }
+}
+
+impl dispatch::RayTracingPassInterface for CoreRayTracingPass {
+    fn set_pipeline(&mut self, _pipeline: &dispatch::DispatchRayTracingPipeline) {
+        // TODO: Wire to wgpu-core ray tracing pass command recording.
+    }
+    fn set_bind_group(
+        &mut self,
+        _index: u32,
+        _bind_group: Option<&dispatch::DispatchBindGroup>,
+        _offsets: &[crate::DynamicOffset],
+    ) {
+    }
+    fn set_immediates(&mut self, _offset: u32, _data: &[u8]) {}
+    fn insert_debug_marker(&mut self, _label: &str) {}
+    fn push_debug_group(&mut self, _group_label: &str) {}
+    fn pop_debug_group(&mut self) {}
+    fn write_timestamp(&mut self, _query_set: &dispatch::DispatchQuerySet, _query_index: u32) {}
+    fn trace_rays(&mut self, _width: u32, _height: u32, _depth: u32) {
+        // TODO: Wire to wgpu-core ray tracing pass command recording + dispatch.
+    }
+}
+
+impl Drop for CoreRayTracingPass {
+    fn drop(&mut self) {
+        // TODO: End the ray tracing pass when wgpu-core pass is implemented.
+    }
+}
+
 impl dispatch::PipelineCacheInterface for CorePipelineCache {
     fn get_data(&self) -> Option<Vec<u8>> {
         self.context.0.pipeline_cache_get_data(self.id)
@@ -2647,6 +2777,18 @@ impl dispatch::CommandEncoderInterface for CoreCommandEncoder {
             context: self.context.clone(),
             pass,
             error_sink: self.error_sink.clone(),
+            id: crate::cmp::Identifier::create(),
+        }
+        .into()
+    }
+
+    fn begin_ray_tracing_pass(
+        &self,
+        _desc: &crate::RayTracingPassDescriptor<'_>,
+    ) -> dispatch::DispatchRayTracingPass {
+        // TODO: Wire to wgpu-core RayTracingPass once command recording is implemented.
+        CoreRayTracingPass {
+            context: self.context.clone(),
             id: crate::cmp::Identifier::create(),
         }
         .into()

@@ -1355,6 +1355,33 @@ impl crate::CommandEncoder for super::CommandEncoder {
         }
     }
 
+    unsafe fn begin_ray_tracing_pass(
+        &mut self,
+        desc: &crate::RayTracingPassDescriptor<super::QuerySet>,
+    ) {
+        if let Some(ref tw) = desc.timestamp_writes {
+            if let Some(index) = tw.beginning_of_pass_write_index {
+                unsafe { self.write_timestamp(tw.query_set, index) };
+            }
+        }
+    }
+
+    unsafe fn end_ray_tracing_pass(&mut self) {}
+
+    unsafe fn set_ray_tracing_pipeline(&mut self, pipeline: &super::RayTracingPipeline) {
+        unsafe {
+            self.device.raw.cmd_bind_pipeline(
+                self.active,
+                vk::PipelineBindPoint::RAY_TRACING_KHR,
+                pipeline.raw,
+            )
+        };
+    }
+
+    unsafe fn trace_rays(&mut self, _width: u32, _height: u32, _depth: u32) {
+        // TODO: Implement once SBT (Shader Binding Table) is built.
+    }
+
     unsafe fn copy_acceleration_structure_to_acceleration_structure(
         &mut self,
         src: &super::AccelerationStructure,

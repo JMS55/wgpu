@@ -1,4 +1,6 @@
-use alloc::{borrow::ToOwned as _, collections::BTreeMap, ffi::CString, sync::Arc, vec::Vec};
+use alloc::{
+    borrow::ToOwned as _, collections::BTreeMap, ffi::CString, string::String, sync::Arc, vec::Vec,
+};
 use core::{
     ffi::CStr,
     mem::{self, MaybeUninit},
@@ -2144,6 +2146,152 @@ impl crate::Device for super::Device {
         unsafe { self.shared.raw.destroy_pipeline(pipeline.raw, None) };
 
         self.counters.compute_pipelines.sub(1);
+    }
+
+    unsafe fn create_ray_tracing_pipeline(
+        &self,
+        desc: &crate::RayTracingPipelineDescriptor<
+            super::PipelineLayout,
+            super::ShaderModule,
+            super::PipelineCache,
+        >,
+    ) -> Result<super::RayTracingPipeline, crate::PipelineError> {
+        let ray_tracing_fns = self
+            .shared
+            .extension_fns
+            .ray_tracing
+            .as_ref()
+            .expect("Feature `RAY_TRACING` not enabled");
+        let rt_pipeline_fn =
+            ray_tracing_fns
+                .ray_tracing_pipeline
+                .as_ref()
+                .ok_or(crate::PipelineError::Linkage(
+                    wgt::ShaderStages::empty(),
+                    String::from("VK_KHR_ray_tracing_pipeline extension not loaded"),
+                ))?;
+
+        let mut stages = Vec::new();
+        let mut groups = Vec::new();
+        let mut temp_raw_modules = Vec::new();
+
+        // Ray generation (GENERAL group)
+        let raygen_compiled = self.compile_stage(
+            &desc.ray_generation,
+            naga::ShaderStage::RayGeneration,
+            &desc.layout.binding_map,
+        )?;
+        stages.push(raygen_compiled.create_info);
+        if let Some(raw_module) = raygen_compiled.temp_raw_module {
+            temp_raw_modules.push(raw_module);
+        }
+        groups.push(
+            vk::RayTracingShaderGroupCreateInfoKHR::default()
+                .ty(vk::RayTracingShaderGroupTypeKHR::GENERAL)
+                .general_shader(0)
+                .closest_hit_shader(vk::SHADER_UNUSED_KHR)
+                .any_hit_shader(vk::SHADER_UNUSED_KHR)
+                .intersection_shader(vk::SHADER_UNUSED_KHR),
+        );
+
+        // Miss shaders (GENERAL groups)
+        for miss_stage in desc.miss {
+            let idx = stages.len() as u32;
+            let compiled = self.compile_stage(
+                miss_stage,
+                naga::ShaderStage::Miss,
+                &desc.layout.binding_map,
+            )?;
+            stages.push(compiled.create_info);
+            if let Some(raw_module) = compiled.temp_raw_module {
+                temp_raw_modules.push(raw_module);
+            }
+            groups.push(
+                vk::RayTracingShaderGroupCreateInfoKHR::default()
+                    .ty(vk::RayTracingShaderGroupTypeKHR::GENERAL)
+                    .general_shader(idx)
+                    .closest_hit_shader(vk::SHADER_UNUSED_KHR)
+                    .any_hit_shader(vk::SHADER_UNUSED_KHR)
+                    .intersection_shader(vk::SHADER_UNUSED_KHR),
+            );
+        }
+
+        // Hit groups (TRIANGLES_HIT_GROUP)
+        for hit_group in desc.hit_groups {
+            let closest_hit_idx = stages.len() as u32;
+            let compiled = self.compile_stage(
+                &hit_group.closest_hit,
+                naga::ShaderStage::ClosestHit,
+                &desc.layout.binding_map,
+            )?;
+            stages.push(compiled.create_info);
+            if let Some(raw_module) = compiled.temp_raw_module {
+                temp_raw_modules.push(raw_module);
+            }
+
+            let any_hit_idx = if let Some(ref any_hit) = hit_group.any_hit {
+                let idx = stages.len() as u32;
+                let compiled = self.compile_stage(
+                    any_hit,
+                    naga::ShaderStage::AnyHit,
+                    &desc.layout.binding_map,
+                )?;
+                stages.push(compiled.create_info);
+                if let Some(raw_module) = compiled.temp_raw_module {
+                    temp_raw_modules.push(raw_module);
+                }
+                idx
+            } else {
+                vk::SHADER_UNUSED_KHR
+            };
+
+            groups.push(
+                vk::RayTracingShaderGroupCreateInfoKHR::default()
+                    .ty(vk::RayTracingShaderGroupTypeKHR::TRIANGLES_HIT_GROUP)
+                    .general_shader(vk::SHADER_UNUSED_KHR)
+                    .closest_hit_shader(closest_hit_idx)
+                    .any_hit_shader(any_hit_idx)
+                    .intersection_shader(vk::SHADER_UNUSED_KHR),
+            );
+        }
+
+        let pipeline_cache = desc
+            .cache
+            .map(|it| it.raw)
+            .unwrap_or(vk::PipelineCache::null());
+
+        let create_info = vk::RayTracingPipelineCreateInfoKHR::default()
+            .stages(&stages)
+            .groups(&groups)
+            .max_pipeline_ray_recursion_depth(desc.max_recursion_depth)
+            .layout(desc.layout.raw);
+
+        let raw = {
+            profiling::scope!("vkCreateRayTracingPipelinesKHR");
+            unsafe {
+                rt_pipeline_fn.create_ray_tracing_pipelines(
+                    vk::DeferredOperationKHR::null(),
+                    pipeline_cache,
+                    core::slice::from_ref(&create_info),
+                    None,
+                )
+            }
+            .map_err(|(_, e)| super::map_pipeline_err(e))?[0]
+        };
+
+        if let Some(label) = desc.label {
+            unsafe { self.shared.set_object_name(raw, label) };
+        }
+
+        for raw_module in temp_raw_modules {
+            unsafe { self.shared.raw.destroy_shader_module(raw_module, None) };
+        }
+
+        Ok(super::RayTracingPipeline { raw })
+    }
+
+    unsafe fn destroy_ray_tracing_pipeline(&self, pipeline: super::RayTracingPipeline) {
+        unsafe { self.shared.raw.destroy_pipeline(pipeline.raw, None) };
     }
 
     unsafe fn create_pipeline_cache(

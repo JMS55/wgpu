@@ -3961,6 +3961,240 @@ impl Device {
         Ok(pipeline)
     }
 
+    pub fn create_ray_tracing_pipeline(
+        self: &Arc<Self>,
+        desc: pipeline::ResolvedRayTracingPipelineDescriptor,
+    ) -> Result<Arc<pipeline::RayTracingPipeline>, pipeline::CreateRayTracingPipelineError> {
+        self.check_is_valid()?;
+
+        self.require_features(wgt::Features::EXPERIMENTAL_RAY_TRACING_PIPELINE)?;
+
+        let is_auto_layout = desc.layout.is_none();
+
+        // Validate all shader modules belong to this device.
+        desc.ray_generation.module.same_device(self)?;
+        for miss in &desc.miss {
+            miss.module.same_device(self)?;
+        }
+        for hg in &desc.hit_groups {
+            hg.closest_hit.module.same_device(self)?;
+            if let Some(ref any_hit) = hg.any_hit {
+                any_hit.module.same_device(self)?;
+            }
+        }
+
+        // Get the pipeline layout from the desc if it is provided.
+        let pipeline_layout = match desc.layout {
+            Some(pipeline_layout) => {
+                pipeline_layout.same_device(self)?;
+                Some(pipeline_layout)
+            }
+            None => None,
+        };
+
+        let mut binding_layout_source = match pipeline_layout {
+            Some(pipeline_layout) => validation::BindingLayoutSource::Provided(pipeline_layout),
+            None => validation::BindingLayoutSource::new_derived(&self.limits),
+        };
+        let mut shader_binding_sizes = FastHashMap::default();
+        let io = validation::StageIo::default();
+
+        // Helper to validate a single stage.
+        let validate_stage =
+            |module: &Arc<pipeline::ShaderModule>,
+             stage_desc: &pipeline::ResolvedProgrammableStageDescriptor,
+             naga_stage: naga::ShaderStage,
+             binding_layout_source: &mut validation::BindingLayoutSource,
+             shader_binding_sizes: &mut FastHashMap<naga::ResourceBinding, wgt::BufferSize>|
+             -> Result<String, pipeline::CreateRayTracingPipelineError> {
+                let name = module.finalize_entry_point_name(
+                    naga_stage,
+                    stage_desc.entry_point.as_ref().map(|ep| ep.as_ref()),
+                )?;
+                if let Some(ref interface) = module.interface {
+                    let _ = interface.check_stage(
+                        binding_layout_source,
+                        shader_binding_sizes,
+                        &name,
+                        validation::ShaderStageForValidation::from_naga(naga_stage),
+                        io.clone(),
+                    )?;
+                }
+                Ok(name)
+            };
+
+        // Validate all stages.
+        let mut shader_modules: Vec<Arc<pipeline::ShaderModule>> = Vec::new();
+
+        let raygen_entry_point = validate_stage(
+            &desc.ray_generation.module,
+            &desc.ray_generation,
+            naga::ShaderStage::RayGeneration,
+            &mut binding_layout_source,
+            &mut shader_binding_sizes,
+        )?;
+        shader_modules.push(desc.ray_generation.module.clone());
+
+        let mut miss_entry_points = Vec::new();
+        for miss in &desc.miss {
+            let name = validate_stage(
+                &miss.module,
+                miss,
+                naga::ShaderStage::Miss,
+                &mut binding_layout_source,
+                &mut shader_binding_sizes,
+            )?;
+            miss_entry_points.push(name);
+            shader_modules.push(miss.module.clone());
+        }
+
+        let mut closest_hit_entry_points = Vec::new();
+        let mut any_hit_entry_points = Vec::new();
+        for hg in &desc.hit_groups {
+            let name = validate_stage(
+                &hg.closest_hit.module,
+                &hg.closest_hit,
+                naga::ShaderStage::ClosestHit,
+                &mut binding_layout_source,
+                &mut shader_binding_sizes,
+            )?;
+            closest_hit_entry_points.push(name);
+            shader_modules.push(hg.closest_hit.module.clone());
+
+            if let Some(ref any_hit) = hg.any_hit {
+                let name = validate_stage(
+                    &any_hit.module,
+                    any_hit,
+                    naga::ShaderStage::AnyHit,
+                    &mut binding_layout_source,
+                    &mut shader_binding_sizes,
+                )?;
+                any_hit_entry_points.push(Some(name));
+                shader_modules.push(any_hit.module.clone());
+            } else {
+                any_hit_entry_points.push(None);
+            }
+        }
+
+        let pipeline_layout = match binding_layout_source {
+            validation::BindingLayoutSource::Provided(pipeline_layout) => pipeline_layout,
+            validation::BindingLayoutSource::Derived(entries) => {
+                self.create_derived_pipeline_layout(entries)?
+            }
+        };
+
+        let late_sized_buffer_groups =
+            Device::make_late_sized_buffer_groups(&shader_binding_sizes, &pipeline_layout);
+
+        let cache = match desc.cache {
+            Some(cache) => {
+                cache.same_device(self)?;
+                Some(cache)
+            }
+            None => None,
+        };
+
+        // Build HAL descriptor.
+        let hal_raygen = hal::ProgrammableStage {
+            module: desc.ray_generation.module.raw(),
+            entry_point: raygen_entry_point.as_ref(),
+            constants: &desc.ray_generation.constants,
+            zero_initialize_workgroup_memory: false,
+        };
+
+        let hal_miss: Vec<_> = desc
+            .miss
+            .iter()
+            .zip(&miss_entry_points)
+            .map(|(stage, name)| hal::ProgrammableStage {
+                module: stage.module.raw(),
+                entry_point: name.as_ref(),
+                constants: &stage.constants,
+                zero_initialize_workgroup_memory: false,
+            })
+            .collect();
+
+        let hal_hit_groups: Vec<_> = desc
+            .hit_groups
+            .iter()
+            .zip(&closest_hit_entry_points)
+            .zip(&any_hit_entry_points)
+            .map(|((hg, ch_name), ah_name)| hal::RayTracingHitGroup {
+                closest_hit: hal::ProgrammableStage {
+                    module: hg.closest_hit.module.raw(),
+                    entry_point: ch_name.as_ref(),
+                    constants: &hg.closest_hit.constants,
+                    zero_initialize_workgroup_memory: false,
+                },
+                any_hit: hg.any_hit.as_ref().map(|ah| hal::ProgrammableStage {
+                    module: ah.module.raw(),
+                    entry_point: ah_name.as_ref().unwrap().as_ref(),
+                    constants: &ah.constants,
+                    zero_initialize_workgroup_memory: false,
+                }),
+            })
+            .collect();
+
+        let pipeline_desc = hal::RayTracingPipelineDescriptor {
+            label: desc.label.to_hal(self.instance_flags),
+            layout: pipeline_layout.raw(),
+            ray_generation: hal_raygen,
+            miss: &hal_miss,
+            hit_groups: &hal_hit_groups,
+            max_recursion_depth: desc.max_recursion_depth,
+            cache: cache.as_ref().map(|it| it.raw()),
+        };
+
+        let raw =
+            unsafe { self.raw().create_ray_tracing_pipeline(&pipeline_desc) }.map_err(|err| {
+                match err {
+                    hal::PipelineError::Device(error) => {
+                        pipeline::CreateRayTracingPipelineError::Device(
+                            self.handle_hal_error(error),
+                        )
+                    }
+                    hal::PipelineError::Linkage(_stages, msg) => {
+                        pipeline::CreateRayTracingPipelineError::Internal(msg)
+                    }
+                    hal::PipelineError::EntryPoint(_stage) => {
+                        pipeline::CreateRayTracingPipelineError::Internal(
+                            ENTRYPOINT_FAILURE_ERROR.to_string(),
+                        )
+                    }
+                    hal::PipelineError::PipelineConstants(_stages, msg) => {
+                        pipeline::CreateRayTracingPipelineError::PipelineConstants(msg)
+                    }
+                }
+            })?;
+
+        let pipeline = pipeline::RayTracingPipeline {
+            raw: ManuallyDrop::new(raw),
+            layout: pipeline_layout,
+            device: self.clone(),
+            _shader_modules: shader_modules,
+            late_sized_buffer_groups,
+            label: desc.label.to_string(),
+            tracking_data: TrackingData::new(self.tracker_indices.ray_tracing_pipelines.clone()),
+        };
+
+        let pipeline = Arc::new(pipeline);
+
+        if is_auto_layout {
+            for bgl in pipeline.layout.bind_group_layouts.iter() {
+                let Some(bgl) = bgl else {
+                    continue;
+                };
+                let _ = bgl
+                    .exclusive_pipeline
+                    .set(binding_model::ExclusivePipeline::RayTracing(
+                        Arc::downgrade(&pipeline),
+                    ));
+            }
+        }
+
+        Ok(pipeline)
+    }
+
     pub fn create_render_pipeline(
         self: &Arc<Self>,
         desc: pipeline::ResolvedGeneralRenderPipelineDescriptor,

@@ -5,13 +5,14 @@ use crate::{
     AccelerationStructureBarrier, Api, Attachment, BufferBarrier, BufferBinding, BufferCopy,
     BufferTextureCopy, BuildAccelerationStructureDescriptor, ColorAttachment, CommandEncoder,
     ComputePassDescriptor, DepthStencilAttachment, DeviceError, Label, MemoryRange,
-    PassTimestampWrites, Rect, RenderPassDescriptor, TextureBarrier, TextureCopy,
+    PassTimestampWrites, RayTracingPassDescriptor, Rect, RenderPassDescriptor, TextureBarrier,
+    TextureCopy,
 };
 
 use super::{
     DynAccelerationStructure, DynBindGroup, DynBuffer, DynCommandBuffer, DynComputePipeline,
-    DynPipelineLayout, DynQuerySet, DynRenderPipeline, DynResource, DynResourceExt as _,
-    DynTexture, DynTextureView,
+    DynPipelineLayout, DynQuerySet, DynRayTracingPipeline, DynRenderPipeline, DynResource,
+    DynResourceExt as _, DynTexture, DynTextureView,
 };
 
 pub trait DynCommandEncoder: DynResource + core::fmt::Debug {
@@ -185,6 +186,11 @@ pub trait DynCommandEncoder: DynResource + core::fmt::Debug {
 
     unsafe fn dispatch(&mut self, count: [u32; 3]);
     unsafe fn dispatch_indirect(&mut self, buffer: &dyn DynBuffer, offset: wgt::BufferAddress);
+
+    unsafe fn begin_ray_tracing_pass(&mut self, desc: &RayTracingPassDescriptor<dyn DynQuerySet>);
+    unsafe fn end_ray_tracing_pass(&mut self);
+    unsafe fn set_ray_tracing_pipeline(&mut self, pipeline: &dyn DynRayTracingPipeline);
+    unsafe fn trace_rays(&mut self, width: u32, height: u32, depth: u32);
 
     unsafe fn build_acceleration_structures<'a>(
         &mut self,
@@ -613,6 +619,30 @@ impl<C: CommandEncoder + DynResource> DynCommandEncoder for C {
     unsafe fn dispatch_indirect(&mut self, buffer: &dyn DynBuffer, offset: wgt::BufferAddress) {
         let buffer = buffer.expect_downcast_ref();
         unsafe { C::dispatch_indirect(self, buffer, offset) };
+    }
+
+    unsafe fn begin_ray_tracing_pass(&mut self, desc: &RayTracingPassDescriptor<dyn DynQuerySet>) {
+        let desc = RayTracingPassDescriptor {
+            label: desc.label,
+            timestamp_writes: desc
+                .timestamp_writes
+                .as_ref()
+                .map(|writes| writes.expect_downcast()),
+        };
+        unsafe { C::begin_ray_tracing_pass(self, &desc) };
+    }
+
+    unsafe fn end_ray_tracing_pass(&mut self) {
+        unsafe { C::end_ray_tracing_pass(self) };
+    }
+
+    unsafe fn set_ray_tracing_pipeline(&mut self, pipeline: &dyn DynRayTracingPipeline) {
+        let pipeline = pipeline.expect_downcast_ref();
+        unsafe { C::set_ray_tracing_pipeline(self, pipeline) };
+    }
+
+    unsafe fn trace_rays(&mut self, width: u32, height: u32, depth: u32) {
+        unsafe { C::trace_rays(self, width, height, depth) };
     }
 
     unsafe fn set_render_pipeline(&mut self, pipeline: &dyn DynRenderPipeline) {

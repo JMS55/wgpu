@@ -1935,9 +1935,33 @@ pub enum ShaderStageForValidation {
     },
     Compute,
     Task,
+    RayGeneration,
+    Miss,
+    ClosestHit,
+    AnyHit,
 }
 
 impl ShaderStageForValidation {
+    pub fn from_naga(stage: naga::ShaderStage) -> Self {
+        match stage {
+            naga::ShaderStage::Vertex => Self::Vertex {
+                topology: wgt::PrimitiveTopology::TriangleList,
+                compare_function: None,
+            },
+            naga::ShaderStage::Fragment => Self::Fragment {
+                dual_source_blending: false,
+                has_depth_attachment: false,
+            },
+            naga::ShaderStage::Compute => Self::Compute,
+            naga::ShaderStage::Task => Self::Task,
+            naga::ShaderStage::Mesh => Self::Mesh,
+            naga::ShaderStage::RayGeneration => Self::RayGeneration,
+            naga::ShaderStage::Miss => Self::Miss,
+            naga::ShaderStage::ClosestHit => Self::ClosestHit,
+            naga::ShaderStage::AnyHit => Self::AnyHit,
+        }
+    }
+
     pub fn to_naga(&self) -> naga::ShaderStage {
         match self {
             Self::Vertex { .. } => naga::ShaderStage::Vertex,
@@ -1945,6 +1969,10 @@ impl ShaderStageForValidation {
             Self::Fragment { .. } => naga::ShaderStage::Fragment,
             Self::Compute => naga::ShaderStage::Compute,
             Self::Task => naga::ShaderStage::Task,
+            Self::RayGeneration => naga::ShaderStage::RayGeneration,
+            Self::Miss => naga::ShaderStage::Miss,
+            Self::ClosestHit => naga::ShaderStage::ClosestHit,
+            Self::AnyHit => naga::ShaderStage::AnyHit,
         }
     }
 
@@ -1955,6 +1983,10 @@ impl ShaderStageForValidation {
             Self::Fragment { .. } => wgt::ShaderStages::FRAGMENT,
             Self::Compute => wgt::ShaderStages::COMPUTE,
             Self::Task => wgt::ShaderStages::TASK,
+            Self::RayGeneration => wgt::ShaderStages::RAY_GENERATION,
+            Self::Miss => wgt::ShaderStages::MISS,
+            Self::ClosestHit => wgt::ShaderStages::CLOSEST_HIT,
+            Self::AnyHit => wgt::ShaderStages::ANY_HIT,
         }
     }
 }

@@ -1775,6 +1775,169 @@ impl Global {
         }
     }
 
+    pub fn device_create_ray_tracing_pipeline(
+        &self,
+        device_id: DeviceId,
+        desc: &pipeline::RayTracingPipelineDescriptor,
+        id_in: Option<id::RayTracingPipelineId>,
+    ) -> (
+        id::RayTracingPipelineId,
+        Option<pipeline::CreateRayTracingPipelineError>,
+    ) {
+        profiling::scope!("Device::create_ray_tracing_pipeline");
+
+        let hub = &self.hub;
+        let fid = hub.ray_tracing_pipelines.prepare(id_in);
+
+        let error = 'error: {
+            let device = self.hub.devices.get(device_id);
+
+            if let Err(e) = device.check_is_valid() {
+                break 'error e.into();
+            }
+
+            let layout = desc
+                .layout
+                .map(|layout| hub.pipeline_layouts.get(layout).get())
+                .transpose();
+            let layout = match layout {
+                Ok(layout) => layout,
+                Err(e) => break 'error e.into(),
+            };
+
+            let cache = desc
+                .cache
+                .map(|cache| hub.pipeline_caches.get(cache).get())
+                .transpose();
+            let cache = match cache {
+                Ok(cache) => cache,
+                Err(e) => break 'error e.into(),
+            };
+
+            // Resolve ray generation stage.
+            let raygen_module = match hub.shader_modules.get(desc.ray_generation.module).get() {
+                Ok(module) => module,
+                Err(e) => break 'error e.into(),
+            };
+            let ray_generation = pipeline::ResolvedProgrammableStageDescriptor {
+                module: raygen_module,
+                entry_point: desc.ray_generation.entry_point.clone(),
+                constants: desc.ray_generation.constants.clone(),
+                zero_initialize_workgroup_memory: false,
+            };
+
+            // Resolve miss stages.
+            let mut miss = Vec::new();
+            for m in &desc.miss {
+                let module = match hub.shader_modules.get(m.module).get() {
+                    Ok(module) => module,
+                    Err(e) => break 'error e.into(),
+                };
+                miss.push(pipeline::ResolvedProgrammableStageDescriptor {
+                    module,
+                    entry_point: m.entry_point.clone(),
+                    constants: m.constants.clone(),
+                    zero_initialize_workgroup_memory: false,
+                });
+            }
+
+            // Resolve hit groups.
+            let mut hit_groups = Vec::new();
+            for hg in &desc.hit_groups {
+                let ch_module = match hub.shader_modules.get(hg.closest_hit.module).get() {
+                    Ok(module) => module,
+                    Err(e) => break 'error e.into(),
+                };
+                let closest_hit = pipeline::ResolvedProgrammableStageDescriptor {
+                    module: ch_module,
+                    entry_point: hg.closest_hit.entry_point.clone(),
+                    constants: hg.closest_hit.constants.clone(),
+                    zero_initialize_workgroup_memory: false,
+                };
+                let any_hit = if let Some(ref ah) = hg.any_hit {
+                    let ah_module = match hub.shader_modules.get(ah.module).get() {
+                        Ok(module) => module,
+                        Err(e) => break 'error e.into(),
+                    };
+                    Some(pipeline::ResolvedProgrammableStageDescriptor {
+                        module: ah_module,
+                        entry_point: ah.entry_point.clone(),
+                        constants: ah.constants.clone(),
+                        zero_initialize_workgroup_memory: false,
+                    })
+                } else {
+                    None
+                };
+                hit_groups.push(pipeline::ResolvedRayTracingHitGroupDescriptor {
+                    closest_hit,
+                    any_hit,
+                });
+            }
+
+            let resolved_desc = pipeline::ResolvedRayTracingPipelineDescriptor {
+                label: desc.label.clone(),
+                layout,
+                ray_generation,
+                miss,
+                hit_groups,
+                max_recursion_depth: desc.max_recursion_depth,
+                cache,
+            };
+
+            let pipeline = match device.create_ray_tracing_pipeline(resolved_desc) {
+                Ok(pipeline) => pipeline,
+                Err(e) => break 'error e,
+            };
+
+            let id = fid.assign(Fallible::Valid(pipeline));
+            api_log!("Device::create_ray_tracing_pipeline -> {id:?}");
+
+            return (id, None);
+        };
+
+        let id = fid.assign(Fallible::Invalid(Arc::new(desc.label.to_string())));
+        (id, Some(error))
+    }
+
+    pub fn ray_tracing_pipeline_get_bind_group_layout(
+        &self,
+        pipeline_id: id::RayTracingPipelineId,
+        index: u32,
+        id_in: Option<id::BindGroupLayoutId>,
+    ) -> (
+        id::BindGroupLayoutId,
+        Option<binding_model::GetBindGroupLayoutError>,
+    ) {
+        let hub = &self.hub;
+        let fid = hub.bind_group_layouts.prepare(id_in);
+
+        let error = 'error: {
+            let pipeline = match hub.ray_tracing_pipelines.get(pipeline_id).get() {
+                Ok(pipeline) => pipeline,
+                Err(e) => break 'error e.into(),
+            };
+
+            match pipeline.get_bind_group_layout(index) {
+                Ok(bgl) => {
+                    let id = fid.assign(Fallible::Valid(bgl.clone()));
+                    return (id, None);
+                }
+                Err(err) => break 'error err,
+            };
+        };
+
+        let id = fid.assign(Fallible::Invalid(Arc::new(String::new())));
+        (id, Some(error))
+    }
+
+    pub fn ray_tracing_pipeline_drop(&self, pipeline_id: id::RayTracingPipelineId) {
+        profiling::scope!("RayTracingPipeline::drop");
+        api_log!("RayTracingPipeline::drop {pipeline_id:?}");
+
+        let hub = &self.hub;
+        let _pipeline = hub.ray_tracing_pipelines.remove(pipeline_id);
+    }
+
     /// # Safety
     /// The `data` argument of `desc` must have been returned by
     /// [Self::pipeline_cache_get_data] for the same adapter

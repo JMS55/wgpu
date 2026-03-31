@@ -93,6 +93,10 @@ mod compat {
                                 ExclusivePipeline::Compute(e_pipeline),
                                 ExclusivePipeline::Compute(a_pipeline),
                             ) if Weak::ptr_eq(e_pipeline, a_pipeline) => {}
+                            (
+                                ExclusivePipeline::RayTracing(e_pipeline),
+                                ExclusivePipeline::RayTracing(a_pipeline),
+                            ) if Weak::ptr_eq(e_pipeline, a_pipeline) => {}
                             (expected, assigned) => {
                                 return Err(Error::Incompatible {
                                     expected_bgl: expected_bgl.error_ident(),

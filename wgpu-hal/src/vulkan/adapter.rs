@@ -939,6 +939,13 @@ impl PhysicalDeviceFeatures {
             supports_ray_query,
         );
 
+        let supports_ray_tracing_pipeline = supports_acceleration_structures
+            && caps.supports_extension(khr::ray_tracing_pipeline::NAME);
+        features.set(
+            F::EXPERIMENTAL_RAY_TRACING_PIPELINE,
+            supports_ray_tracing_pipeline,
+        );
+
         // Binding arrays of TLAS are supported on Vulkan when ray queries are supported.
         //
         // Note: this flag is used for shader-side `binding_array<acceleration_structure>` as well as
@@ -1313,6 +1320,13 @@ impl PhysicalDeviceProperties {
             extensions.push(khr::acceleration_structure::NAME);
             extensions.push(khr::buffer_device_address::NAME);
             extensions.push(khr::ray_query::NAME);
+        }
+
+        if requested_features.contains(wgt::Features::EXPERIMENTAL_RAY_TRACING_PIPELINE) {
+            extensions.push(khr::deferred_host_operations::NAME);
+            extensions.push(khr::acceleration_structure::NAME);
+            extensions.push(khr::buffer_device_address::NAME);
+            extensions.push(khr::ray_tracing_pipeline::NAME);
         }
 
         if requested_features.contains(wgt::Features::EXPERIMENTAL_RAY_HIT_VERTEX_RETURN) {
@@ -2497,6 +2511,16 @@ impl super::Adapter {
                     &self.instance.raw,
                     &raw_device,
                 ),
+                ray_tracing_pipeline: if enabled_extensions
+                    .contains(&khr::ray_tracing_pipeline::NAME)
+                {
+                    Some(khr::ray_tracing_pipeline::Device::new(
+                        &self.instance.raw,
+                        &raw_device,
+                    ))
+                } else {
+                    None
+                },
             })
         } else {
             None
@@ -2572,6 +2596,10 @@ impl super::Adapter {
                 capabilities.push(spv::Capability::RayQueryKHR);
             }
 
+            if features.contains(wgt::Features::EXPERIMENTAL_RAY_TRACING_PIPELINE) {
+                capabilities.push(spv::Capability::RayTracingKHR);
+            }
+
             if features.contains(wgt::Features::SHADER_INT64) {
                 capabilities.push(spv::Capability::Int64);
             }
@@ -2635,6 +2663,9 @@ impl super::Adapter {
             );
             if features.contains(wgt::Features::EXPERIMENTAL_RAY_QUERY) {
                 capabilities.push(spv::Capability::RayQueryKHR);
+            }
+            if features.contains(wgt::Features::EXPERIMENTAL_RAY_TRACING_PIPELINE) {
+                capabilities.push(spv::Capability::RayTracingKHR);
             }
             if features.contains(wgt::Features::EXPERIMENTAL_RAY_HIT_VERTEX_RETURN) {
                 capabilities.push(spv::Capability::RayQueryPositionFetchKHR)

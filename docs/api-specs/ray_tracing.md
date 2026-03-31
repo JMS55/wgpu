@@ -19,7 +19,7 @@ The documentation and specific details of the functions and structures provided
 can be found with their definitions.
 
 Acceleration structures do not have a separate feature, instead they are enabled by `Features::EXPERIMENTAL_RAY_QUERY`, unlike vulkan.
-When ray tracing pipelines are added, that feature will also enable acceleration structures.
+`Features::EXPERIMENTAL_RAY_TRACING_PIPELINE` also requires acceleration structure support.
 
 A [`Blas`] can be created with [`Device::create_blas`].
 A [`Tlas`] can be created with [`Device::create_tlas`].
@@ -313,6 +313,101 @@ fn ch() {}
 @miss
 fn miss() {}
 ```
+
+### Host-side Ray Tracing Pipeline API
+
+Ray tracing pipelines are created and dispatched using the following `wgpu` API:
+
+#### Feature and Limits
+
+- **Feature**: `Features::EXPERIMENTAL_RAY_TRACING_PIPELINE`
+  - Supported on Vulkan (with `VK_KHR_ray_tracing_pipeline`)
+  - Not supported on Metal, GLES, or WebGPU
+- **Limit**: `Limits::max_ray_tracing_pipeline_recursion_depth`
+  - The maximum recursion depth for `traceRay` calls from hit/miss shaders.
+  - Vulkan minimum: 1
+
+#### Pipeline Creation
+
+A `RayTracingPipeline` is created with `Device::create_ray_tracing_pipeline`:
+
+```rust
+let pipeline = device.create_ray_tracing_pipeline(&wgpu::RayTracingPipelineDescriptor {
+    label: Some("rt pipeline"),
+    layout: Some(&pipeline_layout),
+    ray_generation: wgpu::RayTracingShaderStage {
+        module: &shader_module,
+        entry_point: Some("ray_gen_main"),
+        compilation_options: Default::default(),
+    },
+    miss: &[wgpu::RayTracingShaderStage {
+        module: &shader_module,
+        entry_point: Some("miss"),
+        compilation_options: Default::default(),
+    }],
+    hit_groups: &[wgpu::RayTracingHitGroup {
+        closest_hit: wgpu::RayTracingShaderStage {
+            module: &shader_module,
+            entry_point: Some("closest_hit_main"),
+            compilation_options: Default::default(),
+        },
+        any_hit: Some(wgpu::RayTracingShaderStage {
+            module: &shader_module,
+            entry_point: Some("any_hit_main"),
+            compilation_options: Default::default(),
+        }),
+    }],
+    max_recursion_depth: 1,
+    cache: None,
+});
+```
+
+**`RayTracingPipelineDescriptor` fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `label` | `Option<&str>` | Debug label |
+| `layout` | `Option<&PipelineLayout>` | Bind group layout. `None` for auto-derived layout. |
+| `ray_generation` | `RayTracingShaderStage` | The ray generation shader (exactly one) |
+| `miss` | `&[RayTracingShaderStage]` | Miss shaders |
+| `hit_groups` | `&[RayTracingHitGroup]` | Hit groups (closest-hit + optional any-hit) |
+| `max_recursion_depth` | `u32` | Max `traceRay` recursion depth |
+| `cache` | `Option<&PipelineCache>` | Pipeline cache |
+
+**`RayTracingHitGroup` fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `closest_hit` | `RayTracingShaderStage` | Invoked when a ray finds its closest intersection |
+| `any_hit` | `Option<RayTracingShaderStage>` | Invoked for each potential intersection (optional) |
+
+#### Dispatching
+
+Ray tracing work is dispatched through a `RayTracingPass`:
+
+```rust
+let mut rtpass = encoder.begin_ray_tracing_pass(&wgpu::RayTracingPassDescriptor {
+    label: Some("rt pass"),
+    timestamp_writes: None,
+});
+rtpass.set_pipeline(&pipeline);
+rtpass.set_bind_group(0, &bind_group, &[]);
+rtpass.trace_rays(width, height, 1);
+drop(rtpass);
+```
+
+`trace_rays(width, height, depth)` specifies the dimensions of the ray generation shader
+invocation grid. Each invocation receives its position via `@builtin(ray_invocation_id)`.
+
+#### Current Limitations
+
+- **Shader Binding Table (SBT)**: Not yet implemented. Pipeline creation works but `trace_rays`
+  dispatch is not yet functional (the SBT, which maps geometry to hit groups, needs to be
+  built internally before dispatch can work).
+- **Naga backends**: The SPIR-V and HLSL naga backends do not yet support emitting ray tracing
+  pipeline shader code. Shaders can be provided via pre-compiled SPIR-V using
+  `Features::PASSTHROUGH_SHADERS`.
+- **DX12**: Pipeline creation is stubbed; will be implemented using DXR.
 
 ### Acceleration structure tags
 

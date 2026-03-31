@@ -198,6 +198,7 @@ fn print_adapter(output: &mut impl io::Write, report: &AdapterReport, idx: usize
         max_blas_geometry_count,
         max_tlas_instance_count,
         max_acceleration_structures_per_shader_stage,
+        max_ray_tracing_pipeline_recursion_depth,
 
         max_multiview_view_count,
     } = limits;
@@ -253,6 +254,7 @@ fn print_adapter(output: &mut impl io::Write, report: &AdapterReport, idx: usize
     writeln!(output, "\t\t                            Max BLAS Geometry count: {max_blas_geometry_count}")?;
     writeln!(output, "\t\t                            Max TLAS Instance count: {max_tlas_instance_count}")?;
     writeln!(output, "\t\t       Max Acceleration Structures Per Shader Stage: {max_acceleration_structures_per_shader_stage}")?;
+    writeln!(output, "\t\t       Max Ray Tracing Pipeline Recursion Depth: {max_ray_tracing_pipeline_recursion_depth}")?;
 
     writeln!(output, "\t\t                           Max Multiview View Count: {max_multiview_view_count}")?;
     // This one reflects more of a wgpu implementation limitations than a hardware limit

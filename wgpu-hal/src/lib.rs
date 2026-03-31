@@ -288,8 +288,9 @@ pub use dynamic::{
     DynAccelerationStructure, DynAcquiredSurfaceTexture, DynAdapter, DynBindGroup,
     DynBindGroupLayout, DynBuffer, DynCommandBuffer, DynCommandEncoder, DynComputePipeline,
     DynDevice, DynExposedAdapter, DynFence, DynInstance, DynOpenDevice, DynPipelineCache,
-    DynPipelineLayout, DynQuerySet, DynQueue, DynRenderPipeline, DynResource, DynSampler,
-    DynShaderModule, DynSurface, DynSurfaceTexture, DynTexture, DynTextureView,
+    DynPipelineLayout, DynQuerySet, DynQueue, DynRayTracingPipeline, DynRenderPipeline,
+    DynResource, DynSampler, DynShaderModule, DynSurface, DynSurfaceTexture, DynTexture,
+    DynTextureView,
 };
 
 #[allow(unused)]
@@ -640,6 +641,7 @@ pub trait Api: Clone + fmt::Debug + Sized + WasmNotSendSync + 'static {
     type ShaderModule: DynShaderModule;
     type RenderPipeline: DynRenderPipeline;
     type ComputePipeline: DynComputePipeline;
+    type RayTracingPipeline: DynRayTracingPipeline;
     type PipelineCache: DynPipelineCache;
 
     type AccelerationStructure: DynAccelerationStructure + 'static;
@@ -1063,6 +1065,17 @@ pub trait Device: WasmNotSendSync {
         >,
     ) -> Result<<Self::A as Api>::ComputePipeline, PipelineError>;
     unsafe fn destroy_compute_pipeline(&self, pipeline: <Self::A as Api>::ComputePipeline);
+
+    #[allow(clippy::type_complexity)]
+    unsafe fn create_ray_tracing_pipeline(
+        &self,
+        desc: &RayTracingPipelineDescriptor<
+            <Self::A as Api>::PipelineLayout,
+            <Self::A as Api>::ShaderModule,
+            <Self::A as Api>::PipelineCache,
+        >,
+    ) -> Result<<Self::A as Api>::RayTracingPipeline, PipelineError>;
+    unsafe fn destroy_ray_tracing_pipeline(&self, pipeline: <Self::A as Api>::RayTracingPipeline);
 
     unsafe fn create_pipeline_cache(
         &self,
@@ -1695,6 +1708,16 @@ pub trait CommandEncoder: WasmNotSendSync + fmt::Debug {
         buffer: &<Self::A as Api>::Buffer,
         offset: wgt::BufferAddress,
     );
+
+    // Ray tracing pass commands
+
+    unsafe fn begin_ray_tracing_pass(
+        &mut self,
+        desc: &RayTracingPassDescriptor<<Self::A as Api>::QuerySet>,
+    );
+    unsafe fn end_ray_tracing_pass(&mut self);
+    unsafe fn set_ray_tracing_pipeline(&mut self, pipeline: &<Self::A as Api>::RayTracingPipeline);
+    unsafe fn trace_rays(&mut self, width: u32, height: u32, depth: u32);
 
     /// To get the required sizes for the buffer allocations use `get_acceleration_structure_build_sizes` per descriptor
     /// All buffers must be synchronized externally
@@ -2442,6 +2465,37 @@ pub struct ComputePipelineDescriptor<
     pub stage: ProgrammableStage<'a, M>,
     /// The cache which will be used and filled when compiling this pipeline
     pub cache: Option<&'a Pc>,
+}
+
+/// Describes a hit group in a ray tracing pipeline.
+#[derive(Debug)]
+pub struct RayTracingHitGroup<'a, M: DynShaderModule + ?Sized> {
+    pub closest_hit: ProgrammableStage<'a, M>,
+    pub any_hit: Option<ProgrammableStage<'a, M>>,
+}
+
+/// Describes a ray tracing pipeline.
+#[derive(Debug)]
+pub struct RayTracingPipelineDescriptor<
+    'a,
+    Pl: DynPipelineLayout + ?Sized,
+    M: DynShaderModule + ?Sized,
+    Pc: DynPipelineCache + ?Sized,
+> {
+    pub label: Label<'a>,
+    pub layout: &'a Pl,
+    pub ray_generation: ProgrammableStage<'a, M>,
+    pub miss: &'a [ProgrammableStage<'a, M>],
+    pub hit_groups: &'a [RayTracingHitGroup<'a, M>],
+    pub max_recursion_depth: u32,
+    pub cache: Option<&'a Pc>,
+}
+
+/// Describes a ray tracing pass.
+#[derive(Clone, Debug)]
+pub struct RayTracingPassDescriptor<'a, Q: DynQuerySet + ?Sized> {
+    pub label: Label<'a>,
+    pub timestamp_writes: Option<PassTimestampWrites<'a, Q>>,
 }
 
 pub struct PipelineCacheDescriptor<'a> {
