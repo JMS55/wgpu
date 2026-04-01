@@ -104,6 +104,7 @@ mod index;
 mod instructions;
 mod layout;
 mod mesh_shader;
+mod non_semantic_debug;
 mod ray;
 mod reclaimable;
 mod selection;
@@ -141,6 +142,9 @@ struct LogicalLayout {
     entry_points: Vec<Word>,
     execution_modes: Vec<Word>,
     debugs: Vec<Word>,
+    /// SPIR-V section 7a: global NonSemantic `ExtInst` instructions
+    /// (between debug instructions and annotations).
+    non_semantic_globals: Vec<Word>,
     annotations: Vec<Word>,
     declarations: Vec<Word>,
     function_declarations: Vec<Word>,
@@ -195,6 +199,22 @@ pub struct DebugInfo<'a> {
     pub source_code: &'a str,
     pub file_name: &'a str,
     pub language: SourceLanguage,
+}
+
+/// State for `NonSemantic.Shader.DebugInfo.100` emission.
+///
+/// Created during `write_logical_layout()` when debug info is enabled,
+/// and used to emit rich debug instructions that tools like NVIDIA Nsight consume.
+#[derive(Debug, Clone)]
+struct NonSemanticDebugState {
+    /// `OpExtInstImport` result ID for `"NonSemantic.Shader.DebugInfo.100"`.
+    ext_inst_id: Word,
+    /// Result ID of the `DebugSource` instruction.
+    debug_source_id: Word,
+    /// Result ID of the `DebugCompilationUnit` instruction.
+    compilation_unit_id: Word,
+    /// Result ID of `DebugInfoNone` (placeholder for optional operands).
+    debug_info_none_id: Word,
 }
 
 /// A SPIR-V block to which we are still adding instructions.
@@ -968,6 +988,10 @@ pub struct Writer {
 
     /// Non semantic debug printf extension `OpExtInstImport`
     debug_printf: Option<Word>,
+
+    /// `NonSemantic.Shader.DebugInfo.100` state, populated when
+    /// `WriterFlags::DEBUG` is set and `debug_info` is provided.
+    non_semantic_debug: Option<NonSemanticDebugState>,
     pub(crate) ray_query_initialization_tracking: bool,
 
     /// See docs in [`Options`]
@@ -1012,6 +1036,16 @@ bitflags::bitflags! {
         /// Note: VK_KHR_shader_non_semantic_info must be enabled. This will have no
         /// effect if `options.ray_query_initialization_tracking` is set to false.
         const PRINT_ON_RAY_QUERY_INITIALIZATION_FAIL = 0x20;
+
+        /// Emit [`NonSemantic.Shader.DebugInfo.100`][spec] extended instructions
+        /// for rich debug information (function scopes, line mapping, entry points).
+        ///
+        /// Requires `VK_KHR_shader_non_semantic_info` (or Vulkan 1.3+).
+        /// When combined with [`DEBUG`](Self::DEBUG) and a [`DebugInfo`] source,
+        /// this enables tools like NVIDIA Nsight to display line-by-line profiling.
+        ///
+        /// [spec]: https://github.com/KhronosGroup/SPIRV-Headers/blob/main/include/spirv/unified1/NonSemanticShaderDebugInfo100.h
+        const EMIT_NONSEMANTIC_SHADER_DEBUG_INFO = 0x40;
     }
 }
 

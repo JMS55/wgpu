@@ -1368,6 +1368,14 @@ impl PhysicalDeviceProperties {
             extensions.push(khr::cooperative_matrix::NAME);
         }
 
+        // Optional `VK_KHR_shader_non_semantic_info` for debug printf and
+        // NonSemantic.Shader.DebugInfo.100 support. Promoted to core in Vulkan 1.3.
+        if self.device_api_version < vk::API_VERSION_1_3
+            && self.supports_extension(khr::shader_non_semantic_info::NAME)
+        {
+            extensions.push(khr::shader_non_semantic_info::NAME);
+        }
+
         extensions
     }
 
@@ -2611,11 +2619,16 @@ impl super::Adapter {
                 // But this requires cloning the `spv::Options` struct, which has heap allocations.
                 true, // could check `super::Workarounds::SEPARATE_ENTRY_POINTS`
             );
+            let has_non_semantic_info = self.phd_capabilities.device_api_version
+                >= vk::API_VERSION_1_3
+                || enabled_extensions.contains(&khr::shader_non_semantic_info::NAME);
             flags.set(
                 spv::WriterFlags::PRINT_ON_RAY_QUERY_INITIALIZATION_FAIL,
-                self.instance.flags.contains(wgt::InstanceFlags::DEBUG)
-                    && (self.instance.instance_api_version >= vk::API_VERSION_1_3
-                        || enabled_extensions.contains(&khr::shader_non_semantic_info::NAME)),
+                self.instance.flags.contains(wgt::InstanceFlags::DEBUG) && has_non_semantic_info,
+            );
+            flags.set(
+                spv::WriterFlags::EMIT_NONSEMANTIC_SHADER_DEBUG_INFO,
+                self.instance.flags.contains(wgt::InstanceFlags::DEBUG) && has_non_semantic_info,
             );
             if features.contains(wgt::Features::EXPERIMENTAL_RAY_QUERY) {
                 capabilities.push(spv::Capability::RayQueryKHR);

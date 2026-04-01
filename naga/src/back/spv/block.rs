@@ -162,6 +162,20 @@ struct LoopContext {
 pub(crate) struct DebugInfoInner<'a> {
     pub source_code: &'a str,
     pub source_file_id: Word,
+    /// `NonSemantic.Shader.DebugInfo.100` state for in-function emission.
+    pub non_semantic: Option<NonSemanticFunctionDebug>,
+}
+
+/// Per-function state needed to emit `NonSemantic.Shader.DebugInfo.100`
+/// instructions inside function bodies.
+#[derive(Debug, Clone)]
+pub(crate) struct NonSemanticFunctionDebug {
+    /// `OpExtInstImport` result ID for `"NonSemantic.Shader.DebugInfo.100"`.
+    pub ext_inst_id: Word,
+    /// Result ID of the `DebugSource` instruction.
+    pub debug_source_id: Word,
+    /// Result ID of the `DebugFunction` instruction for the current function.
+    pub debug_function_id: Word,
 }
 
 impl Writer {
@@ -3438,8 +3452,17 @@ impl BlockContext<'_> {
         exit: BlockExit,
         loop_context: LoopContext,
         debug_info: Option<&DebugInfoInner>,
+        ns_preamble: Option<(Instruction, Instruction)>,
     ) -> Result<BlockExitDisposition, Error> {
         let mut block = Block::new(label_id);
+
+        // Inject NonSemantic DebugScope + DebugFunctionDefinition at
+        // the start of the function entry block.
+        if let Some((scope_inst, func_def_inst)) = ns_preamble {
+            block.body.push(scope_inst);
+            block.body.push(func_def_inst);
+        }
+
         for (statement, span) in naga_block.span_iter() {
             if let (Some(debug_info), false) = (
                 debug_info,
@@ -3459,6 +3482,24 @@ impl BlockContext<'_> {
                     loc.line_number,
                     loc.line_position,
                 ));
+                // Emit NonSemantic DebugLine alongside OpLine.
+                if let Some(ref ns) = debug_info.non_semantic {
+                    use super::non_semantic_debug as nsd;
+                    let line_id = self
+                        .writer
+                        .get_constant_scalar(crate::Literal::U32(loc.line_number));
+                    let col_id = self
+                        .writer
+                        .get_constant_scalar(crate::Literal::U32(loc.line_position));
+                    let debug_line_id = self.gen_id();
+                    block.body.push(Instruction::ext_inst(
+                        ns.ext_inst_id,
+                        nsd::DEBUG_LINE,
+                        self.writer.void_type,
+                        debug_line_id,
+                        &[ns.debug_source_id, line_id, line_id, col_id, col_id],
+                    ));
+                }
             };
             match *statement {
                 Statement::Emit(ref range) => {
@@ -3480,6 +3521,7 @@ impl BlockContext<'_> {
                         BlockExit::Branch { target: merge_id },
                         loop_context,
                         debug_info,
+                        None,
                     )?;
 
                     match merge_used {
@@ -3541,6 +3583,7 @@ impl BlockContext<'_> {
                                 BlockExit::Branch { target: merge_id },
                                 loop_context,
                                 debug_info,
+                                None,
                             )?;
                         }
                         if let Some(block_id) = reject_id {
@@ -3554,6 +3597,7 @@ impl BlockContext<'_> {
                                 BlockExit::Branch { target: merge_id },
                                 loop_context,
                                 debug_info,
+                                None,
                             )?;
                         }
 
@@ -3643,6 +3687,7 @@ impl BlockContext<'_> {
                             },
                             inner_context,
                             debug_info,
+                            None,
                         )?;
                     }
 
@@ -3699,6 +3744,7 @@ impl BlockContext<'_> {
                             break_id: Some(merge_id),
                         },
                         debug_info,
+                        None,
                     )?;
 
                     let exit = match break_if {
@@ -3723,6 +3769,7 @@ impl BlockContext<'_> {
                             break_id: Some(merge_id),
                         },
                         debug_info,
+                        None,
                     )?;
 
                     block = Block::new(merge_id);
@@ -4207,6 +4254,22 @@ impl BlockContext<'_> {
             }
         };
 
+        // Emit NonSemantic DebugNoScope before the block terminator if this
+        // is a function-level return.
+        if matches!(exit, BlockExit::Return) {
+            if let Some(ref ns) = debug_info.and_then(|di| di.non_semantic.as_ref()) {
+                use super::non_semantic_debug as nsd;
+                let no_scope_id = self.gen_id();
+                block.body.push(Instruction::ext_inst(
+                    ns.ext_inst_id,
+                    nsd::DEBUG_NO_SCOPE,
+                    self.writer.void_type,
+                    no_scope_id,
+                    &[],
+                ));
+            }
+        }
+
         self.function.consume(block, termination);
         Ok(BlockExitDisposition::Used)
     }
@@ -4215,7 +4278,33 @@ impl BlockContext<'_> {
         &mut self,
         entry_id: Word,
         debug_info: Option<&DebugInfoInner>,
+        function_id: Word,
     ) -> Result<(), Error> {
+        // Emit NonSemantic DebugScope + DebugFunctionDefinition at function entry.
+        let ns_preamble = if let Some(ref ns) = debug_info.and_then(|di| di.non_semantic.as_ref()) {
+            use super::non_semantic_debug as nsd;
+
+            let scope_id = self.gen_id();
+            let scope_inst = Instruction::ext_inst(
+                ns.ext_inst_id,
+                nsd::DEBUG_SCOPE,
+                self.writer.void_type,
+                scope_id,
+                &[ns.debug_function_id],
+            );
+            let func_def_id = self.gen_id();
+            let func_def_inst = Instruction::ext_inst(
+                ns.ext_inst_id,
+                nsd::DEBUG_FUNCTION_DEFINITION,
+                self.writer.void_type,
+                func_def_id,
+                &[ns.debug_function_id, function_id],
+            );
+            Some((scope_inst, func_def_inst))
+        } else {
+            None
+        };
+
         // We can ignore the `BlockExitDisposition` returned here because
         // `BlockExit::Return` doesn't refer to a block.
         let _ = self.write_block(
@@ -4224,6 +4313,7 @@ impl BlockContext<'_> {
             BlockExit::Return,
             LoopContext::default(),
             debug_info,
+            ns_preamble,
         )?;
 
         Ok(())

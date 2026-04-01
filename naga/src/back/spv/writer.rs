@@ -5,13 +5,13 @@ use hashbrown::hash_map::Entry;
 use spirv::Word;
 
 use super::{
-    block::DebugInfoInner,
+    block::{DebugInfoInner, NonSemanticFunctionDebug},
     helpers::{contains_builtin, global_needs_wrapper, map_storage_class},
     Block, BlockContext, CachedConstant, CachedExpressions, CooperativeType, DebugInfo,
     EntryPointContext, Error, Function, FunctionArgument, GlobalVariable, IdGenerator, Instruction,
     LocalImageType, LocalType, LocalVariable, LogicalLayout, LookupFunctionType, LookupType,
-    NumericType, Options, PhysicalLayout, PipelineOptions, ResultMember, Writer, WriterFlags,
-    BITS_PER_BYTE,
+    NonSemanticDebugState, NumericType, Options, PhysicalLayout, PipelineOptions, ResultMember,
+    Writer, WriterFlags, BITS_PER_BYTE,
 };
 use crate::{
     arena::{Handle, HandleVec, UniqueArena},
@@ -115,6 +115,7 @@ impl Writer {
                 options.use_storage_input_output_16,
             ),
             debug_printf: None,
+            non_semantic_debug: None,
             task_dispatch_limits: options.task_dispatch_limits,
             mesh_shader_primitive_indices_clamp: options.mesh_shader_primitive_indices_clamp,
         })
@@ -205,6 +206,7 @@ impl Writer {
             ray_query_functions: take(&mut self.ray_query_functions).reclaim(),
             io_f16_polyfills: take(&mut self.io_f16_polyfills).reclaim(),
             debug_printf: None,
+            non_semantic_debug: None,
         };
 
         *self = fresh;
@@ -1193,6 +1195,7 @@ impl Writer {
         ir_module: &crate::Module,
         mut interface: Option<FunctionInterface>,
         debug_info: &Option<DebugInfoInner>,
+        function_span: crate::Span,
     ) -> Result<Word, Error> {
         self.write_wrapped_functions(ir_function, info, ir_module)?;
 
@@ -1440,6 +1443,37 @@ impl Writer {
             }
         }
 
+        // Emit NonSemantic.Shader.DebugInfo.100 per-function instructions.
+        let ns_function_debug = if let Some(ref nsd_state) = self.non_semantic_debug.clone() {
+            if let Some(ref debug_info_inner) = debug_info {
+                let nfd = self.emit_nonsemantic_function_debug(
+                    nsd_state,
+                    ir_function,
+                    debug_info_inner,
+                    function_span,
+                );
+
+                // Emit DebugEntryPoint for entry point functions.
+                if interface.is_some() {
+                    self.emit_nonsemantic_entry_point(nsd_state, &nfd);
+                }
+
+                Some(nfd)
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        // Build a debug_info that includes per-function NonSemantic state.
+        let debug_info_with_ns: Option<DebugInfoInner> =
+            debug_info.as_ref().map(|di| DebugInfoInner {
+                source_code: di.source_code,
+                source_file_id: di.source_file_id,
+                non_semantic: ns_function_debug,
+            });
+
         let function_type = self.get_function_type(lookup_function_type);
         function.signature = Some(Instruction::function(
             return_type_id,
@@ -1679,7 +1713,7 @@ impl Writer {
             next_id
         };
 
-        context.write_function_body(main_id, debug_info.as_ref())?;
+        context.write_function_body(main_id, debug_info_with_ns.as_ref(), function_id)?;
 
         // Consume the `BlockContext`, ending its borrows and letting the
         // `Writer` steal back its cached expression table and temp_list.
@@ -1741,6 +1775,9 @@ impl Writer {
                 workgroup_size: entry_point.workgroup_size,
             }),
             debug_info,
+            // Entry points are stored in a Vec, not an Arena, so they
+            // don't have associated spans.
+            crate::Span::default(),
         )?;
 
         let exec_model = match entry_point.stage {
@@ -3616,6 +3653,7 @@ impl Writer {
                 debug_info_inner = Some(DebugInfoInner {
                     source_code: debug_info.source_code,
                     source_file_id,
+                    non_semantic: None,
                 });
                 self.debugs.append(&mut Instruction::source_auto_continued(
                     debug_info.language,
@@ -3651,6 +3689,20 @@ impl Writer {
                 if let Some(ref name) = constant.name {
                     let id = self.constant_ids[constant.init];
                     self.debugs.push(Instruction::name(id, name));
+                }
+            }
+        }
+
+        // Emit NonSemantic.Shader.DebugInfo.100 global instructions.
+        // This must come after types and constants are written (since
+        // DebugCompilationUnit references OpConstant ids), and before functions.
+        if self
+            .flags
+            .contains(WriterFlags::EMIT_NONSEMANTIC_SHADER_DEBUG_INFO)
+        {
+            if let Some(ref debug_info) = debug_info.as_ref() {
+                if let Some(ref debug_info_inner) = debug_info_inner {
+                    self.emit_nonsemantic_debug_globals(debug_info, debug_info_inner);
                 }
             }
         }
@@ -3698,7 +3750,15 @@ impl Writer {
                     continue;
                 }
             }
-            let id = self.write_function(ir_function, info, ir_module, None, &debug_info_inner)?;
+            let function_span = ir_module.functions.get_span(handle);
+            let id = self.write_function(
+                ir_function,
+                info,
+                ir_module,
+                None,
+                &debug_info_inner,
+                function_span,
+            )?;
             self.lookup_function.insert(handle, id);
         }
 
@@ -3802,6 +3862,183 @@ impl Writer {
 
     pub(super) fn needs_f16_polyfill(&self, ty_inner: &crate::TypeInner) -> bool {
         self.io_f16_polyfills.needs_polyfill(ty_inner)
+    }
+
+    /// Emit the `NonSemantic.Shader.DebugInfo.100` global instructions:
+    /// extension import, `DebugInfoNone`, `DebugSource`, and `DebugCompilationUnit`.
+    fn emit_nonsemantic_debug_globals(
+        &mut self,
+        debug_info: &DebugInfo,
+        debug_info_inner: &DebugInfoInner,
+    ) {
+        use super::non_semantic_debug as nsd;
+
+        // Import the extension and instruction set.
+        self.use_extension("SPV_KHR_non_semantic_info");
+        let ext_inst_id = self.id_gen.next();
+        Instruction::ext_inst_import(ext_inst_id, "NonSemantic.Shader.DebugInfo.100")
+            .to_words(&mut self.logical_layout.ext_inst_imports);
+
+        // DebugInfoNone — placeholder for optional operands.
+        let debug_info_none_id = self.id_gen.next();
+        Instruction::ext_inst(
+            ext_inst_id,
+            nsd::DEBUG_INFO_NONE,
+            self.void_type,
+            debug_info_none_id,
+            &[],
+        )
+        .to_words(&mut self.logical_layout.non_semantic_globals);
+
+        // OpString for source text (separate from the filename OpString
+        // already created for OpSource).
+        let source_text_string_id = self.id_gen.next();
+        self.debugs.push(Instruction::string(
+            debug_info.source_code,
+            source_text_string_id,
+        ));
+
+        // DebugSource — references filename and source text strings.
+        let debug_source_id = self.id_gen.next();
+        Instruction::ext_inst(
+            ext_inst_id,
+            nsd::DEBUG_SOURCE,
+            self.void_type,
+            debug_source_id,
+            &[debug_info_inner.source_file_id, source_text_string_id],
+        )
+        .to_words(&mut self.logical_layout.non_semantic_globals);
+
+        // DebugCompilationUnit — version, DWARF version, source, language.
+        // Use GLSL (2) as source language for Nsight compatibility.
+        let version_id = self.get_constant_scalar(crate::Literal::U32(1));
+        let dwarf_version_id = self.get_constant_scalar(crate::Literal::U32(4));
+        let language_id = self.get_constant_scalar(crate::Literal::U32(debug_info.language as u32));
+        let compilation_unit_id = self.id_gen.next();
+        Instruction::ext_inst(
+            ext_inst_id,
+            nsd::DEBUG_COMPILATION_UNIT,
+            self.void_type,
+            compilation_unit_id,
+            &[version_id, dwarf_version_id, debug_source_id, language_id],
+        )
+        .to_words(&mut self.logical_layout.non_semantic_globals);
+
+        self.non_semantic_debug = Some(NonSemanticDebugState {
+            ext_inst_id,
+            debug_source_id,
+            compilation_unit_id,
+            debug_info_none_id,
+        });
+    }
+
+    /// Emit `NonSemantic.Shader.DebugInfo.100` per-function instructions:
+    /// `DebugTypeFunction`, `DebugFunction`, and optionally `DebugEntryPoint`.
+    ///
+    /// Returns the [`NonSemanticFunctionDebug`] state needed for in-function emission.
+    fn emit_nonsemantic_function_debug(
+        &mut self,
+        nsd_state: &NonSemanticDebugState,
+        ir_function: &crate::Function,
+        debug_info_inner: &DebugInfoInner,
+        function_span: crate::Span,
+    ) -> NonSemanticFunctionDebug {
+        use super::non_semantic_debug as nsd;
+
+        let ext = nsd_state.ext_inst_id;
+
+        // DebugTypeFunction — we use DebugInfoNone for types since we don't
+        // emit full type debug info yet.
+        let flags_id = self.get_constant_scalar(crate::Literal::U32(
+            nsd::FLAG_IS_PUBLIC | nsd::FLAG_IS_DEFINITION,
+        ));
+        let debug_type_function_id = self.id_gen.next();
+        Instruction::ext_inst(
+            ext,
+            nsd::DEBUG_TYPE_FUNCTION,
+            self.void_type,
+            debug_type_function_id,
+            &[flags_id, nsd_state.debug_info_none_id],
+        )
+        .to_words(&mut self.logical_layout.non_semantic_globals);
+
+        // Function name as OpString.
+        let func_name = ir_function.name.as_deref().unwrap_or("");
+        let func_name_id = self.id_gen.next();
+        self.debugs
+            .push(Instruction::string(func_name, func_name_id));
+
+        // Source location from the function span.
+        let (line, column) = if function_span.is_defined() {
+            let loc = function_span.location(debug_info_inner.source_code);
+            (loc.line_number, loc.line_position)
+        } else {
+            (0, 0)
+        };
+        let line_id = self.get_constant_scalar(crate::Literal::U32(line));
+        let column_id = self.get_constant_scalar(crate::Literal::U32(column));
+
+        // Empty linkage name.
+        let empty_string_id = self.id_gen.next();
+        self.debugs.push(Instruction::string("", empty_string_id));
+
+        // DebugFunction
+        let debug_function_id = self.id_gen.next();
+        Instruction::ext_inst(
+            ext,
+            nsd::DEBUG_FUNCTION,
+            self.void_type,
+            debug_function_id,
+            &[
+                func_name_id,                  // Name
+                debug_type_function_id,        // Type
+                nsd_state.debug_source_id,     // Source
+                line_id,                       // Line
+                column_id,                     // Column
+                nsd_state.compilation_unit_id, // Parent (scope)
+                empty_string_id,               // Linkage Name
+                flags_id,                      // Flags
+                line_id,                       // Scope Line
+            ],
+        )
+        .to_words(&mut self.logical_layout.non_semantic_globals);
+
+        NonSemanticFunctionDebug {
+            ext_inst_id: ext,
+            debug_source_id: nsd_state.debug_source_id,
+            debug_function_id,
+        }
+    }
+
+    /// Emit a `DebugEntryPoint` instruction for an entry point function.
+    fn emit_nonsemantic_entry_point(
+        &mut self,
+        nsd_state: &NonSemanticDebugState,
+        nfd: &NonSemanticFunctionDebug,
+    ) {
+        use super::non_semantic_debug as nsd;
+
+        // Compiler signature and command-line args as OpString.
+        let compiler_sig_id = self.id_gen.next();
+        self.debugs
+            .push(Instruction::string("naga", compiler_sig_id));
+        let args_id = self.id_gen.next();
+        self.debugs.push(Instruction::string("", args_id));
+
+        let debug_entry_point_id = self.id_gen.next();
+        Instruction::ext_inst(
+            nsd_state.ext_inst_id,
+            nsd::DEBUG_ENTRY_POINT,
+            self.void_type,
+            debug_entry_point_id,
+            &[
+                nfd.debug_function_id,
+                nsd_state.compilation_unit_id,
+                compiler_sig_id,
+                args_id,
+            ],
+        )
+        .to_words(&mut self.logical_layout.non_semantic_globals);
     }
 
     pub(super) fn write_debug_printf(

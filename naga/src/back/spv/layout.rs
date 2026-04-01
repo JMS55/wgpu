@@ -60,6 +60,7 @@ impl LogicalLayout {
         sink.extend(self.entry_points.iter().cloned());
         sink.extend(self.execution_modes.iter().cloned());
         sink.extend(self.debugs.iter().cloned());
+        sink.extend(self.non_semantic_globals.iter().cloned());
         sink.extend(self.annotations.iter().cloned());
         sink.extend(self.declarations.iter().cloned());
         sink.extend(self.function_declarations.iter().cloned());
@@ -77,6 +78,7 @@ impl super::reclaimable::Reclaimable for LogicalLayout {
             entry_points: self.entry_points.reclaim(),
             execution_modes: self.execution_modes.reclaim(),
             debugs: self.debugs.reclaim(),
+            non_semantic_globals: self.non_semantic_globals.reclaim(),
             annotations: self.annotations.reclaim(),
             declarations: self.declarations.reclaim(),
             function_declarations: self.function_declarations.reclaim(),
