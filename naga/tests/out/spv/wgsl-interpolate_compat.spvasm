@@ -1,16 +1,19 @@
 ; SPIR-V
 ; Version: 1.0
-; Generator: rspirv
-; Bound: 133
-OpCapability Shader
-OpCapability SampleRateShading
-%1 = OpExtInstImport "GLSL.std.450"
-OpMemoryModel Logical GLSL450
-OpEntryPoint Vertex %29 "vert_main" %11 %13 %15 %16 %18 %20 %22 %23 %24 %25 %26 %27
-OpEntryPoint Fragment %131 "frag_main" %104 %107 %110 %112 %115 %118 %121 %123 %125 %127 %129
-OpExecutionMode %131 OriginUpperLeft
-%3 = OpString "interpolate_compat.wgsl"
-OpSource Unknown 0 %3 "// NOTE: This is basically the same as `interpolate.wgsl`, except for the removal of
+; Generator: Khronos; 28
+; Bound: 165
+; Schema: 0
+               OpCapability Shader
+               OpCapability SampleRateShading
+               OpExtension "SPV_KHR_non_semantic_info"
+          %1 = OpExtInstImport "GLSL.std.450"
+         %10 = OpExtInstImport "NonSemantic.Shader.DebugInfo.100"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %vert_main "vert_main" %position %_flat %flat_either %_linear %linear_centroid %linear_sample %linear_center %perspective %perspective_centroid %perspective_sample %perspective_center %gl_PointSize
+               OpEntryPoint Fragment %frag_main "frag_main" %position_0 %_flat_0 %flat_either_0 %_linear_0 %linear_centroid_0 %linear_sample_0 %linear_center_0 %perspective_0 %perspective_centroid_0 %perspective_sample_0 %perspective_center_0
+               OpExecutionMode %frag_main OriginUpperLeft
+         %32 = OpString "vert_main"
+         %42 = OpString "// NOTE: This is basically the same as `interpolate.wgsl`, except for the removal of
 // `@interpolate(flat, first)`, which is unsupported in GLSL and `compat`.
 
 // NOTE: invalid combinations are tested in the
@@ -54,282 +57,399 @@ fn vert_main() -> FragmentInput {
 @fragment
 fn frag_main(val : FragmentInput) { }
 "
-OpMemberName %9 0 "position"
-OpMemberName %9 1 "_flat"
-OpMemberName %9 2 "flat_either"
-OpMemberName %9 3 "_linear"
-OpMemberName %9 4 "linear_centroid"
-OpMemberName %9 5 "linear_sample"
-OpMemberName %9 6 "linear_center"
-OpMemberName %9 7 "perspective"
-OpMemberName %9 8 "perspective_centroid"
-OpMemberName %9 9 "perspective_sample"
-OpMemberName %9 10 "perspective_center"
-OpName %9 "FragmentInput"
-OpName %11 "position"
-OpName %13 "_flat"
-OpName %15 "flat_either"
-OpName %16 "_linear"
-OpName %18 "linear_centroid"
-OpName %20 "linear_sample"
-OpName %22 "linear_center"
-OpName %23 "perspective"
-OpName %24 "perspective_centroid"
-OpName %25 "perspective_sample"
-OpName %26 "perspective_center"
-OpName %29 "vert_main"
-OpName %58 "out"
-OpName %104 "position"
-OpName %107 "_flat"
-OpName %110 "flat_either"
-OpName %112 "_linear"
-OpName %115 "linear_centroid"
-OpName %118 "linear_sample"
-OpName %121 "linear_center"
-OpName %123 "perspective"
-OpName %125 "perspective_centroid"
-OpName %127 "perspective_sample"
-OpName %129 "perspective_center"
-OpName %131 "frag_main"
-OpMemberDecorate %9 0 Offset 0
-OpMemberDecorate %9 1 Offset 16
-OpMemberDecorate %9 2 Offset 20
-OpMemberDecorate %9 3 Offset 24
-OpMemberDecorate %9 4 Offset 32
-OpMemberDecorate %9 5 Offset 48
-OpMemberDecorate %9 6 Offset 64
-OpMemberDecorate %9 7 Offset 80
-OpMemberDecorate %9 8 Offset 96
-OpMemberDecorate %9 9 Offset 100
-OpMemberDecorate %9 10 Offset 104
-OpDecorate %11 BuiltIn Position
-OpDecorate %13 Location 0
-OpDecorate %13 Flat
-OpDecorate %15 Location 2
-OpDecorate %15 Flat
-OpDecorate %16 Location 3
-OpDecorate %16 NoPerspective
-OpDecorate %18 Location 4
-OpDecorate %18 NoPerspective
-OpDecorate %18 Centroid
-OpDecorate %20 Location 6
-OpDecorate %20 NoPerspective
-OpDecorate %20 Sample
-OpDecorate %22 Location 7
-OpDecorate %22 NoPerspective
-OpDecorate %23 Location 8
-OpDecorate %24 Location 9
-OpDecorate %24 Centroid
-OpDecorate %25 Location 10
-OpDecorate %25 Sample
-OpDecorate %26 Location 11
-OpDecorate %27 BuiltIn PointSize
-OpDecorate %104 BuiltIn FragCoord
-OpDecorate %107 Location 0
-OpDecorate %107 Flat
-OpDecorate %110 Location 2
-OpDecorate %110 Flat
-OpDecorate %112 Location 3
-OpDecorate %112 NoPerspective
-OpDecorate %115 Location 4
-OpDecorate %115 NoPerspective
-OpDecorate %115 Centroid
-OpDecorate %118 Location 6
-OpDecorate %118 NoPerspective
-OpDecorate %118 Sample
-OpDecorate %121 Location 7
-OpDecorate %121 NoPerspective
-OpDecorate %123 Location 8
-OpDecorate %125 Location 9
-OpDecorate %125 Centroid
-OpDecorate %127 Location 10
-OpDecorate %127 Sample
-OpDecorate %129 Location 11
-%2 = OpTypeVoid
-%4 = OpTypeFloat 32
-%5 = OpTypeVector %4 4
-%6 = OpTypeInt 32 0
-%7 = OpTypeVector %4 2
-%8 = OpTypeVector %4 3
-%9 = OpTypeStruct %5 %6 %6 %4 %7 %8 %8 %5 %4 %4 %4
-%12 = OpTypePointer Output %5
-%11 = OpVariable  %12  Output
-%14 = OpTypePointer Output %6
-%13 = OpVariable  %14  Output
-%15 = OpVariable  %14  Output
-%17 = OpTypePointer Output %4
-%16 = OpVariable  %17  Output
-%19 = OpTypePointer Output %7
-%18 = OpVariable  %19  Output
-%21 = OpTypePointer Output %8
-%20 = OpVariable  %21  Output
-%22 = OpVariable  %21  Output
-%23 = OpVariable  %12  Output
-%24 = OpVariable  %17  Output
-%25 = OpVariable  %17  Output
-%26 = OpVariable  %17  Output
-%27 = OpVariable  %17  Output
-%28 = OpConstant  %4  1
-%30 = OpTypeFunction %2
-%31 = OpConstant  %4  2
-%32 = OpConstant  %4  4
-%33 = OpConstant  %4  5
-%34 = OpConstant  %4  6
-%35 = OpConstantComposite  %5  %31 %32 %33 %34
-%36 = OpConstant  %6  8
-%37 = OpConstant  %6  10
-%38 = OpConstant  %4  27
-%39 = OpConstant  %4  64
-%40 = OpConstant  %4  125
-%41 = OpConstantComposite  %7  %39 %40
-%42 = OpConstant  %4  216
-%43 = OpConstant  %4  343
-%44 = OpConstant  %4  512
-%45 = OpConstantComposite  %8  %42 %43 %44
-%46 = OpConstant  %4  255
-%47 = OpConstant  %4  511
-%48 = OpConstant  %4  1024
-%49 = OpConstantComposite  %8  %46 %47 %48
-%50 = OpConstant  %4  729
-%51 = OpConstant  %4  1000
-%52 = OpConstant  %4  1331
-%53 = OpConstant  %4  1728
-%54 = OpConstantComposite  %5  %50 %51 %52 %53
-%55 = OpConstant  %4  2197
-%56 = OpConstant  %4  2744
-%57 = OpConstant  %4  2812
-%59 = OpTypePointer Function %9
-%60 = OpConstantNull  %9
-%62 = OpTypePointer Function %5
-%63 = OpConstant  %6  0
-%65 = OpTypePointer Function %6
-%66 = OpConstant  %6  1
-%68 = OpConstant  %6  2
-%70 = OpTypePointer Function %4
-%71 = OpConstant  %6  3
-%73 = OpTypePointer Function %7
-%74 = OpConstant  %6  4
-%76 = OpTypePointer Function %8
-%77 = OpConstant  %6  5
-%79 = OpConstant  %6  6
-%81 = OpConstant  %6  7
-%84 = OpConstant  %6  9
-%105 = OpTypePointer Input %5
-%104 = OpVariable  %105  Input
-%108 = OpTypePointer Input %6
-%107 = OpVariable  %108  Input
-%110 = OpVariable  %108  Input
-%113 = OpTypePointer Input %4
-%112 = OpVariable  %113  Input
-%116 = OpTypePointer Input %7
-%115 = OpVariable  %116  Input
-%119 = OpTypePointer Input %8
-%118 = OpVariable  %119  Input
-%121 = OpVariable  %119  Input
-%123 = OpVariable  %105  Input
-%125 = OpVariable  %113  Input
-%127 = OpVariable  %113  Input
-%129 = OpVariable  %113  Input
-%29 = OpFunction  %2  None %30
-%10 = OpLabel
-%58 = OpVariable  %59  Function %60
-OpStore %27 %28
-OpBranch %61
-%61 = OpLabel
-OpLine %3 26 4
-OpLine %3 26 19
-OpLine %3 26 4
-%64 = OpAccessChain  %62  %58 %63
-OpStore %64 %35
-OpLine %3 27 4
-OpLine %3 27 4
-%67 = OpAccessChain  %65  %58 %66
-OpStore %67 %36
-OpLine %3 29 4
-OpLine %3 29 4
-%69 = OpAccessChain  %65  %58 %68
-OpStore %69 %37
-OpLine %3 30 4
-OpLine %3 30 4
-%72 = OpAccessChain  %70  %58 %71
-OpStore %72 %38
-OpLine %3 31 4
-OpLine %3 31 26
-OpLine %3 31 4
-%75 = OpAccessChain  %73  %58 %74
-OpStore %75 %41
-OpLine %3 32 4
-OpLine %3 32 24
-OpLine %3 32 4
-%78 = OpAccessChain  %76  %58 %77
-OpStore %78 %45
-OpLine %3 33 4
-OpLine %3 33 24
-OpLine %3 33 4
-%80 = OpAccessChain  %76  %58 %79
-OpStore %80 %49
-OpLine %3 34 4
-OpLine %3 34 22
-OpLine %3 34 4
-%82 = OpAccessChain  %62  %58 %81
-OpStore %82 %54
-OpLine %3 35 4
-OpLine %3 35 4
-%83 = OpAccessChain  %70  %58 %36
-OpStore %83 %55
-OpLine %3 36 4
-OpLine %3 36 4
-%85 = OpAccessChain  %70  %58 %84
-OpStore %85 %56
-OpLine %3 37 4
-OpLine %3 37 4
-%86 = OpAccessChain  %70  %58 %37
-OpStore %86 %57
-OpLine %3 1 1
-%87 = OpLoad  %9  %58
-%88 = OpCompositeExtract  %5  %87 0
-OpStore %11 %88
-%89 = OpAccessChain  %17  %11 %66
-%90 = OpLoad  %4  %89
-%91 = OpFNegate  %4  %90
-OpStore %89 %91
-%92 = OpCompositeExtract  %6  %87 1
-OpStore %13 %92
-%93 = OpCompositeExtract  %6  %87 2
-OpStore %15 %93
-%94 = OpCompositeExtract  %4  %87 3
-OpStore %16 %94
-%95 = OpCompositeExtract  %7  %87 4
-OpStore %18 %95
-%96 = OpCompositeExtract  %8  %87 5
-OpStore %20 %96
-%97 = OpCompositeExtract  %8  %87 6
-OpStore %22 %97
-%98 = OpCompositeExtract  %5  %87 7
-OpStore %23 %98
-%99 = OpCompositeExtract  %4  %87 8
-OpStore %24 %99
-%100 = OpCompositeExtract  %4  %87 9
-OpStore %25 %100
-%101 = OpCompositeExtract  %4  %87 10
-OpStore %26 %101
-OpReturn
-OpFunctionEnd
-%131 = OpFunction  %2  None %30
-%102 = OpLabel
-%106 = OpLoad  %5  %104
-%109 = OpLoad  %6  %107
-%111 = OpLoad  %6  %110
-%114 = OpLoad  %4  %112
-%117 = OpLoad  %7  %115
-%120 = OpLoad  %8  %118
-%122 = OpLoad  %8  %121
-%124 = OpLoad  %5  %123
-%126 = OpLoad  %4  %125
-%128 = OpLoad  %4  %127
-%130 = OpLoad  %4  %129
-%103 = OpCompositeConstruct  %9  %106 %109 %111 %114 %117 %120 %122 %124 %126 %128 %130
-OpBranch %132
-%132 = OpLabel
-OpReturn
-OpFunctionEnd
+         %46 = OpString "void"
+         %52 = OpString "naga"
+         %53 = OpString ""
+        %149 = OpString "frag_main"
+        %151 = OpString "// NOTE: This is basically the same as `interpolate.wgsl`, except for the removal of
+// `@interpolate(flat, first)`, which is unsupported in GLSL and `compat`.
+
+// NOTE: invalid combinations are tested in the
+// `validation::incompatible_interpolation_and_sampling_types` test.
+struct FragmentInput {
+  @builtin(position) position: vec4<f32>,
+  @location(0) @interpolate(flat) _flat : u32,
+  // NOTE: not supported in `compat` or GLSL
+  // // @location(1) @interpolate(flat, first) flat_first : u32,
+  @location(2) @interpolate(flat, either) flat_either : u32,
+  @location(3) @interpolate(linear) _linear : f32,
+  @location(4) @interpolate(linear, centroid) linear_centroid : vec2<f32>,
+  @location(6) @interpolate(linear, sample) linear_sample : vec3<f32>,
+  @location(7) @interpolate(linear, center) linear_center : vec3<f32>,
+  @location(8) @interpolate(perspective) perspective : vec4<f32>,
+  @location(9) @interpolate(perspective, centroid) perspective_centroid : f32,
+  @location(10) @interpolate(perspective, sample) perspective_sample : f32,
+  @location(11) @interpolate(perspective, center) perspective_center : f32,
+}
+
+@vertex
+fn vert_main() -> FragmentInput {
+   var out: FragmentInput;
+
+   out.position = vec4<f32>(2.0, 4.0, 5.0, 6.0);
+   out._flat = 8u;
+   // out.flat_first = 9u;
+   out.flat_either = 10u;
+   out._linear = 27.0;
+   out.linear_centroid = vec2<f32>(64.0, 125.0);
+   out.linear_sample = vec3<f32>(216.0, 343.0, 512.0);
+   out.linear_center = vec3<f32>(255.0, 511.0, 1024.0);
+   out.perspective = vec4<f32>(729.0, 1000.0, 1331.0, 1728.0);
+   out.perspective_centroid = 2197.0;
+   out.perspective_sample = 2744.0;
+   out.perspective_center = 2812.0;
+
+   return out;
+}
+
+@fragment
+fn frag_main(val : FragmentInput) { }
+"
+        %155 = OpString "void"
+        %161 = OpString "naga"
+        %162 = OpString ""
+          %3 = OpString "interpolate_compat.wgsl"
+               OpSource GLSL 0 %3 "// NOTE: This is basically the same as `interpolate.wgsl`, except for the removal of
+// `@interpolate(flat, first)`, which is unsupported in GLSL and `compat`.
+
+// NOTE: invalid combinations are tested in the
+// `validation::incompatible_interpolation_and_sampling_types` test.
+struct FragmentInput {
+  @builtin(position) position: vec4<f32>,
+  @location(0) @interpolate(flat) _flat : u32,
+  // NOTE: not supported in `compat` or GLSL
+  // // @location(1) @interpolate(flat, first) flat_first : u32,
+  @location(2) @interpolate(flat, either) flat_either : u32,
+  @location(3) @interpolate(linear) _linear : f32,
+  @location(4) @interpolate(linear, centroid) linear_centroid : vec2<f32>,
+  @location(6) @interpolate(linear, sample) linear_sample : vec3<f32>,
+  @location(7) @interpolate(linear, center) linear_center : vec3<f32>,
+  @location(8) @interpolate(perspective) perspective : vec4<f32>,
+  @location(9) @interpolate(perspective, centroid) perspective_centroid : f32,
+  @location(10) @interpolate(perspective, sample) perspective_sample : f32,
+  @location(11) @interpolate(perspective, center) perspective_center : f32,
+}
+
+@vertex
+fn vert_main() -> FragmentInput {
+   var out: FragmentInput;
+
+   out.position = vec4<f32>(2.0, 4.0, 5.0, 6.0);
+   out._flat = 8u;
+   // out.flat_first = 9u;
+   out.flat_either = 10u;
+   out._linear = 27.0;
+   out.linear_centroid = vec2<f32>(64.0, 125.0);
+   out.linear_sample = vec3<f32>(216.0, 343.0, 512.0);
+   out.linear_center = vec3<f32>(255.0, 511.0, 1024.0);
+   out.perspective = vec4<f32>(729.0, 1000.0, 1331.0, 1728.0);
+   out.perspective_centroid = 2197.0;
+   out.perspective_sample = 2744.0;
+   out.perspective_center = 2812.0;
+
+   return out;
+}
+
+@fragment
+fn frag_main(val : FragmentInput) { }
+"
+               OpMemberName %FragmentInput 0 "position"
+               OpMemberName %FragmentInput 1 "_flat"
+               OpMemberName %FragmentInput 2 "flat_either"
+               OpMemberName %FragmentInput 3 "_linear"
+               OpMemberName %FragmentInput 4 "linear_centroid"
+               OpMemberName %FragmentInput 5 "linear_sample"
+               OpMemberName %FragmentInput 6 "linear_center"
+               OpMemberName %FragmentInput 7 "perspective"
+               OpMemberName %FragmentInput 8 "perspective_centroid"
+               OpMemberName %FragmentInput 9 "perspective_sample"
+               OpMemberName %FragmentInput 10 "perspective_center"
+               OpName %FragmentInput "FragmentInput"
+               OpName %position "position"
+               OpName %_flat "_flat"
+               OpName %flat_either "flat_either"
+               OpName %_linear "_linear"
+               OpName %linear_centroid "linear_centroid"
+               OpName %linear_sample "linear_sample"
+               OpName %linear_center "linear_center"
+               OpName %perspective "perspective"
+               OpName %perspective_centroid "perspective_centroid"
+               OpName %perspective_sample "perspective_sample"
+               OpName %perspective_center "perspective_center"
+               OpName %vert_main "vert_main"
+               OpName %out "out"
+               OpName %position_0 "position"
+               OpName %_flat_0 "_flat"
+               OpName %flat_either_0 "flat_either"
+               OpName %_linear_0 "_linear"
+               OpName %linear_centroid_0 "linear_centroid"
+               OpName %linear_sample_0 "linear_sample"
+               OpName %linear_center_0 "linear_center"
+               OpName %perspective_0 "perspective"
+               OpName %perspective_centroid_0 "perspective_centroid"
+               OpName %perspective_sample_0 "perspective_sample"
+               OpName %perspective_center_0 "perspective_center"
+               OpName %frag_main "frag_main"
+               OpMemberDecorate %FragmentInput 0 Offset 0
+               OpMemberDecorate %FragmentInput 1 Offset 16
+               OpMemberDecorate %FragmentInput 2 Offset 20
+               OpMemberDecorate %FragmentInput 3 Offset 24
+               OpMemberDecorate %FragmentInput 4 Offset 32
+               OpMemberDecorate %FragmentInput 5 Offset 48
+               OpMemberDecorate %FragmentInput 6 Offset 64
+               OpMemberDecorate %FragmentInput 7 Offset 80
+               OpMemberDecorate %FragmentInput 8 Offset 96
+               OpMemberDecorate %FragmentInput 9 Offset 100
+               OpMemberDecorate %FragmentInput 10 Offset 104
+               OpDecorate %position BuiltIn Position
+               OpDecorate %_flat Location 0
+               OpDecorate %_flat Flat
+               OpDecorate %flat_either Location 2
+               OpDecorate %flat_either Flat
+               OpDecorate %_linear Location 3
+               OpDecorate %_linear NoPerspective
+               OpDecorate %linear_centroid Location 4
+               OpDecorate %linear_centroid NoPerspective
+               OpDecorate %linear_centroid Centroid
+               OpDecorate %linear_sample Location 6
+               OpDecorate %linear_sample NoPerspective
+               OpDecorate %linear_sample Sample
+               OpDecorate %linear_center Location 7
+               OpDecorate %linear_center NoPerspective
+               OpDecorate %perspective Location 8
+               OpDecorate %perspective_centroid Location 9
+               OpDecorate %perspective_centroid Centroid
+               OpDecorate %perspective_sample Location 10
+               OpDecorate %perspective_sample Sample
+               OpDecorate %perspective_center Location 11
+               OpDecorate %gl_PointSize BuiltIn PointSize
+               OpDecorate %position_0 BuiltIn FragCoord
+               OpDecorate %_flat_0 Location 0
+               OpDecorate %_flat_0 Flat
+               OpDecorate %flat_either_0 Location 2
+               OpDecorate %flat_either_0 Flat
+               OpDecorate %_linear_0 Location 3
+               OpDecorate %_linear_0 NoPerspective
+               OpDecorate %linear_centroid_0 Location 4
+               OpDecorate %linear_centroid_0 NoPerspective
+               OpDecorate %linear_centroid_0 Centroid
+               OpDecorate %linear_sample_0 Location 6
+               OpDecorate %linear_sample_0 NoPerspective
+               OpDecorate %linear_sample_0 Sample
+               OpDecorate %linear_center_0 Location 7
+               OpDecorate %linear_center_0 NoPerspective
+               OpDecorate %perspective_0 Location 8
+               OpDecorate %perspective_centroid_0 Location 9
+               OpDecorate %perspective_centroid_0 Centroid
+               OpDecorate %perspective_sample_0 Location 10
+               OpDecorate %perspective_sample_0 Sample
+               OpDecorate %perspective_center_0 Location 11
+       %void = OpTypeVoid
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+       %uint = OpTypeInt 32 0
+    %v2float = OpTypeVector %float 2
+    %v3float = OpTypeVector %float 3
+%FragmentInput = OpTypeStruct %v4float %uint %uint %float %v2float %v3float %v3float %v4float %float %float %float
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %position = OpVariable %_ptr_Output_v4float Output
+%_ptr_Output_uint = OpTypePointer Output %uint
+      %_flat = OpVariable %_ptr_Output_uint Output
+%flat_either = OpVariable %_ptr_Output_uint Output
+%_ptr_Output_float = OpTypePointer Output %float
+    %_linear = OpVariable %_ptr_Output_float Output
+%_ptr_Output_v2float = OpTypePointer Output %v2float
+%linear_centroid = OpVariable %_ptr_Output_v2float Output
+%_ptr_Output_v3float = OpTypePointer Output %v3float
+%linear_sample = OpVariable %_ptr_Output_v3float Output
+%linear_center = OpVariable %_ptr_Output_v3float Output
+%perspective = OpVariable %_ptr_Output_v4float Output
+%perspective_centroid = OpVariable %_ptr_Output_float Output
+%perspective_sample = OpVariable %_ptr_Output_float Output
+%perspective_center = OpVariable %_ptr_Output_float Output
+%gl_PointSize = OpVariable %_ptr_Output_float Output
+    %float_1 = OpConstant %float 1
+         %31 = OpTypeFunction %void
+     %uint_1 = OpConstant %uint 1
+     %uint_4 = OpConstant %uint 4
+     %uint_2 = OpConstant %uint 2
+    %uint_26 = OpConstant %uint 26
+     %uint_8 = OpConstant %uint 8
+     %uint_0 = OpConstant %uint 0
+     %uint_3 = OpConstant %uint 3
+     %uint_6 = OpConstant %uint 6
+    %float_2 = OpConstant %float 2
+    %float_4 = OpConstant %float 4
+    %float_5 = OpConstant %float 5
+    %float_6 = OpConstant %float 6
+         %59 = OpConstantComposite %v4float %float_2 %float_4 %float_5 %float_6
+    %uint_10 = OpConstant %uint 10
+   %float_27 = OpConstant %float 27
+   %float_64 = OpConstant %float 64
+  %float_125 = OpConstant %float 125
+         %64 = OpConstantComposite %v2float %float_64 %float_125
+  %float_216 = OpConstant %float 216
+  %float_343 = OpConstant %float 343
+  %float_512 = OpConstant %float 512
+         %68 = OpConstantComposite %v3float %float_216 %float_343 %float_512
+  %float_255 = OpConstant %float 255
+  %float_511 = OpConstant %float 511
+ %float_1024 = OpConstant %float 1024
+         %72 = OpConstantComposite %v3float %float_255 %float_511 %float_1024
+  %float_729 = OpConstant %float 729
+ %float_1000 = OpConstant %float 1000
+ %float_1331 = OpConstant %float 1331
+ %float_1728 = OpConstant %float 1728
+         %77 = OpConstantComposite %v4float %float_729 %float_1000 %float_1331 %float_1728
+ %float_2197 = OpConstant %float 2197
+ %float_2744 = OpConstant %float 2744
+ %float_2812 = OpConstant %float 2812
+%_ptr_Function_FragmentInput = OpTypePointer Function %FragmentInput
+         %83 = OpConstantNull %FragmentInput
+%_ptr_Function_v4float = OpTypePointer Function %v4float
+%_ptr_Function_uint = OpTypePointer Function %uint
+%_ptr_Function_float = OpTypePointer Function %float
+%_ptr_Function_v2float = OpTypePointer Function %v2float
+%_ptr_Function_v3float = OpTypePointer Function %v3float
+     %uint_5 = OpConstant %uint 5
+     %uint_7 = OpConstant %uint 7
+     %uint_9 = OpConstant %uint 9
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+ %position_0 = OpVariable %_ptr_Input_v4float Input
+%_ptr_Input_uint = OpTypePointer Input %uint
+    %_flat_0 = OpVariable %_ptr_Input_uint Input
+%flat_either_0 = OpVariable %_ptr_Input_uint Input
+%_ptr_Input_float = OpTypePointer Input %float
+  %_linear_0 = OpVariable %_ptr_Input_float Input
+%_ptr_Input_v2float = OpTypePointer Input %v2float
+%linear_centroid_0 = OpVariable %_ptr_Input_v2float Input
+%_ptr_Input_v3float = OpTypePointer Input %v3float
+%linear_sample_0 = OpVariable %_ptr_Input_v3float Input
+%linear_center_0 = OpVariable %_ptr_Input_v3float Input
+%perspective_0 = OpVariable %_ptr_Input_v4float Input
+%perspective_centroid_0 = OpVariable %_ptr_Input_float Input
+%perspective_sample_0 = OpVariable %_ptr_Input_float Input
+%perspective_center_0 = OpVariable %_ptr_Input_float Input
+         %41 = OpExtInst %void %10 DebugInfoNone
+         %43 = OpExtInst %void %10 DebugSource %3 %42
+         %44 = OpExtInst %void %10 DebugCompilationUnit %uint_1 %uint_4 %43 %uint_2
+         %45 = OpExtInst %void %10 DebugExpression
+         %47 = OpExtInst %void %10 DebugTypeBasic %46 %uint_0 %uint_0 %uint_0
+         %48 = OpExtInst %void %10 DebugTypeFunction %uint_0 %47
+         %49 = OpExtInst %void %10 DebugFunction %32 %48 %43 %uint_26 %uint_4 %44 %32 %uint_8 %uint_26
+         %54 = OpExtInst %void %10 DebugEntryPoint %49 %44 %52 %53
+        %150 = OpExtInst %void %10 DebugInfoNone
+        %152 = OpExtInst %void %10 DebugSource %3 %151
+        %153 = OpExtInst %void %10 DebugCompilationUnit %uint_1 %uint_4 %152 %uint_2
+        %154 = OpExtInst %void %10 DebugExpression
+        %156 = OpExtInst %void %10 DebugTypeBasic %155 %uint_0 %uint_0 %uint_0
+        %157 = OpExtInst %void %10 DebugTypeFunction %uint_0 %156
+        %158 = OpExtInst %void %10 DebugFunction %149 %157 %152 %uint_1 %uint_1 %153 %149 %uint_8 %uint_1
+        %163 = OpExtInst %void %10 DebugEntryPoint %158 %153 %161 %162
+  %vert_main = OpFunction %void None %31
+         %11 = OpLabel
+        %out = OpVariable %_ptr_Function_FragmentInput Function %83
+               OpStore %gl_PointSize %float_1
+         %50 = OpExtInst %void %10 DebugScope %49
+         %51 = OpExtInst %void %10 DebugFunctionDefinition %49 %vert_main
+               OpBranch %84
+         %84 = OpLabel
+               OpLine %3 26 4
+               OpLine %3 26 19
+               OpLine %3 26 4
+         %86 = OpAccessChain %_ptr_Function_v4float %out %uint_0
+               OpStore %86 %59
+               OpLine %3 27 4
+               OpLine %3 27 4
+         %88 = OpAccessChain %_ptr_Function_uint %out %uint_1
+               OpStore %88 %uint_8
+               OpLine %3 29 4
+               OpLine %3 29 4
+         %89 = OpAccessChain %_ptr_Function_uint %out %uint_2
+               OpStore %89 %uint_10
+               OpLine %3 30 4
+               OpLine %3 30 4
+         %91 = OpAccessChain %_ptr_Function_float %out %uint_3
+               OpStore %91 %float_27
+               OpLine %3 31 4
+               OpLine %3 31 26
+               OpLine %3 31 4
+         %93 = OpAccessChain %_ptr_Function_v2float %out %uint_4
+               OpStore %93 %64
+               OpLine %3 32 4
+               OpLine %3 32 24
+               OpLine %3 32 4
+         %96 = OpAccessChain %_ptr_Function_v3float %out %uint_5
+               OpStore %96 %68
+               OpLine %3 33 4
+               OpLine %3 33 24
+               OpLine %3 33 4
+         %97 = OpAccessChain %_ptr_Function_v3float %out %uint_6
+               OpStore %97 %72
+               OpLine %3 34 4
+               OpLine %3 34 22
+               OpLine %3 34 4
+         %99 = OpAccessChain %_ptr_Function_v4float %out %uint_7
+               OpStore %99 %77
+               OpLine %3 35 4
+               OpLine %3 35 4
+        %100 = OpAccessChain %_ptr_Function_float %out %uint_8
+               OpStore %100 %float_2197
+               OpLine %3 36 4
+               OpLine %3 36 4
+        %102 = OpAccessChain %_ptr_Function_float %out %uint_9
+               OpStore %102 %float_2744
+               OpLine %3 37 4
+               OpLine %3 37 4
+        %103 = OpAccessChain %_ptr_Function_float %out %uint_10
+               OpStore %103 %float_2812
+               OpLine %3 1 1
+        %104 = OpLoad %FragmentInput %out
+        %105 = OpCompositeExtract %v4float %104 0
+               OpStore %position %105
+        %106 = OpAccessChain %_ptr_Output_float %position %uint_1
+        %107 = OpLoad %float %106
+        %108 = OpFNegate %float %107
+               OpStore %106 %108
+        %109 = OpCompositeExtract %uint %104 1
+               OpStore %_flat %109
+        %110 = OpCompositeExtract %uint %104 2
+               OpStore %flat_either %110
+        %111 = OpCompositeExtract %float %104 3
+               OpStore %_linear %111
+        %112 = OpCompositeExtract %v2float %104 4
+               OpStore %linear_centroid %112
+        %113 = OpCompositeExtract %v3float %104 5
+               OpStore %linear_sample %113
+        %114 = OpCompositeExtract %v3float %104 6
+               OpStore %linear_center %114
+        %115 = OpCompositeExtract %v4float %104 7
+               OpStore %perspective %115
+        %116 = OpCompositeExtract %float %104 8
+               OpStore %perspective_centroid %116
+        %117 = OpCompositeExtract %float %104 9
+               OpStore %perspective_sample %117
+        %118 = OpCompositeExtract %float %104 10
+               OpStore %perspective_center %118
+               OpReturn
+               OpFunctionEnd
+  %frag_main = OpFunction %void None %31
+        %119 = OpLabel
+        %123 = OpLoad %v4float %position_0
+        %126 = OpLoad %uint %_flat_0
+        %128 = OpLoad %uint %flat_either_0
+        %131 = OpLoad %float %_linear_0
+        %134 = OpLoad %v2float %linear_centroid_0
+        %137 = OpLoad %v3float %linear_sample_0
+        %139 = OpLoad %v3float %linear_center_0
+        %141 = OpLoad %v4float %perspective_0
+        %143 = OpLoad %float %perspective_centroid_0
+        %145 = OpLoad %float %perspective_sample_0
+        %147 = OpLoad %float %perspective_center_0
+        %120 = OpCompositeConstruct %FragmentInput %123 %126 %128 %131 %134 %137 %139 %141 %143 %145 %147
+        %159 = OpExtInst %void %10 DebugScope %158
+        %160 = OpExtInst %void %10 DebugFunctionDefinition %158 %frag_main
+               OpBranch %164
+        %164 = OpLabel
+               OpReturn
+               OpFunctionEnd

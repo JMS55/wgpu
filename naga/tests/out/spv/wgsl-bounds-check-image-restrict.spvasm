@@ -1,17 +1,20 @@
 ; SPIR-V
 ; Version: 1.1
-; Generator: rspirv
-; Bound: 204
-OpCapability Shader
-OpCapability Sampled1D
-OpCapability Image1D
-OpCapability ImageQuery
-%1 = OpExtInstImport "GLSL.std.450"
-OpMemoryModel Logical GLSL450
-OpEntryPoint Fragment %174 "fragment_shader" %172
-OpExecutionMode %174 OriginUpperLeft
-%3 = OpString "bounds-check-image-restrict.wgsl"
-OpSource Unknown 0 %3 "@group(0) @binding(0)
+; Generator: Khronos; 28
+; Bound: 371
+; Schema: 0
+               OpCapability Shader
+               OpCapability Sampled1D
+               OpCapability Image1D
+               OpCapability ImageQuery
+               OpExtension "SPV_KHR_non_semantic_info"
+          %1 = OpExtInstImport "GLSL.std.450"
+         %37 = OpExtInstImport "NonSemantic.Shader.DebugInfo.100"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %fragment_shader "fragment_shader" %324
+               OpExecutionMode %fragment_shader OriginUpperLeft
+         %44 = OpString "test_textureLoad_1d"
+         %55 = OpString "@group(0) @binding(0)
 var image_1d: texture_1d<f32>;
 
 fn test_textureLoad_1d(coords: i32, level: i32) -> vec4<f32> {
@@ -101,339 +104,1573 @@ fn fragment_shader() -> @location(0) vec4<f32> {
     return vec4<f32>(0.,0.,0.,0.);
 }
 "
-OpName %19 "image_1d"
-OpName %21 "image_2d"
-OpName %23 "image_2d_array"
-OpName %25 "image_3d"
-OpName %27 "image_multisampled_2d"
-OpName %29 "image_storage_1d"
-OpName %31 "image_storage_2d"
-OpName %33 "image_storage_2d_array"
-OpName %35 "image_storage_3d"
-OpName %38 "coords"
-OpName %39 "level"
-OpName %40 "test_textureLoad_1d"
-OpName %53 "coords"
-OpName %54 "level"
-OpName %55 "test_textureLoad_2d"
-OpName %68 "coords"
-OpName %69 "index"
-OpName %70 "level"
-OpName %71 "test_textureLoad_2d_array_u"
-OpName %86 "coords"
-OpName %87 "index"
-OpName %88 "level"
-OpName %89 "test_textureLoad_2d_array_s"
-OpName %103 "coords"
-OpName %104 "level"
-OpName %105 "test_textureLoad_3d"
-OpName %118 "coords"
-OpName %119 "_sample"
-OpName %120 "test_textureLoad_multisampled_2d"
-OpName %132 "coords"
-OpName %133 "value"
-OpName %134 "test_textureStore_1d"
-OpName %139 "coords"
-OpName %140 "value"
-OpName %141 "test_textureStore_2d"
-OpName %146 "coords"
-OpName %147 "array_index"
-OpName %148 "value"
-OpName %149 "test_textureStore_2d_array_u"
-OpName %156 "coords"
-OpName %157 "array_index"
-OpName %158 "value"
-OpName %159 "test_textureStore_2d_array_s"
-OpName %165 "coords"
-OpName %166 "value"
-OpName %167 "test_textureStore_3d"
-OpName %174 "fragment_shader"
-OpDecorate %19 DescriptorSet 0
-OpDecorate %19 Binding 0
-OpDecorate %21 DescriptorSet 0
-OpDecorate %21 Binding 1
-OpDecorate %23 DescriptorSet 0
-OpDecorate %23 Binding 2
-OpDecorate %25 DescriptorSet 0
-OpDecorate %25 Binding 3
-OpDecorate %27 DescriptorSet 0
-OpDecorate %27 Binding 4
-OpDecorate %29 NonReadable
-OpDecorate %29 DescriptorSet 0
-OpDecorate %29 Binding 5
-OpDecorate %31 NonReadable
-OpDecorate %31 DescriptorSet 0
-OpDecorate %31 Binding 6
-OpDecorate %33 NonReadable
-OpDecorate %33 DescriptorSet 0
-OpDecorate %33 Binding 7
-OpDecorate %35 NonReadable
-OpDecorate %35 DescriptorSet 0
-OpDecorate %35 Binding 8
-OpDecorate %172 Location 0
-%2 = OpTypeVoid
-%5 = OpTypeFloat 32
-%4 = OpTypeImage %5 1D 0 0 0 1 Unknown
-%6 = OpTypeInt 32 1
-%7 = OpTypeVector %5 4
-%8 = OpTypeImage %5 2D 0 0 0 1 Unknown
-%9 = OpTypeVector %6 2
-%10 = OpTypeImage %5 2D 0 1 0 1 Unknown
-%11 = OpTypeInt 32 0
-%12 = OpTypeImage %5 3D 0 0 0 1 Unknown
-%13 = OpTypeVector %6 3
-%14 = OpTypeImage %5 2D 0 0 1 1 Unknown
-%15 = OpTypeImage %5 1D 0 0 0 2 Rgba8
-%16 = OpTypeImage %5 2D 0 0 0 2 Rgba8
-%17 = OpTypeImage %5 2D 0 1 0 2 Rgba8
-%18 = OpTypeImage %5 3D 0 0 0 2 Rgba8
-%20 = OpTypePointer UniformConstant %4
-%19 = OpVariable  %20  UniformConstant
-%22 = OpTypePointer UniformConstant %8
-%21 = OpVariable  %22  UniformConstant
-%24 = OpTypePointer UniformConstant %10
-%23 = OpVariable  %24  UniformConstant
-%26 = OpTypePointer UniformConstant %12
-%25 = OpVariable  %26  UniformConstant
-%28 = OpTypePointer UniformConstant %14
-%27 = OpVariable  %28  UniformConstant
-%30 = OpTypePointer UniformConstant %15
-%29 = OpVariable  %30  UniformConstant
-%32 = OpTypePointer UniformConstant %16
-%31 = OpVariable  %32  UniformConstant
-%34 = OpTypePointer UniformConstant %17
-%33 = OpVariable  %34  UniformConstant
-%36 = OpTypePointer UniformConstant %18
-%35 = OpVariable  %36  UniformConstant
-%41 = OpTypeFunction %7 %6 %6
-%45 = OpConstant  %6  1
-%56 = OpTypeFunction %7 %9 %6
-%63 = OpConstantComposite  %9  %45 %45
-%72 = OpTypeFunction %7 %9 %11 %6
-%81 = OpConstantComposite  %13  %45 %45 %45
-%90 = OpTypeFunction %7 %9 %6 %6
-%98 = OpConstantComposite  %13  %45 %45 %45
-%106 = OpTypeFunction %7 %13 %6
-%113 = OpConstantComposite  %13  %45 %45 %45
-%127 = OpConstantComposite  %9  %45 %45
-%135 = OpTypeFunction %2 %6 %7
-%142 = OpTypeFunction %2 %9 %7
-%150 = OpTypeFunction %2 %9 %11 %7
-%160 = OpTypeFunction %2 %9 %6 %7
-%168 = OpTypeFunction %2 %13 %7
-%173 = OpTypePointer Output %7
-%172 = OpVariable  %173  Output
-%175 = OpTypeFunction %2
-%185 = OpConstant  %6  0
-%186 = OpConstantNull  %9
-%187 = OpConstant  %11  0
-%188 = OpConstantNull  %13
-%189 = OpConstantNull  %7
-%190 = OpConstant  %5  0
-%191 = OpConstantComposite  %7  %190 %190 %190 %190
-%40 = OpFunction  %7  None %41
-%38 = OpFunctionParameter  %6
-%39 = OpFunctionParameter  %6
-%37 = OpLabel
-%42 = OpLoad  %4  %19
-OpBranch %43
-%43 = OpLabel
-OpLine %3 5 11
-%44 = OpImageQueryLevels  %6  %42
-%46 = OpISub  %6  %44 %45
-%47 = OpExtInst  %6  %1 UMin %39 %46
-%48 = OpImageQuerySizeLod  %6  %42 %47
-%49 = OpISub  %6  %48 %45
-%50 = OpExtInst  %6  %1 UMin %38 %49
-%51 = OpImageFetch  %7  %42 %50 Lod %47
-OpReturnValue %51
-OpFunctionEnd
-%55 = OpFunction  %7  None %56
-%53 = OpFunctionParameter  %9
-%54 = OpFunctionParameter  %6
-%52 = OpLabel
-%57 = OpLoad  %8  %21
-OpBranch %58
-%58 = OpLabel
-OpLine %3 12 11
-%59 = OpImageQueryLevels  %6  %57
-%60 = OpISub  %6  %59 %45
-%61 = OpExtInst  %6  %1 UMin %54 %60
-%62 = OpImageQuerySizeLod  %9  %57 %61
-%64 = OpISub  %9  %62 %63
-%65 = OpExtInst  %9  %1 UMin %53 %64
-%66 = OpImageFetch  %7  %57 %65 Lod %61
-OpReturnValue %66
-OpFunctionEnd
-%71 = OpFunction  %7  None %72
-%68 = OpFunctionParameter  %9
-%69 = OpFunctionParameter  %11
-%70 = OpFunctionParameter  %6
-%67 = OpLabel
-%73 = OpLoad  %10  %23
-OpBranch %74
-%74 = OpLabel
-OpLine %3 19 11
-%75 = OpBitcast  %6  %69
-%76 = OpCompositeConstruct  %13  %68 %75
-%77 = OpImageQueryLevels  %6  %73
-%78 = OpISub  %6  %77 %45
-%79 = OpExtInst  %6  %1 UMin %70 %78
-%80 = OpImageQuerySizeLod  %13  %73 %79
-%82 = OpISub  %13  %80 %81
-%83 = OpExtInst  %13  %1 UMin %76 %82
-%84 = OpImageFetch  %7  %73 %83 Lod %79
-OpReturnValue %84
-OpFunctionEnd
-%89 = OpFunction  %7  None %90
-%86 = OpFunctionParameter  %9
-%87 = OpFunctionParameter  %6
-%88 = OpFunctionParameter  %6
-%85 = OpLabel
-%91 = OpLoad  %10  %23
-OpBranch %92
-%92 = OpLabel
-OpLine %3 23 11
-%93 = OpCompositeConstruct  %13  %86 %87
-%94 = OpImageQueryLevels  %6  %91
-%95 = OpISub  %6  %94 %45
-%96 = OpExtInst  %6  %1 UMin %88 %95
-%97 = OpImageQuerySizeLod  %13  %91 %96
-%99 = OpISub  %13  %97 %98
-%100 = OpExtInst  %13  %1 UMin %93 %99
-%101 = OpImageFetch  %7  %91 %100 Lod %96
-OpReturnValue %101
-OpFunctionEnd
-%105 = OpFunction  %7  None %106
-%103 = OpFunctionParameter  %13
-%104 = OpFunctionParameter  %6
-%102 = OpLabel
-%107 = OpLoad  %12  %25
-OpBranch %108
-%108 = OpLabel
-OpLine %3 30 11
-%109 = OpImageQueryLevels  %6  %107
-%110 = OpISub  %6  %109 %45
-%111 = OpExtInst  %6  %1 UMin %104 %110
-%112 = OpImageQuerySizeLod  %13  %107 %111
-%114 = OpISub  %13  %112 %113
-%115 = OpExtInst  %13  %1 UMin %103 %114
-%116 = OpImageFetch  %7  %107 %115 Lod %111
-OpReturnValue %116
-OpFunctionEnd
-%120 = OpFunction  %7  None %56
-%118 = OpFunctionParameter  %9
-%119 = OpFunctionParameter  %6
-%117 = OpLabel
-%121 = OpLoad  %14  %27
-OpBranch %122
-%122 = OpLabel
-OpLine %3 37 11
-%123 = OpImageQuerySamples  %6  %121
-%124 = OpISub  %6  %123 %45
-%125 = OpExtInst  %6  %1 UMin %119 %124
-%126 = OpImageQuerySize  %9  %121
-%128 = OpISub  %9  %126 %127
-%129 = OpExtInst  %9  %1 UMin %118 %128
-%130 = OpImageFetch  %7  %121 %129 Sample %125
-OpReturnValue %130
-OpFunctionEnd
-%134 = OpFunction  %2  None %135
-%132 = OpFunctionParameter  %6
-%133 = OpFunctionParameter  %7
-%131 = OpLabel
-%136 = OpLoad  %15  %29
-OpBranch %137
-%137 = OpLabel
-OpLine %3 44 5
-OpImageWrite %136 %132 %133
-OpReturn
-OpFunctionEnd
-%141 = OpFunction  %2  None %142
-%139 = OpFunctionParameter  %9
-%140 = OpFunctionParameter  %7
-%138 = OpLabel
-%143 = OpLoad  %16  %31
-OpBranch %144
-%144 = OpLabel
-OpLine %3 51 5
-OpImageWrite %143 %139 %140
-OpReturn
-OpFunctionEnd
-%149 = OpFunction  %2  None %150
-%146 = OpFunctionParameter  %9
-%147 = OpFunctionParameter  %11
-%148 = OpFunctionParameter  %7
-%145 = OpLabel
-%151 = OpLoad  %17  %33
-OpBranch %152
-%152 = OpLabel
-OpLine %3 58 2
-%153 = OpBitcast  %6  %147
-%154 = OpCompositeConstruct  %13  %146 %153
-OpImageWrite %151 %154 %148
-OpReturn
-OpFunctionEnd
-%159 = OpFunction  %2  None %160
-%156 = OpFunctionParameter  %9
-%157 = OpFunctionParameter  %6
-%158 = OpFunctionParameter  %7
-%155 = OpLabel
-%161 = OpLoad  %17  %33
-OpBranch %162
-%162 = OpLabel
-OpLine %3 62 2
-%163 = OpCompositeConstruct  %13  %156 %157
-OpImageWrite %161 %163 %158
-OpReturn
-OpFunctionEnd
-%167 = OpFunction  %2  None %168
-%165 = OpFunctionParameter  %13
-%166 = OpFunctionParameter  %7
-%164 = OpLabel
-%169 = OpLoad  %18  %35
-OpBranch %170
-%170 = OpLabel
-OpLine %3 69 5
-OpImageWrite %169 %165 %166
-OpReturn
-OpFunctionEnd
-%174 = OpFunction  %2  None %175
-%171 = OpLabel
-%176 = OpLoad  %4  %19
-%177 = OpLoad  %8  %21
-%178 = OpLoad  %10  %23
-%179 = OpLoad  %12  %25
-%180 = OpLoad  %14  %27
-%181 = OpLoad  %15  %29
-%182 = OpLoad  %16  %31
-%183 = OpLoad  %17  %33
-%184 = OpLoad  %18  %35
-OpBranch %192
-%192 = OpLabel
-OpLine %3 76 5
-%193 = OpFunctionCall  %7  %40 %185 %185
-OpLine %3 77 5
-%194 = OpFunctionCall  %7  %55 %186 %185
-OpLine %3 78 5
-%195 = OpFunctionCall  %7  %71 %186 %187 %185
-OpLine %3 79 5
-%196 = OpFunctionCall  %7  %89 %186 %185 %185
-OpLine %3 80 5
-%197 = OpFunctionCall  %7  %105 %188 %185
-OpLine %3 81 5
-%198 = OpFunctionCall  %7  %120 %186 %185
-OpLine %3 82 5
-%199 = OpFunctionCall  %2  %134 %185 %189
-OpLine %3 83 5
-%200 = OpFunctionCall  %2  %141 %186 %189
-OpLine %3 84 5
-%201 = OpFunctionCall  %2  %149 %186 %187 %189
-OpLine %3 85 5
-%202 = OpFunctionCall  %2  %159 %186 %185 %189
-OpLine %3 86 5
-%203 = OpFunctionCall  %2  %167 %188 %189
-OpLine %3 88 12
-OpStore %172 %191
-OpReturn
-OpFunctionEnd
+         %59 = OpString "void"
+         %80 = OpString "test_textureLoad_2d"
+         %83 = OpString "@group(0) @binding(0)
+var image_1d: texture_1d<f32>;
+
+fn test_textureLoad_1d(coords: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_1d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_2d: texture_2d<f32>;
+
+fn test_textureLoad_2d(coords: vec2<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d, coords, level);
+}
+
+@group(0) @binding(2)
+var image_2d_array: texture_2d_array<f32>;
+
+fn test_textureLoad_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+@group(0) @binding(3)
+var image_3d: texture_3d<f32>;
+
+fn test_textureLoad_3d(coords: vec3<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_3d, coords, level);
+}
+
+@group(0) @binding(4)
+var image_multisampled_2d: texture_multisampled_2d<f32>;
+
+fn test_textureLoad_multisampled_2d(coords: vec2<i32>, _sample: i32) -> vec4<f32> {
+   return textureLoad(image_multisampled_2d, coords, _sample);
+}
+
+@group(0) @binding(5)
+var image_storage_1d: texture_storage_1d<rgba8unorm, write>;
+
+fn test_textureStore_1d(coords: i32, value: vec4<f32>) {
+    textureStore(image_storage_1d, coords, value);
+}
+
+@group(0) @binding(6)
+var image_storage_2d: texture_storage_2d<rgba8unorm, write>;
+
+fn test_textureStore_2d(coords: vec2<i32>, value: vec4<f32>) {
+    textureStore(image_storage_2d, coords, value);
+}
+
+@group(0) @binding(7)
+var image_storage_2d_array: texture_storage_2d_array<rgba8unorm, write>;
+
+fn test_textureStore_2d_array_u(coords: vec2<i32>, array_index: u32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+fn test_textureStore_2d_array_s(coords: vec2<i32>, array_index: i32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+@group(0) @binding(8)
+var image_storage_3d: texture_storage_3d<rgba8unorm, write>;
+
+fn test_textureStore_3d(coords: vec3<i32>, value: vec4<f32>) {
+    textureStore(image_storage_3d, coords, value);
+}
+
+// GLSL output requires that we identify an entry point, so
+// that it can tell what \"in\" and \"out\" globals to write.
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_1d(0, 0);
+    test_textureLoad_2d(vec2<i32>(), 0);
+    test_textureLoad_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_3d(vec3<i32>(), 0);
+    test_textureLoad_multisampled_2d(vec2<i32>(), 0);
+    test_textureStore_1d(0, vec4<f32>());
+    test_textureStore_2d(vec2<i32>(), vec4<f32>());
+    test_textureStore_2d_array_u(vec2<i32>(), 0u, vec4<f32>());
+    test_textureStore_2d_array_s(vec2<i32>(), 0, vec4<f32>());
+    test_textureStore_3d(vec3<i32>(), vec4<f32>());
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+         %87 = OpString "void"
+        %109 = OpString "test_textureLoad_2d_array_u"
+        %112 = OpString "@group(0) @binding(0)
+var image_1d: texture_1d<f32>;
+
+fn test_textureLoad_1d(coords: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_1d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_2d: texture_2d<f32>;
+
+fn test_textureLoad_2d(coords: vec2<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d, coords, level);
+}
+
+@group(0) @binding(2)
+var image_2d_array: texture_2d_array<f32>;
+
+fn test_textureLoad_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+@group(0) @binding(3)
+var image_3d: texture_3d<f32>;
+
+fn test_textureLoad_3d(coords: vec3<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_3d, coords, level);
+}
+
+@group(0) @binding(4)
+var image_multisampled_2d: texture_multisampled_2d<f32>;
+
+fn test_textureLoad_multisampled_2d(coords: vec2<i32>, _sample: i32) -> vec4<f32> {
+   return textureLoad(image_multisampled_2d, coords, _sample);
+}
+
+@group(0) @binding(5)
+var image_storage_1d: texture_storage_1d<rgba8unorm, write>;
+
+fn test_textureStore_1d(coords: i32, value: vec4<f32>) {
+    textureStore(image_storage_1d, coords, value);
+}
+
+@group(0) @binding(6)
+var image_storage_2d: texture_storage_2d<rgba8unorm, write>;
+
+fn test_textureStore_2d(coords: vec2<i32>, value: vec4<f32>) {
+    textureStore(image_storage_2d, coords, value);
+}
+
+@group(0) @binding(7)
+var image_storage_2d_array: texture_storage_2d_array<rgba8unorm, write>;
+
+fn test_textureStore_2d_array_u(coords: vec2<i32>, array_index: u32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+fn test_textureStore_2d_array_s(coords: vec2<i32>, array_index: i32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+@group(0) @binding(8)
+var image_storage_3d: texture_storage_3d<rgba8unorm, write>;
+
+fn test_textureStore_3d(coords: vec3<i32>, value: vec4<f32>) {
+    textureStore(image_storage_3d, coords, value);
+}
+
+// GLSL output requires that we identify an entry point, so
+// that it can tell what \"in\" and \"out\" globals to write.
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_1d(0, 0);
+    test_textureLoad_2d(vec2<i32>(), 0);
+    test_textureLoad_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_3d(vec3<i32>(), 0);
+    test_textureLoad_multisampled_2d(vec2<i32>(), 0);
+    test_textureStore_1d(0, vec4<f32>());
+    test_textureStore_2d(vec2<i32>(), vec4<f32>());
+    test_textureStore_2d_array_u(vec2<i32>(), 0u, vec4<f32>());
+    test_textureStore_2d_array_s(vec2<i32>(), 0, vec4<f32>());
+    test_textureStore_3d(vec3<i32>(), vec4<f32>());
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+        %116 = OpString "void"
+        %140 = OpString "test_textureLoad_2d_array_s"
+        %143 = OpString "@group(0) @binding(0)
+var image_1d: texture_1d<f32>;
+
+fn test_textureLoad_1d(coords: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_1d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_2d: texture_2d<f32>;
+
+fn test_textureLoad_2d(coords: vec2<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d, coords, level);
+}
+
+@group(0) @binding(2)
+var image_2d_array: texture_2d_array<f32>;
+
+fn test_textureLoad_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+@group(0) @binding(3)
+var image_3d: texture_3d<f32>;
+
+fn test_textureLoad_3d(coords: vec3<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_3d, coords, level);
+}
+
+@group(0) @binding(4)
+var image_multisampled_2d: texture_multisampled_2d<f32>;
+
+fn test_textureLoad_multisampled_2d(coords: vec2<i32>, _sample: i32) -> vec4<f32> {
+   return textureLoad(image_multisampled_2d, coords, _sample);
+}
+
+@group(0) @binding(5)
+var image_storage_1d: texture_storage_1d<rgba8unorm, write>;
+
+fn test_textureStore_1d(coords: i32, value: vec4<f32>) {
+    textureStore(image_storage_1d, coords, value);
+}
+
+@group(0) @binding(6)
+var image_storage_2d: texture_storage_2d<rgba8unorm, write>;
+
+fn test_textureStore_2d(coords: vec2<i32>, value: vec4<f32>) {
+    textureStore(image_storage_2d, coords, value);
+}
+
+@group(0) @binding(7)
+var image_storage_2d_array: texture_storage_2d_array<rgba8unorm, write>;
+
+fn test_textureStore_2d_array_u(coords: vec2<i32>, array_index: u32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+fn test_textureStore_2d_array_s(coords: vec2<i32>, array_index: i32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+@group(0) @binding(8)
+var image_storage_3d: texture_storage_3d<rgba8unorm, write>;
+
+fn test_textureStore_3d(coords: vec3<i32>, value: vec4<f32>) {
+    textureStore(image_storage_3d, coords, value);
+}
+
+// GLSL output requires that we identify an entry point, so
+// that it can tell what \"in\" and \"out\" globals to write.
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_1d(0, 0);
+    test_textureLoad_2d(vec2<i32>(), 0);
+    test_textureLoad_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_3d(vec3<i32>(), 0);
+    test_textureLoad_multisampled_2d(vec2<i32>(), 0);
+    test_textureStore_1d(0, vec4<f32>());
+    test_textureStore_2d(vec2<i32>(), vec4<f32>());
+    test_textureStore_2d_array_u(vec2<i32>(), 0u, vec4<f32>());
+    test_textureStore_2d_array_s(vec2<i32>(), 0, vec4<f32>());
+    test_textureStore_3d(vec3<i32>(), vec4<f32>());
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+        %147 = OpString "void"
+        %169 = OpString "test_textureLoad_3d"
+        %172 = OpString "@group(0) @binding(0)
+var image_1d: texture_1d<f32>;
+
+fn test_textureLoad_1d(coords: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_1d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_2d: texture_2d<f32>;
+
+fn test_textureLoad_2d(coords: vec2<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d, coords, level);
+}
+
+@group(0) @binding(2)
+var image_2d_array: texture_2d_array<f32>;
+
+fn test_textureLoad_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+@group(0) @binding(3)
+var image_3d: texture_3d<f32>;
+
+fn test_textureLoad_3d(coords: vec3<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_3d, coords, level);
+}
+
+@group(0) @binding(4)
+var image_multisampled_2d: texture_multisampled_2d<f32>;
+
+fn test_textureLoad_multisampled_2d(coords: vec2<i32>, _sample: i32) -> vec4<f32> {
+   return textureLoad(image_multisampled_2d, coords, _sample);
+}
+
+@group(0) @binding(5)
+var image_storage_1d: texture_storage_1d<rgba8unorm, write>;
+
+fn test_textureStore_1d(coords: i32, value: vec4<f32>) {
+    textureStore(image_storage_1d, coords, value);
+}
+
+@group(0) @binding(6)
+var image_storage_2d: texture_storage_2d<rgba8unorm, write>;
+
+fn test_textureStore_2d(coords: vec2<i32>, value: vec4<f32>) {
+    textureStore(image_storage_2d, coords, value);
+}
+
+@group(0) @binding(7)
+var image_storage_2d_array: texture_storage_2d_array<rgba8unorm, write>;
+
+fn test_textureStore_2d_array_u(coords: vec2<i32>, array_index: u32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+fn test_textureStore_2d_array_s(coords: vec2<i32>, array_index: i32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+@group(0) @binding(8)
+var image_storage_3d: texture_storage_3d<rgba8unorm, write>;
+
+fn test_textureStore_3d(coords: vec3<i32>, value: vec4<f32>) {
+    textureStore(image_storage_3d, coords, value);
+}
+
+// GLSL output requires that we identify an entry point, so
+// that it can tell what \"in\" and \"out\" globals to write.
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_1d(0, 0);
+    test_textureLoad_2d(vec2<i32>(), 0);
+    test_textureLoad_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_3d(vec3<i32>(), 0);
+    test_textureLoad_multisampled_2d(vec2<i32>(), 0);
+    test_textureStore_1d(0, vec4<f32>());
+    test_textureStore_2d(vec2<i32>(), vec4<f32>());
+    test_textureStore_2d_array_u(vec2<i32>(), 0u, vec4<f32>());
+    test_textureStore_2d_array_s(vec2<i32>(), 0, vec4<f32>());
+    test_textureStore_3d(vec3<i32>(), vec4<f32>());
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+        %176 = OpString "void"
+        %196 = OpString "test_textureLoad_multisampled_2d"
+        %199 = OpString "@group(0) @binding(0)
+var image_1d: texture_1d<f32>;
+
+fn test_textureLoad_1d(coords: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_1d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_2d: texture_2d<f32>;
+
+fn test_textureLoad_2d(coords: vec2<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d, coords, level);
+}
+
+@group(0) @binding(2)
+var image_2d_array: texture_2d_array<f32>;
+
+fn test_textureLoad_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+@group(0) @binding(3)
+var image_3d: texture_3d<f32>;
+
+fn test_textureLoad_3d(coords: vec3<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_3d, coords, level);
+}
+
+@group(0) @binding(4)
+var image_multisampled_2d: texture_multisampled_2d<f32>;
+
+fn test_textureLoad_multisampled_2d(coords: vec2<i32>, _sample: i32) -> vec4<f32> {
+   return textureLoad(image_multisampled_2d, coords, _sample);
+}
+
+@group(0) @binding(5)
+var image_storage_1d: texture_storage_1d<rgba8unorm, write>;
+
+fn test_textureStore_1d(coords: i32, value: vec4<f32>) {
+    textureStore(image_storage_1d, coords, value);
+}
+
+@group(0) @binding(6)
+var image_storage_2d: texture_storage_2d<rgba8unorm, write>;
+
+fn test_textureStore_2d(coords: vec2<i32>, value: vec4<f32>) {
+    textureStore(image_storage_2d, coords, value);
+}
+
+@group(0) @binding(7)
+var image_storage_2d_array: texture_storage_2d_array<rgba8unorm, write>;
+
+fn test_textureStore_2d_array_u(coords: vec2<i32>, array_index: u32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+fn test_textureStore_2d_array_s(coords: vec2<i32>, array_index: i32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+@group(0) @binding(8)
+var image_storage_3d: texture_storage_3d<rgba8unorm, write>;
+
+fn test_textureStore_3d(coords: vec3<i32>, value: vec4<f32>) {
+    textureStore(image_storage_3d, coords, value);
+}
+
+// GLSL output requires that we identify an entry point, so
+// that it can tell what \"in\" and \"out\" globals to write.
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_1d(0, 0);
+    test_textureLoad_2d(vec2<i32>(), 0);
+    test_textureLoad_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_3d(vec3<i32>(), 0);
+    test_textureLoad_multisampled_2d(vec2<i32>(), 0);
+    test_textureStore_1d(0, vec4<f32>());
+    test_textureStore_2d(vec2<i32>(), vec4<f32>());
+    test_textureStore_2d_array_u(vec2<i32>(), 0u, vec4<f32>());
+    test_textureStore_2d_array_s(vec2<i32>(), 0, vec4<f32>());
+    test_textureStore_3d(vec3<i32>(), vec4<f32>());
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+        %203 = OpString "void"
+        %224 = OpString "test_textureStore_1d"
+        %227 = OpString "@group(0) @binding(0)
+var image_1d: texture_1d<f32>;
+
+fn test_textureLoad_1d(coords: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_1d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_2d: texture_2d<f32>;
+
+fn test_textureLoad_2d(coords: vec2<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d, coords, level);
+}
+
+@group(0) @binding(2)
+var image_2d_array: texture_2d_array<f32>;
+
+fn test_textureLoad_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+@group(0) @binding(3)
+var image_3d: texture_3d<f32>;
+
+fn test_textureLoad_3d(coords: vec3<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_3d, coords, level);
+}
+
+@group(0) @binding(4)
+var image_multisampled_2d: texture_multisampled_2d<f32>;
+
+fn test_textureLoad_multisampled_2d(coords: vec2<i32>, _sample: i32) -> vec4<f32> {
+   return textureLoad(image_multisampled_2d, coords, _sample);
+}
+
+@group(0) @binding(5)
+var image_storage_1d: texture_storage_1d<rgba8unorm, write>;
+
+fn test_textureStore_1d(coords: i32, value: vec4<f32>) {
+    textureStore(image_storage_1d, coords, value);
+}
+
+@group(0) @binding(6)
+var image_storage_2d: texture_storage_2d<rgba8unorm, write>;
+
+fn test_textureStore_2d(coords: vec2<i32>, value: vec4<f32>) {
+    textureStore(image_storage_2d, coords, value);
+}
+
+@group(0) @binding(7)
+var image_storage_2d_array: texture_storage_2d_array<rgba8unorm, write>;
+
+fn test_textureStore_2d_array_u(coords: vec2<i32>, array_index: u32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+fn test_textureStore_2d_array_s(coords: vec2<i32>, array_index: i32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+@group(0) @binding(8)
+var image_storage_3d: texture_storage_3d<rgba8unorm, write>;
+
+fn test_textureStore_3d(coords: vec3<i32>, value: vec4<f32>) {
+    textureStore(image_storage_3d, coords, value);
+}
+
+// GLSL output requires that we identify an entry point, so
+// that it can tell what \"in\" and \"out\" globals to write.
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_1d(0, 0);
+    test_textureLoad_2d(vec2<i32>(), 0);
+    test_textureLoad_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_3d(vec3<i32>(), 0);
+    test_textureLoad_multisampled_2d(vec2<i32>(), 0);
+    test_textureStore_1d(0, vec4<f32>());
+    test_textureStore_2d(vec2<i32>(), vec4<f32>());
+    test_textureStore_2d_array_u(vec2<i32>(), 0u, vec4<f32>());
+    test_textureStore_2d_array_s(vec2<i32>(), 0, vec4<f32>());
+    test_textureStore_3d(vec3<i32>(), vec4<f32>());
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+        %231 = OpString "void"
+        %244 = OpString "test_textureStore_2d"
+        %247 = OpString "@group(0) @binding(0)
+var image_1d: texture_1d<f32>;
+
+fn test_textureLoad_1d(coords: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_1d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_2d: texture_2d<f32>;
+
+fn test_textureLoad_2d(coords: vec2<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d, coords, level);
+}
+
+@group(0) @binding(2)
+var image_2d_array: texture_2d_array<f32>;
+
+fn test_textureLoad_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+@group(0) @binding(3)
+var image_3d: texture_3d<f32>;
+
+fn test_textureLoad_3d(coords: vec3<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_3d, coords, level);
+}
+
+@group(0) @binding(4)
+var image_multisampled_2d: texture_multisampled_2d<f32>;
+
+fn test_textureLoad_multisampled_2d(coords: vec2<i32>, _sample: i32) -> vec4<f32> {
+   return textureLoad(image_multisampled_2d, coords, _sample);
+}
+
+@group(0) @binding(5)
+var image_storage_1d: texture_storage_1d<rgba8unorm, write>;
+
+fn test_textureStore_1d(coords: i32, value: vec4<f32>) {
+    textureStore(image_storage_1d, coords, value);
+}
+
+@group(0) @binding(6)
+var image_storage_2d: texture_storage_2d<rgba8unorm, write>;
+
+fn test_textureStore_2d(coords: vec2<i32>, value: vec4<f32>) {
+    textureStore(image_storage_2d, coords, value);
+}
+
+@group(0) @binding(7)
+var image_storage_2d_array: texture_storage_2d_array<rgba8unorm, write>;
+
+fn test_textureStore_2d_array_u(coords: vec2<i32>, array_index: u32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+fn test_textureStore_2d_array_s(coords: vec2<i32>, array_index: i32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+@group(0) @binding(8)
+var image_storage_3d: texture_storage_3d<rgba8unorm, write>;
+
+fn test_textureStore_3d(coords: vec3<i32>, value: vec4<f32>) {
+    textureStore(image_storage_3d, coords, value);
+}
+
+// GLSL output requires that we identify an entry point, so
+// that it can tell what \"in\" and \"out\" globals to write.
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_1d(0, 0);
+    test_textureLoad_2d(vec2<i32>(), 0);
+    test_textureLoad_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_3d(vec3<i32>(), 0);
+    test_textureLoad_multisampled_2d(vec2<i32>(), 0);
+    test_textureStore_1d(0, vec4<f32>());
+    test_textureStore_2d(vec2<i32>(), vec4<f32>());
+    test_textureStore_2d_array_u(vec2<i32>(), 0u, vec4<f32>());
+    test_textureStore_2d_array_s(vec2<i32>(), 0, vec4<f32>());
+    test_textureStore_3d(vec3<i32>(), vec4<f32>());
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+        %251 = OpString "void"
+        %265 = OpString "test_textureStore_2d_array_u"
+        %268 = OpString "@group(0) @binding(0)
+var image_1d: texture_1d<f32>;
+
+fn test_textureLoad_1d(coords: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_1d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_2d: texture_2d<f32>;
+
+fn test_textureLoad_2d(coords: vec2<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d, coords, level);
+}
+
+@group(0) @binding(2)
+var image_2d_array: texture_2d_array<f32>;
+
+fn test_textureLoad_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+@group(0) @binding(3)
+var image_3d: texture_3d<f32>;
+
+fn test_textureLoad_3d(coords: vec3<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_3d, coords, level);
+}
+
+@group(0) @binding(4)
+var image_multisampled_2d: texture_multisampled_2d<f32>;
+
+fn test_textureLoad_multisampled_2d(coords: vec2<i32>, _sample: i32) -> vec4<f32> {
+   return textureLoad(image_multisampled_2d, coords, _sample);
+}
+
+@group(0) @binding(5)
+var image_storage_1d: texture_storage_1d<rgba8unorm, write>;
+
+fn test_textureStore_1d(coords: i32, value: vec4<f32>) {
+    textureStore(image_storage_1d, coords, value);
+}
+
+@group(0) @binding(6)
+var image_storage_2d: texture_storage_2d<rgba8unorm, write>;
+
+fn test_textureStore_2d(coords: vec2<i32>, value: vec4<f32>) {
+    textureStore(image_storage_2d, coords, value);
+}
+
+@group(0) @binding(7)
+var image_storage_2d_array: texture_storage_2d_array<rgba8unorm, write>;
+
+fn test_textureStore_2d_array_u(coords: vec2<i32>, array_index: u32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+fn test_textureStore_2d_array_s(coords: vec2<i32>, array_index: i32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+@group(0) @binding(8)
+var image_storage_3d: texture_storage_3d<rgba8unorm, write>;
+
+fn test_textureStore_3d(coords: vec3<i32>, value: vec4<f32>) {
+    textureStore(image_storage_3d, coords, value);
+}
+
+// GLSL output requires that we identify an entry point, so
+// that it can tell what \"in\" and \"out\" globals to write.
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_1d(0, 0);
+    test_textureLoad_2d(vec2<i32>(), 0);
+    test_textureLoad_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_3d(vec3<i32>(), 0);
+    test_textureLoad_multisampled_2d(vec2<i32>(), 0);
+    test_textureStore_1d(0, vec4<f32>());
+    test_textureStore_2d(vec2<i32>(), vec4<f32>());
+    test_textureStore_2d_array_u(vec2<i32>(), 0u, vec4<f32>());
+    test_textureStore_2d_array_s(vec2<i32>(), 0, vec4<f32>());
+    test_textureStore_3d(vec3<i32>(), vec4<f32>());
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+        %272 = OpString "void"
+        %288 = OpString "test_textureStore_2d_array_s"
+        %291 = OpString "@group(0) @binding(0)
+var image_1d: texture_1d<f32>;
+
+fn test_textureLoad_1d(coords: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_1d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_2d: texture_2d<f32>;
+
+fn test_textureLoad_2d(coords: vec2<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d, coords, level);
+}
+
+@group(0) @binding(2)
+var image_2d_array: texture_2d_array<f32>;
+
+fn test_textureLoad_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+@group(0) @binding(3)
+var image_3d: texture_3d<f32>;
+
+fn test_textureLoad_3d(coords: vec3<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_3d, coords, level);
+}
+
+@group(0) @binding(4)
+var image_multisampled_2d: texture_multisampled_2d<f32>;
+
+fn test_textureLoad_multisampled_2d(coords: vec2<i32>, _sample: i32) -> vec4<f32> {
+   return textureLoad(image_multisampled_2d, coords, _sample);
+}
+
+@group(0) @binding(5)
+var image_storage_1d: texture_storage_1d<rgba8unorm, write>;
+
+fn test_textureStore_1d(coords: i32, value: vec4<f32>) {
+    textureStore(image_storage_1d, coords, value);
+}
+
+@group(0) @binding(6)
+var image_storage_2d: texture_storage_2d<rgba8unorm, write>;
+
+fn test_textureStore_2d(coords: vec2<i32>, value: vec4<f32>) {
+    textureStore(image_storage_2d, coords, value);
+}
+
+@group(0) @binding(7)
+var image_storage_2d_array: texture_storage_2d_array<rgba8unorm, write>;
+
+fn test_textureStore_2d_array_u(coords: vec2<i32>, array_index: u32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+fn test_textureStore_2d_array_s(coords: vec2<i32>, array_index: i32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+@group(0) @binding(8)
+var image_storage_3d: texture_storage_3d<rgba8unorm, write>;
+
+fn test_textureStore_3d(coords: vec3<i32>, value: vec4<f32>) {
+    textureStore(image_storage_3d, coords, value);
+}
+
+// GLSL output requires that we identify an entry point, so
+// that it can tell what \"in\" and \"out\" globals to write.
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_1d(0, 0);
+    test_textureLoad_2d(vec2<i32>(), 0);
+    test_textureLoad_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_3d(vec3<i32>(), 0);
+    test_textureLoad_multisampled_2d(vec2<i32>(), 0);
+    test_textureStore_1d(0, vec4<f32>());
+    test_textureStore_2d(vec2<i32>(), vec4<f32>());
+    test_textureStore_2d_array_u(vec2<i32>(), 0u, vec4<f32>());
+    test_textureStore_2d_array_s(vec2<i32>(), 0, vec4<f32>());
+    test_textureStore_3d(vec3<i32>(), vec4<f32>());
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+        %295 = OpString "void"
+        %309 = OpString "test_textureStore_3d"
+        %312 = OpString "@group(0) @binding(0)
+var image_1d: texture_1d<f32>;
+
+fn test_textureLoad_1d(coords: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_1d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_2d: texture_2d<f32>;
+
+fn test_textureLoad_2d(coords: vec2<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d, coords, level);
+}
+
+@group(0) @binding(2)
+var image_2d_array: texture_2d_array<f32>;
+
+fn test_textureLoad_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+@group(0) @binding(3)
+var image_3d: texture_3d<f32>;
+
+fn test_textureLoad_3d(coords: vec3<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_3d, coords, level);
+}
+
+@group(0) @binding(4)
+var image_multisampled_2d: texture_multisampled_2d<f32>;
+
+fn test_textureLoad_multisampled_2d(coords: vec2<i32>, _sample: i32) -> vec4<f32> {
+   return textureLoad(image_multisampled_2d, coords, _sample);
+}
+
+@group(0) @binding(5)
+var image_storage_1d: texture_storage_1d<rgba8unorm, write>;
+
+fn test_textureStore_1d(coords: i32, value: vec4<f32>) {
+    textureStore(image_storage_1d, coords, value);
+}
+
+@group(0) @binding(6)
+var image_storage_2d: texture_storage_2d<rgba8unorm, write>;
+
+fn test_textureStore_2d(coords: vec2<i32>, value: vec4<f32>) {
+    textureStore(image_storage_2d, coords, value);
+}
+
+@group(0) @binding(7)
+var image_storage_2d_array: texture_storage_2d_array<rgba8unorm, write>;
+
+fn test_textureStore_2d_array_u(coords: vec2<i32>, array_index: u32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+fn test_textureStore_2d_array_s(coords: vec2<i32>, array_index: i32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+@group(0) @binding(8)
+var image_storage_3d: texture_storage_3d<rgba8unorm, write>;
+
+fn test_textureStore_3d(coords: vec3<i32>, value: vec4<f32>) {
+    textureStore(image_storage_3d, coords, value);
+}
+
+// GLSL output requires that we identify an entry point, so
+// that it can tell what \"in\" and \"out\" globals to write.
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_1d(0, 0);
+    test_textureLoad_2d(vec2<i32>(), 0);
+    test_textureLoad_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_3d(vec3<i32>(), 0);
+    test_textureLoad_multisampled_2d(vec2<i32>(), 0);
+    test_textureStore_1d(0, vec4<f32>());
+    test_textureStore_2d(vec2<i32>(), vec4<f32>());
+    test_textureStore_2d_array_u(vec2<i32>(), 0u, vec4<f32>());
+    test_textureStore_2d_array_s(vec2<i32>(), 0, vec4<f32>());
+    test_textureStore_3d(vec3<i32>(), vec4<f32>());
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+        %316 = OpString "void"
+        %337 = OpString "fragment_shader"
+        %340 = OpString "@group(0) @binding(0)
+var image_1d: texture_1d<f32>;
+
+fn test_textureLoad_1d(coords: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_1d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_2d: texture_2d<f32>;
+
+fn test_textureLoad_2d(coords: vec2<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d, coords, level);
+}
+
+@group(0) @binding(2)
+var image_2d_array: texture_2d_array<f32>;
+
+fn test_textureLoad_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+@group(0) @binding(3)
+var image_3d: texture_3d<f32>;
+
+fn test_textureLoad_3d(coords: vec3<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_3d, coords, level);
+}
+
+@group(0) @binding(4)
+var image_multisampled_2d: texture_multisampled_2d<f32>;
+
+fn test_textureLoad_multisampled_2d(coords: vec2<i32>, _sample: i32) -> vec4<f32> {
+   return textureLoad(image_multisampled_2d, coords, _sample);
+}
+
+@group(0) @binding(5)
+var image_storage_1d: texture_storage_1d<rgba8unorm, write>;
+
+fn test_textureStore_1d(coords: i32, value: vec4<f32>) {
+    textureStore(image_storage_1d, coords, value);
+}
+
+@group(0) @binding(6)
+var image_storage_2d: texture_storage_2d<rgba8unorm, write>;
+
+fn test_textureStore_2d(coords: vec2<i32>, value: vec4<f32>) {
+    textureStore(image_storage_2d, coords, value);
+}
+
+@group(0) @binding(7)
+var image_storage_2d_array: texture_storage_2d_array<rgba8unorm, write>;
+
+fn test_textureStore_2d_array_u(coords: vec2<i32>, array_index: u32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+fn test_textureStore_2d_array_s(coords: vec2<i32>, array_index: i32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+@group(0) @binding(8)
+var image_storage_3d: texture_storage_3d<rgba8unorm, write>;
+
+fn test_textureStore_3d(coords: vec3<i32>, value: vec4<f32>) {
+    textureStore(image_storage_3d, coords, value);
+}
+
+// GLSL output requires that we identify an entry point, so
+// that it can tell what \"in\" and \"out\" globals to write.
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_1d(0, 0);
+    test_textureLoad_2d(vec2<i32>(), 0);
+    test_textureLoad_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_3d(vec3<i32>(), 0);
+    test_textureLoad_multisampled_2d(vec2<i32>(), 0);
+    test_textureStore_1d(0, vec4<f32>());
+    test_textureStore_2d(vec2<i32>(), vec4<f32>());
+    test_textureStore_2d_array_u(vec2<i32>(), 0u, vec4<f32>());
+    test_textureStore_2d_array_s(vec2<i32>(), 0, vec4<f32>());
+    test_textureStore_3d(vec3<i32>(), vec4<f32>());
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+        %344 = OpString "void"
+        %350 = OpString "naga"
+        %351 = OpString ""
+          %3 = OpString "bounds-check-image-restrict.wgsl"
+               OpSource GLSL 0 %3 "@group(0) @binding(0)
+var image_1d: texture_1d<f32>;
+
+fn test_textureLoad_1d(coords: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_1d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_2d: texture_2d<f32>;
+
+fn test_textureLoad_2d(coords: vec2<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d, coords, level);
+}
+
+@group(0) @binding(2)
+var image_2d_array: texture_2d_array<f32>;
+
+fn test_textureLoad_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> vec4<f32> {
+   return textureLoad(image_2d_array, coords, index, level);
+}
+
+@group(0) @binding(3)
+var image_3d: texture_3d<f32>;
+
+fn test_textureLoad_3d(coords: vec3<i32>, level: i32) -> vec4<f32> {
+   return textureLoad(image_3d, coords, level);
+}
+
+@group(0) @binding(4)
+var image_multisampled_2d: texture_multisampled_2d<f32>;
+
+fn test_textureLoad_multisampled_2d(coords: vec2<i32>, _sample: i32) -> vec4<f32> {
+   return textureLoad(image_multisampled_2d, coords, _sample);
+}
+
+@group(0) @binding(5)
+var image_storage_1d: texture_storage_1d<rgba8unorm, write>;
+
+fn test_textureStore_1d(coords: i32, value: vec4<f32>) {
+    textureStore(image_storage_1d, coords, value);
+}
+
+@group(0) @binding(6)
+var image_storage_2d: texture_storage_2d<rgba8unorm, write>;
+
+fn test_textureStore_2d(coords: vec2<i32>, value: vec4<f32>) {
+    textureStore(image_storage_2d, coords, value);
+}
+
+@group(0) @binding(7)
+var image_storage_2d_array: texture_storage_2d_array<rgba8unorm, write>;
+
+fn test_textureStore_2d_array_u(coords: vec2<i32>, array_index: u32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+fn test_textureStore_2d_array_s(coords: vec2<i32>, array_index: i32, value: vec4<f32>) {
+ textureStore(image_storage_2d_array, coords, array_index, value);
+}
+
+@group(0) @binding(8)
+var image_storage_3d: texture_storage_3d<rgba8unorm, write>;
+
+fn test_textureStore_3d(coords: vec3<i32>, value: vec4<f32>) {
+    textureStore(image_storage_3d, coords, value);
+}
+
+// GLSL output requires that we identify an entry point, so
+// that it can tell what \"in\" and \"out\" globals to write.
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_1d(0, 0);
+    test_textureLoad_2d(vec2<i32>(), 0);
+    test_textureLoad_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_3d(vec3<i32>(), 0);
+    test_textureLoad_multisampled_2d(vec2<i32>(), 0);
+    test_textureStore_1d(0, vec4<f32>());
+    test_textureStore_2d(vec2<i32>(), vec4<f32>());
+    test_textureStore_2d_array_u(vec2<i32>(), 0u, vec4<f32>());
+    test_textureStore_2d_array_s(vec2<i32>(), 0, vec4<f32>());
+    test_textureStore_3d(vec3<i32>(), vec4<f32>());
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+               OpName %image_1d "image_1d"
+               OpName %image_2d "image_2d"
+               OpName %image_2d_array "image_2d_array"
+               OpName %image_3d "image_3d"
+               OpName %image_multisampled_2d "image_multisampled_2d"
+               OpName %image_storage_1d "image_storage_1d"
+               OpName %image_storage_2d "image_storage_2d"
+               OpName %image_storage_2d_array "image_storage_2d_array"
+               OpName %image_storage_3d "image_storage_3d"
+               OpName %coords "coords"
+               OpName %level "level"
+               OpName %test_textureLoad_1d "test_textureLoad_1d"
+               OpName %coords_0 "coords"
+               OpName %level_0 "level"
+               OpName %test_textureLoad_2d "test_textureLoad_2d"
+               OpName %coords_1 "coords"
+               OpName %index "index"
+               OpName %level_1 "level"
+               OpName %test_textureLoad_2d_array_u "test_textureLoad_2d_array_u"
+               OpName %coords_2 "coords"
+               OpName %index_0 "index"
+               OpName %level_2 "level"
+               OpName %test_textureLoad_2d_array_s "test_textureLoad_2d_array_s"
+               OpName %coords_3 "coords"
+               OpName %level_3 "level"
+               OpName %test_textureLoad_3d "test_textureLoad_3d"
+               OpName %coords_4 "coords"
+               OpName %_sample "_sample"
+               OpName %test_textureLoad_multisampled_2d "test_textureLoad_multisampled_2d"
+               OpName %coords_5 "coords"
+               OpName %value "value"
+               OpName %test_textureStore_1d "test_textureStore_1d"
+               OpName %coords_6 "coords"
+               OpName %value_0 "value"
+               OpName %test_textureStore_2d "test_textureStore_2d"
+               OpName %coords_7 "coords"
+               OpName %array_index "array_index"
+               OpName %value_1 "value"
+               OpName %test_textureStore_2d_array_u "test_textureStore_2d_array_u"
+               OpName %coords_8 "coords"
+               OpName %array_index_0 "array_index"
+               OpName %value_2 "value"
+               OpName %test_textureStore_2d_array_s "test_textureStore_2d_array_s"
+               OpName %coords_9 "coords"
+               OpName %value_3 "value"
+               OpName %test_textureStore_3d "test_textureStore_3d"
+               OpName %fragment_shader "fragment_shader"
+               OpDecorate %image_1d DescriptorSet 0
+               OpDecorate %image_1d Binding 0
+               OpDecorate %image_2d DescriptorSet 0
+               OpDecorate %image_2d Binding 1
+               OpDecorate %image_2d_array DescriptorSet 0
+               OpDecorate %image_2d_array Binding 2
+               OpDecorate %image_3d DescriptorSet 0
+               OpDecorate %image_3d Binding 3
+               OpDecorate %image_multisampled_2d DescriptorSet 0
+               OpDecorate %image_multisampled_2d Binding 4
+               OpDecorate %image_storage_1d NonReadable
+               OpDecorate %image_storage_1d DescriptorSet 0
+               OpDecorate %image_storage_1d Binding 5
+               OpDecorate %image_storage_2d NonReadable
+               OpDecorate %image_storage_2d DescriptorSet 0
+               OpDecorate %image_storage_2d Binding 6
+               OpDecorate %image_storage_2d_array NonReadable
+               OpDecorate %image_storage_2d_array DescriptorSet 0
+               OpDecorate %image_storage_2d_array Binding 7
+               OpDecorate %image_storage_3d NonReadable
+               OpDecorate %image_storage_3d DescriptorSet 0
+               OpDecorate %image_storage_3d Binding 8
+               OpDecorate %324 Location 0
+       %void = OpTypeVoid
+      %float = OpTypeFloat 32
+          %4 = OpTypeImage %float 1D 0 0 0 1 Unknown
+        %int = OpTypeInt 32 1
+    %v4float = OpTypeVector %float 4
+          %8 = OpTypeImage %float 2D 0 0 0 1 Unknown
+      %v2int = OpTypeVector %int 2
+         %10 = OpTypeImage %float 2D 0 1 0 1 Unknown
+       %uint = OpTypeInt 32 0
+         %12 = OpTypeImage %float 3D 0 0 0 1 Unknown
+      %v3int = OpTypeVector %int 3
+         %14 = OpTypeImage %float 2D 0 0 1 1 Unknown
+         %15 = OpTypeImage %float 1D 0 0 0 2 Rgba8
+         %16 = OpTypeImage %float 2D 0 0 0 2 Rgba8
+         %17 = OpTypeImage %float 2D 0 1 0 2 Rgba8
+         %18 = OpTypeImage %float 3D 0 0 0 2 Rgba8
+%_ptr_UniformConstant_4 = OpTypePointer UniformConstant %4
+   %image_1d = OpVariable %_ptr_UniformConstant_4 UniformConstant
+%_ptr_UniformConstant_8 = OpTypePointer UniformConstant %8
+   %image_2d = OpVariable %_ptr_UniformConstant_8 UniformConstant
+%_ptr_UniformConstant_10 = OpTypePointer UniformConstant %10
+%image_2d_array = OpVariable %_ptr_UniformConstant_10 UniformConstant
+%_ptr_UniformConstant_12 = OpTypePointer UniformConstant %12
+   %image_3d = OpVariable %_ptr_UniformConstant_12 UniformConstant
+%_ptr_UniformConstant_14 = OpTypePointer UniformConstant %14
+%image_multisampled_2d = OpVariable %_ptr_UniformConstant_14 UniformConstant
+%_ptr_UniformConstant_15 = OpTypePointer UniformConstant %15
+%image_storage_1d = OpVariable %_ptr_UniformConstant_15 UniformConstant
+%_ptr_UniformConstant_16 = OpTypePointer UniformConstant %16
+%image_storage_2d = OpVariable %_ptr_UniformConstant_16 UniformConstant
+%_ptr_UniformConstant_17 = OpTypePointer UniformConstant %17
+%image_storage_2d_array = OpVariable %_ptr_UniformConstant_17 UniformConstant
+%_ptr_UniformConstant_18 = OpTypePointer UniformConstant %18
+%image_storage_3d = OpVariable %_ptr_UniformConstant_18 UniformConstant
+         %42 = OpTypeFunction %v4float %int %int
+     %uint_1 = OpConstant %uint 1
+     %uint_4 = OpConstant %uint 4
+     %uint_2 = OpConstant %uint 2
+     %uint_5 = OpConstant %uint 5
+    %uint_11 = OpConstant %uint 11
+     %uint_8 = OpConstant %uint 8
+     %uint_0 = OpConstant %uint 0
+     %uint_3 = OpConstant %uint 3
+     %uint_6 = OpConstant %uint 6
+      %int_1 = OpConstant %int 1
+         %78 = OpTypeFunction %v4float %v2int %int
+    %uint_12 = OpConstant %uint 12
+         %98 = OpConstantComposite %v2int %int_1 %int_1
+        %107 = OpTypeFunction %v4float %v2int %uint %int
+    %uint_19 = OpConstant %uint 19
+        %129 = OpConstantComposite %v3int %int_1 %int_1 %int_1
+        %138 = OpTypeFunction %v4float %v2int %int %int
+    %uint_23 = OpConstant %uint 23
+        %159 = OpConstantComposite %v3int %int_1 %int_1 %int_1
+        %167 = OpTypeFunction %v4float %v3int %int
+    %uint_30 = OpConstant %uint 30
+        %187 = OpConstantComposite %v3int %int_1 %int_1 %int_1
+    %uint_37 = OpConstant %uint 37
+        %214 = OpConstantComposite %v2int %int_1 %int_1
+        %222 = OpTypeFunction %void %int %v4float
+    %uint_44 = OpConstant %uint 44
+        %242 = OpTypeFunction %void %v2int %v4float
+    %uint_51 = OpConstant %uint 51
+        %263 = OpTypeFunction %void %v2int %uint %v4float
+    %uint_58 = OpConstant %uint 58
+        %286 = OpTypeFunction %void %v2int %int %v4float
+    %uint_62 = OpConstant %uint 62
+        %307 = OpTypeFunction %void %v3int %v4float
+    %uint_69 = OpConstant %uint 69
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+        %324 = OpVariable %_ptr_Output_v4float Output
+        %327 = OpTypeFunction %void
+    %uint_76 = OpConstant %uint 76
+      %int_0 = OpConstant %int 0
+        %354 = OpConstantNull %v2int
+        %355 = OpConstantNull %v3int
+        %356 = OpConstantNull %v4float
+    %float_0 = OpConstant %float 0
+        %358 = OpConstantComposite %v4float %float_0 %float_0 %float_0 %float_0
+         %54 = OpExtInst %void %37 DebugInfoNone
+         %56 = OpExtInst %void %37 DebugSource %3 %55
+         %57 = OpExtInst %void %37 DebugCompilationUnit %uint_1 %uint_4 %56 %uint_2
+         %58 = OpExtInst %void %37 DebugExpression
+         %60 = OpExtInst %void %37 DebugTypeBasic %59 %uint_0 %uint_0 %uint_0
+         %61 = OpExtInst %void %37 DebugTypeFunction %uint_0 %60
+         %62 = OpExtInst %void %37 DebugFunction %44 %61 %56 %uint_5 %uint_11 %57 %44 %uint_8 %uint_5
+         %82 = OpExtInst %void %37 DebugInfoNone
+         %84 = OpExtInst %void %37 DebugSource %3 %83
+         %85 = OpExtInst %void %37 DebugCompilationUnit %uint_1 %uint_4 %84 %uint_2
+         %86 = OpExtInst %void %37 DebugExpression
+         %88 = OpExtInst %void %37 DebugTypeBasic %87 %uint_0 %uint_0 %uint_0
+         %89 = OpExtInst %void %37 DebugTypeFunction %uint_0 %88
+         %90 = OpExtInst %void %37 DebugFunction %80 %89 %84 %uint_12 %uint_11 %85 %80 %uint_8 %uint_12
+        %111 = OpExtInst %void %37 DebugInfoNone
+        %113 = OpExtInst %void %37 DebugSource %3 %112
+        %114 = OpExtInst %void %37 DebugCompilationUnit %uint_1 %uint_4 %113 %uint_2
+        %115 = OpExtInst %void %37 DebugExpression
+        %117 = OpExtInst %void %37 DebugTypeBasic %116 %uint_0 %uint_0 %uint_0
+        %118 = OpExtInst %void %37 DebugTypeFunction %uint_0 %117
+        %119 = OpExtInst %void %37 DebugFunction %109 %118 %113 %uint_19 %uint_11 %114 %109 %uint_8 %uint_19
+        %142 = OpExtInst %void %37 DebugInfoNone
+        %144 = OpExtInst %void %37 DebugSource %3 %143
+        %145 = OpExtInst %void %37 DebugCompilationUnit %uint_1 %uint_4 %144 %uint_2
+        %146 = OpExtInst %void %37 DebugExpression
+        %148 = OpExtInst %void %37 DebugTypeBasic %147 %uint_0 %uint_0 %uint_0
+        %149 = OpExtInst %void %37 DebugTypeFunction %uint_0 %148
+        %150 = OpExtInst %void %37 DebugFunction %140 %149 %144 %uint_23 %uint_11 %145 %140 %uint_8 %uint_23
+        %171 = OpExtInst %void %37 DebugInfoNone
+        %173 = OpExtInst %void %37 DebugSource %3 %172
+        %174 = OpExtInst %void %37 DebugCompilationUnit %uint_1 %uint_4 %173 %uint_2
+        %175 = OpExtInst %void %37 DebugExpression
+        %177 = OpExtInst %void %37 DebugTypeBasic %176 %uint_0 %uint_0 %uint_0
+        %178 = OpExtInst %void %37 DebugTypeFunction %uint_0 %177
+        %179 = OpExtInst %void %37 DebugFunction %169 %178 %173 %uint_30 %uint_11 %174 %169 %uint_8 %uint_30
+        %198 = OpExtInst %void %37 DebugInfoNone
+        %200 = OpExtInst %void %37 DebugSource %3 %199
+        %201 = OpExtInst %void %37 DebugCompilationUnit %uint_1 %uint_4 %200 %uint_2
+        %202 = OpExtInst %void %37 DebugExpression
+        %204 = OpExtInst %void %37 DebugTypeBasic %203 %uint_0 %uint_0 %uint_0
+        %205 = OpExtInst %void %37 DebugTypeFunction %uint_0 %204
+        %206 = OpExtInst %void %37 DebugFunction %196 %205 %200 %uint_37 %uint_11 %201 %196 %uint_8 %uint_37
+        %226 = OpExtInst %void %37 DebugInfoNone
+        %228 = OpExtInst %void %37 DebugSource %3 %227
+        %229 = OpExtInst %void %37 DebugCompilationUnit %uint_1 %uint_4 %228 %uint_2
+        %230 = OpExtInst %void %37 DebugExpression
+        %232 = OpExtInst %void %37 DebugTypeBasic %231 %uint_0 %uint_0 %uint_0
+        %233 = OpExtInst %void %37 DebugTypeFunction %uint_0 %232
+        %234 = OpExtInst %void %37 DebugFunction %224 %233 %228 %uint_44 %uint_5 %229 %224 %uint_8 %uint_44
+        %246 = OpExtInst %void %37 DebugInfoNone
+        %248 = OpExtInst %void %37 DebugSource %3 %247
+        %249 = OpExtInst %void %37 DebugCompilationUnit %uint_1 %uint_4 %248 %uint_2
+        %250 = OpExtInst %void %37 DebugExpression
+        %252 = OpExtInst %void %37 DebugTypeBasic %251 %uint_0 %uint_0 %uint_0
+        %253 = OpExtInst %void %37 DebugTypeFunction %uint_0 %252
+        %254 = OpExtInst %void %37 DebugFunction %244 %253 %248 %uint_51 %uint_5 %249 %244 %uint_8 %uint_51
+        %267 = OpExtInst %void %37 DebugInfoNone
+        %269 = OpExtInst %void %37 DebugSource %3 %268
+        %270 = OpExtInst %void %37 DebugCompilationUnit %uint_1 %uint_4 %269 %uint_2
+        %271 = OpExtInst %void %37 DebugExpression
+        %273 = OpExtInst %void %37 DebugTypeBasic %272 %uint_0 %uint_0 %uint_0
+        %274 = OpExtInst %void %37 DebugTypeFunction %uint_0 %273
+        %275 = OpExtInst %void %37 DebugFunction %265 %274 %269 %uint_58 %uint_2 %270 %265 %uint_8 %uint_58
+        %290 = OpExtInst %void %37 DebugInfoNone
+        %292 = OpExtInst %void %37 DebugSource %3 %291
+        %293 = OpExtInst %void %37 DebugCompilationUnit %uint_1 %uint_4 %292 %uint_2
+        %294 = OpExtInst %void %37 DebugExpression
+        %296 = OpExtInst %void %37 DebugTypeBasic %295 %uint_0 %uint_0 %uint_0
+        %297 = OpExtInst %void %37 DebugTypeFunction %uint_0 %296
+        %298 = OpExtInst %void %37 DebugFunction %288 %297 %292 %uint_62 %uint_2 %293 %288 %uint_8 %uint_62
+        %311 = OpExtInst %void %37 DebugInfoNone
+        %313 = OpExtInst %void %37 DebugSource %3 %312
+        %314 = OpExtInst %void %37 DebugCompilationUnit %uint_1 %uint_4 %313 %uint_2
+        %315 = OpExtInst %void %37 DebugExpression
+        %317 = OpExtInst %void %37 DebugTypeBasic %316 %uint_0 %uint_0 %uint_0
+        %318 = OpExtInst %void %37 DebugTypeFunction %uint_0 %317
+        %319 = OpExtInst %void %37 DebugFunction %309 %318 %313 %uint_69 %uint_5 %314 %309 %uint_8 %uint_69
+        %339 = OpExtInst %void %37 DebugInfoNone
+        %341 = OpExtInst %void %37 DebugSource %3 %340
+        %342 = OpExtInst %void %37 DebugCompilationUnit %uint_1 %uint_4 %341 %uint_2
+        %343 = OpExtInst %void %37 DebugExpression
+        %345 = OpExtInst %void %37 DebugTypeBasic %344 %uint_0 %uint_0 %uint_0
+        %346 = OpExtInst %void %37 DebugTypeFunction %uint_0 %345
+        %347 = OpExtInst %void %37 DebugFunction %337 %346 %341 %uint_76 %uint_5 %342 %337 %uint_8 %uint_76
+        %352 = OpExtInst %void %37 DebugEntryPoint %347 %342 %350 %351
+%test_textureLoad_1d = OpFunction %v4float None %42
+     %coords = OpFunctionParameter %int
+      %level = OpFunctionParameter %int
+         %38 = OpLabel
+         %43 = OpLoad %4 %image_1d
+         %63 = OpExtInst %void %37 DebugScope %62
+         %64 = OpExtInst %void %37 DebugFunctionDefinition %62 %test_textureLoad_1d
+               OpBranch %65
+         %65 = OpLabel
+               OpLine %3 5 11
+         %66 = OpImageQueryLevels %int %43
+         %68 = OpISub %int %66 %int_1
+         %69 = OpExtInst %int %1 UMin %level %68
+         %70 = OpImageQuerySizeLod %int %43 %69
+         %71 = OpISub %int %70 %int_1
+         %72 = OpExtInst %int %1 UMin %coords %71
+         %73 = OpImageFetch %v4float %43 %72 Lod %69
+               OpReturnValue %73
+               OpFunctionEnd
+%test_textureLoad_2d = OpFunction %v4float None %78
+   %coords_0 = OpFunctionParameter %v2int
+    %level_0 = OpFunctionParameter %int
+         %74 = OpLabel
+         %79 = OpLoad %8 %image_2d
+         %91 = OpExtInst %void %37 DebugScope %90
+         %92 = OpExtInst %void %37 DebugFunctionDefinition %90 %test_textureLoad_2d
+               OpBranch %93
+         %93 = OpLabel
+               OpLine %3 12 11
+         %94 = OpImageQueryLevels %int %79
+         %95 = OpISub %int %94 %int_1
+         %96 = OpExtInst %int %1 UMin %level_0 %95
+         %97 = OpImageQuerySizeLod %v2int %79 %96
+         %99 = OpISub %v2int %97 %98
+        %100 = OpExtInst %v2int %1 UMin %coords_0 %99
+        %101 = OpImageFetch %v4float %79 %100 Lod %96
+               OpReturnValue %101
+               OpFunctionEnd
+%test_textureLoad_2d_array_u = OpFunction %v4float None %107
+   %coords_1 = OpFunctionParameter %v2int
+      %index = OpFunctionParameter %uint
+    %level_1 = OpFunctionParameter %int
+        %102 = OpLabel
+        %108 = OpLoad %10 %image_2d_array
+        %120 = OpExtInst %void %37 DebugScope %119
+        %121 = OpExtInst %void %37 DebugFunctionDefinition %119 %test_textureLoad_2d_array_u
+               OpBranch %122
+        %122 = OpLabel
+               OpLine %3 19 11
+        %123 = OpBitcast %int %index
+        %124 = OpCompositeConstruct %v3int %coords_1 %123
+        %125 = OpImageQueryLevels %int %108
+        %126 = OpISub %int %125 %int_1
+        %127 = OpExtInst %int %1 UMin %level_1 %126
+        %128 = OpImageQuerySizeLod %v3int %108 %127
+        %130 = OpISub %v3int %128 %129
+        %131 = OpExtInst %v3int %1 UMin %124 %130
+        %132 = OpImageFetch %v4float %108 %131 Lod %127
+               OpReturnValue %132
+               OpFunctionEnd
+%test_textureLoad_2d_array_s = OpFunction %v4float None %138
+   %coords_2 = OpFunctionParameter %v2int
+    %index_0 = OpFunctionParameter %int
+    %level_2 = OpFunctionParameter %int
+        %133 = OpLabel
+        %139 = OpLoad %10 %image_2d_array
+        %151 = OpExtInst %void %37 DebugScope %150
+        %152 = OpExtInst %void %37 DebugFunctionDefinition %150 %test_textureLoad_2d_array_s
+               OpBranch %153
+        %153 = OpLabel
+               OpLine %3 23 11
+        %154 = OpCompositeConstruct %v3int %coords_2 %index_0
+        %155 = OpImageQueryLevels %int %139
+        %156 = OpISub %int %155 %int_1
+        %157 = OpExtInst %int %1 UMin %level_2 %156
+        %158 = OpImageQuerySizeLod %v3int %139 %157
+        %160 = OpISub %v3int %158 %159
+        %161 = OpExtInst %v3int %1 UMin %154 %160
+        %162 = OpImageFetch %v4float %139 %161 Lod %157
+               OpReturnValue %162
+               OpFunctionEnd
+%test_textureLoad_3d = OpFunction %v4float None %167
+   %coords_3 = OpFunctionParameter %v3int
+    %level_3 = OpFunctionParameter %int
+        %163 = OpLabel
+        %168 = OpLoad %12 %image_3d
+        %180 = OpExtInst %void %37 DebugScope %179
+        %181 = OpExtInst %void %37 DebugFunctionDefinition %179 %test_textureLoad_3d
+               OpBranch %182
+        %182 = OpLabel
+               OpLine %3 30 11
+        %183 = OpImageQueryLevels %int %168
+        %184 = OpISub %int %183 %int_1
+        %185 = OpExtInst %int %1 UMin %level_3 %184
+        %186 = OpImageQuerySizeLod %v3int %168 %185
+        %188 = OpISub %v3int %186 %187
+        %189 = OpExtInst %v3int %1 UMin %coords_3 %188
+        %190 = OpImageFetch %v4float %168 %189 Lod %185
+               OpReturnValue %190
+               OpFunctionEnd
+%test_textureLoad_multisampled_2d = OpFunction %v4float None %78
+   %coords_4 = OpFunctionParameter %v2int
+    %_sample = OpFunctionParameter %int
+        %191 = OpLabel
+        %195 = OpLoad %14 %image_multisampled_2d
+        %207 = OpExtInst %void %37 DebugScope %206
+        %208 = OpExtInst %void %37 DebugFunctionDefinition %206 %test_textureLoad_multisampled_2d
+               OpBranch %209
+        %209 = OpLabel
+               OpLine %3 37 11
+        %210 = OpImageQuerySamples %int %195
+        %211 = OpISub %int %210 %int_1
+        %212 = OpExtInst %int %1 UMin %_sample %211
+        %213 = OpImageQuerySize %v2int %195
+        %215 = OpISub %v2int %213 %214
+        %216 = OpExtInst %v2int %1 UMin %coords_4 %215
+        %217 = OpImageFetch %v4float %195 %216 Sample %212
+               OpReturnValue %217
+               OpFunctionEnd
+%test_textureStore_1d = OpFunction %void None %222
+   %coords_5 = OpFunctionParameter %int
+      %value = OpFunctionParameter %v4float
+        %218 = OpLabel
+        %223 = OpLoad %15 %image_storage_1d
+        %235 = OpExtInst %void %37 DebugScope %234
+        %236 = OpExtInst %void %37 DebugFunctionDefinition %234 %test_textureStore_1d
+               OpBranch %237
+        %237 = OpLabel
+               OpLine %3 44 5
+               OpImageWrite %223 %coords_5 %value
+               OpReturn
+               OpFunctionEnd
+%test_textureStore_2d = OpFunction %void None %242
+   %coords_6 = OpFunctionParameter %v2int
+    %value_0 = OpFunctionParameter %v4float
+        %238 = OpLabel
+        %243 = OpLoad %16 %image_storage_2d
+        %255 = OpExtInst %void %37 DebugScope %254
+        %256 = OpExtInst %void %37 DebugFunctionDefinition %254 %test_textureStore_2d
+               OpBranch %257
+        %257 = OpLabel
+               OpLine %3 51 5
+               OpImageWrite %243 %coords_6 %value_0
+               OpReturn
+               OpFunctionEnd
+%test_textureStore_2d_array_u = OpFunction %void None %263
+   %coords_7 = OpFunctionParameter %v2int
+%array_index = OpFunctionParameter %uint
+    %value_1 = OpFunctionParameter %v4float
+        %258 = OpLabel
+        %264 = OpLoad %17 %image_storage_2d_array
+        %276 = OpExtInst %void %37 DebugScope %275
+        %277 = OpExtInst %void %37 DebugFunctionDefinition %275 %test_textureStore_2d_array_u
+               OpBranch %278
+        %278 = OpLabel
+               OpLine %3 58 2
+        %279 = OpBitcast %int %array_index
+        %280 = OpCompositeConstruct %v3int %coords_7 %279
+               OpImageWrite %264 %280 %value_1
+               OpReturn
+               OpFunctionEnd
+%test_textureStore_2d_array_s = OpFunction %void None %286
+   %coords_8 = OpFunctionParameter %v2int
+%array_index_0 = OpFunctionParameter %int
+    %value_2 = OpFunctionParameter %v4float
+        %281 = OpLabel
+        %287 = OpLoad %17 %image_storage_2d_array
+        %299 = OpExtInst %void %37 DebugScope %298
+        %300 = OpExtInst %void %37 DebugFunctionDefinition %298 %test_textureStore_2d_array_s
+               OpBranch %301
+        %301 = OpLabel
+               OpLine %3 62 2
+        %302 = OpCompositeConstruct %v3int %coords_8 %array_index_0
+               OpImageWrite %287 %302 %value_2
+               OpReturn
+               OpFunctionEnd
+%test_textureStore_3d = OpFunction %void None %307
+   %coords_9 = OpFunctionParameter %v3int
+    %value_3 = OpFunctionParameter %v4float
+        %303 = OpLabel
+        %308 = OpLoad %18 %image_storage_3d
+        %320 = OpExtInst %void %37 DebugScope %319
+        %321 = OpExtInst %void %37 DebugFunctionDefinition %319 %test_textureStore_3d
+               OpBranch %322
+        %322 = OpLabel
+               OpLine %3 69 5
+               OpImageWrite %308 %coords_9 %value_3
+               OpReturn
+               OpFunctionEnd
+%fragment_shader = OpFunction %void None %327
+        %323 = OpLabel
+        %328 = OpLoad %4 %image_1d
+        %329 = OpLoad %8 %image_2d
+        %330 = OpLoad %10 %image_2d_array
+        %331 = OpLoad %12 %image_3d
+        %332 = OpLoad %14 %image_multisampled_2d
+        %333 = OpLoad %15 %image_storage_1d
+        %334 = OpLoad %16 %image_storage_2d
+        %335 = OpLoad %17 %image_storage_2d_array
+        %336 = OpLoad %18 %image_storage_3d
+        %348 = OpExtInst %void %37 DebugScope %347
+        %349 = OpExtInst %void %37 DebugFunctionDefinition %347 %fragment_shader
+               OpBranch %359
+        %359 = OpLabel
+               OpLine %3 76 5
+        %360 = OpFunctionCall %v4float %test_textureLoad_1d %int_0 %int_0
+               OpLine %3 77 5
+        %361 = OpFunctionCall %v4float %test_textureLoad_2d %354 %int_0
+               OpLine %3 78 5
+        %362 = OpFunctionCall %v4float %test_textureLoad_2d_array_u %354 %uint_0 %int_0
+               OpLine %3 79 5
+        %363 = OpFunctionCall %v4float %test_textureLoad_2d_array_s %354 %int_0 %int_0
+               OpLine %3 80 5
+        %364 = OpFunctionCall %v4float %test_textureLoad_3d %355 %int_0
+               OpLine %3 81 5
+        %365 = OpFunctionCall %v4float %test_textureLoad_multisampled_2d %354 %int_0
+               OpLine %3 82 5
+        %366 = OpFunctionCall %void %test_textureStore_1d %int_0 %356
+               OpLine %3 83 5
+        %367 = OpFunctionCall %void %test_textureStore_2d %354 %356
+               OpLine %3 84 5
+        %368 = OpFunctionCall %void %test_textureStore_2d_array_u %354 %uint_0 %356
+               OpLine %3 85 5
+        %369 = OpFunctionCall %void %test_textureStore_2d_array_s %354 %int_0 %356
+               OpLine %3 86 5
+        %370 = OpFunctionCall %void %test_textureStore_3d %355 %356
+               OpLine %3 88 12
+               OpStore %324 %358
+               OpReturn
+               OpFunctionEnd

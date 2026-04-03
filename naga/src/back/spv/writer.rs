@@ -115,6 +115,7 @@ impl Writer {
                 options.use_storage_input_output_16,
             ),
             debug_printf: None,
+            nonsemantic_shader_debug_info: None,
             task_dispatch_limits: options.task_dispatch_limits,
             mesh_shader_primitive_indices_clamp: options.mesh_shader_primitive_indices_clamp,
         })
@@ -205,6 +206,7 @@ impl Writer {
             ray_query_functions: take(&mut self.ray_query_functions).reclaim(),
             io_f16_polyfills: take(&mut self.io_f16_polyfills).reclaim(),
             debug_printf: None,
+            nonsemantic_shader_debug_info: None,
         };
 
         *self = fresh;
@@ -1512,6 +1514,258 @@ impl Writer {
             self.global_variables[handle] = gv;
         }
 
+        // Emit NonSemantic.Shader.DebugInfo.100 per-function debug prologue.
+        //
+        // All DebugXxx OpExtInst instructions go into `prelude.body` (inside
+        // the function body) so that rspirv and other parsers that don't
+        // support non-semantic instructions in global scope can still parse the
+        // output.  OpString instructions go into `self.debug_strings` so that
+        // they appear in the SPIR-V debug section (before OpName/OpSource and
+        // before function bodies) and can be referenced by the per-function
+        // non-semantic instructions.
+        let ns_debug_function_id =
+            if let (Some(ref ns), Some(ref naga_debug_info)) =
+                (&self.nonsemantic_shader_debug_info, debug_info)
+            {
+                use super::debuginfo::{encoding, flags, opcodes, source_language};
+
+                let ext_id = ns.ext_id;
+                let void_type = self.void_type;
+
+                // -------- OpStrings (debug section) --------
+
+                // The file name OpString was already emitted in write_logical_layout;
+                // reuse its result ID from DebugInfoInner.
+                let file_name_str_id = naga_debug_info.source_file_id;
+
+                // Function name string.
+                let func_name = ir_function.name.as_deref().unwrap_or("unnamed");
+                let func_name_str_id = self.id_gen.next();
+                self.debug_strings
+                    .push(Instruction::string(func_name, func_name_str_id));
+
+                // -------- Constant operands (declarations section) --------
+                let ver_1 = self.get_constant_scalar(crate::Literal::U32(1));
+                let ver_4 = self.get_constant_scalar(crate::Literal::U32(4));
+                let lang_glsl =
+                    self.get_constant_scalar(crate::Literal::U32(source_language::GLSL));
+
+                let (line, col) = ir_function
+                    .body
+                    .span_iter()
+                    .next()
+                    .and_then(|(_, span)| {
+                        if span.is_defined() {
+                            let loc = span.location(naga_debug_info.source_code);
+                            Some((loc.line_number, loc.line_position))
+                        } else {
+                            None
+                        }
+                    })
+                    .unwrap_or((1, 1));
+                let line_id = self.get_constant_scalar(crate::Literal::U32(line));
+                let col_id = self.get_constant_scalar(crate::Literal::U32(col));
+                let flags_def =
+                    self.get_constant_scalar(crate::Literal::U32(flags::IS_DEFINITION));
+                let flags_zero = self.get_constant_scalar(crate::Literal::U32(0));
+                let enc_bool =
+                    self.get_constant_scalar(crate::Literal::U32(encoding::BOOLEAN));
+                let enc_float =
+                    self.get_constant_scalar(crate::Literal::U32(encoding::FLOAT));
+                let enc_sint =
+                    self.get_constant_scalar(crate::Literal::U32(encoding::SIGNED));
+                let enc_uint =
+                    self.get_constant_scalar(crate::Literal::U32(encoding::UNSIGNED));
+                let _ = (enc_bool, enc_float, enc_sint, enc_uint); // used below
+
+                // -------- Global NonSemantic OpExtInst --------
+                // DebugInfoNone, DebugSource, DebugCompilationUnit,
+                // DebugExpression, DebugTypeFunction, and DebugFunction must
+                // live in the global declarations section (between section 9
+                // and section 10), NOT inside function bodies, per spirv-val.
+                // We emit them with `.to_words(&mut self.logical_layout.global_debug)`.
+                //
+                // DebugScope goes into the function body (prelude.body): it is
+                // one of the few debug instructions allowed inside functions.
+
+                // DebugInfoNone — placeholder for optional parameters.
+                let debug_info_none = self.id_gen.next();
+                Instruction::ext_inst(
+                    ext_id,
+                    opcodes::DEBUG_INFO_NONE,
+                    void_type,
+                    debug_info_none,
+                    &[],
+                )
+                .to_words(&mut self.logical_layout.global_debug);
+
+                // DebugSource — file name + source text.
+                // Including the source text lets NSight display the shader
+                // source inline without needing to locate the file on disk.
+                let source_text_str_id = self.id_gen.next();
+                self.debug_strings.push(Instruction::string(
+                    naga_debug_info.source_code,
+                    source_text_str_id,
+                ));
+                let debug_source = self.id_gen.next();
+                Instruction::ext_inst(
+                    ext_id,
+                    opcodes::DEBUG_SOURCE,
+                    void_type,
+                    debug_source,
+                    &[file_name_str_id, source_text_str_id],
+                )
+                .to_words(&mut self.logical_layout.global_debug);
+
+                // DebugCompilationUnit.
+                let compilation_unit = self.id_gen.next();
+                Instruction::ext_inst(
+                    ext_id,
+                    opcodes::DEBUG_COMPILATION_UNIT,
+                    void_type,
+                    compilation_unit,
+                    &[ver_1, ver_4, debug_source, lang_glsl],
+                )
+                .to_words(&mut self.logical_layout.global_debug);
+
+                // Empty DebugExpression (used in DebugDeclare).
+                let empty_expression = self.id_gen.next();
+                Instruction::ext_inst(
+                    ext_id,
+                    opcodes::DEBUG_EXPRESSION,
+                    void_type,
+                    empty_expression,
+                    &[],
+                )
+                .to_words(&mut self.logical_layout.global_debug);
+
+                // DebugTypeBasic("void") — used as Return Type in DebugTypeFunction.
+                // The spec allows DebugInfoNone for void returns, but spirv-val
+                // (SDK 1.4.341.1) rejects it, so we use a void DebugTypeBasic.
+                // Encoding=0 means "unspecified/none", which is correct for void.
+                let void_name_id = self.id_gen.next();
+                self.debug_strings
+                    .push(Instruction::string("void", void_name_id));
+                let size_zero = self.get_constant_scalar(crate::Literal::U32(0));
+                let enc_none = self.get_constant_scalar(crate::Literal::U32(0));
+                let debug_type_void = self.id_gen.next();
+                Instruction::ext_inst(
+                    ext_id,
+                    opcodes::DEBUG_TYPE_BASIC,
+                    void_type,
+                    debug_type_void,
+                    &[void_name_id, size_zero, enc_none, flags_zero],
+                )
+                .to_words(&mut self.logical_layout.global_debug);
+
+                // DebugTypeFunction — describes the function's type.
+                let debug_type_function = self.id_gen.next();
+                Instruction::ext_inst(
+                    ext_id,
+                    opcodes::DEBUG_TYPE_FUNCTION,
+                    void_type,
+                    debug_type_function,
+                    &[flags_zero, debug_type_void],
+                )
+                .to_words(&mut self.logical_layout.global_debug);
+
+                // DebugFunction.
+                let debug_func_id = self.id_gen.next();
+                Instruction::ext_inst(
+                    ext_id,
+                    opcodes::DEBUG_FUNCTION,
+                    void_type,
+                    debug_func_id,
+                    &[
+                        func_name_str_id,
+                        debug_type_function,
+                        debug_source,
+                        line_id,
+                        col_id,
+                        compilation_unit,
+                        func_name_str_id, // LinkageName (reuse name)
+                        flags_def,
+                        line_id, // ScopeLine
+                        // No optional Declaration operand: the OpFunction ID
+                        // is in section 11 and would be a forward reference
+                        // from the global_debug section (between sections 9-10).
+                    ],
+                )
+                .to_words(&mut self.logical_layout.global_debug);
+
+                // DebugScope — allowed inside function bodies.
+                let debug_scope_id = self.id_gen.next();
+                prelude.body.push(Instruction::ext_inst(
+                    ext_id,
+                    opcodes::DEBUG_SCOPE,
+                    void_type,
+                    debug_scope_id,
+                    &[debug_func_id],
+                ));
+
+                // DebugFunctionDefinition — links the DebugFunction to the
+                // OpFunction. Must be in the function body (not global scope).
+                let debug_func_def_id = self.id_gen.next();
+                prelude.body.push(Instruction::ext_inst(
+                    ext_id,
+                    opcodes::DEBUG_FUNCTION_DEFINITION,
+                    void_type,
+                    debug_func_def_id,
+                    &[debug_func_id, function_id],
+                ));
+
+                // DebugEntryPoint — emitted for entry-point functions only.
+                // Links the DebugFunction + CompilationUnit with compiler info.
+                if interface.is_some() {
+                    let compiler_str_id = self.id_gen.next();
+                    self.debug_strings
+                        .push(Instruction::string("naga", compiler_str_id));
+                    let cmdline_str_id = self.id_gen.next();
+                    self.debug_strings
+                        .push(Instruction::string("", cmdline_str_id));
+                    let debug_entry_point_id = self.id_gen.next();
+                    Instruction::ext_inst(
+                        ext_id,
+                        opcodes::DEBUG_ENTRY_POINT,
+                        void_type,
+                        debug_entry_point_id,
+                        &[debug_func_id, compilation_unit, compiler_str_id, cmdline_str_id],
+                    )
+                    .to_words(&mut self.logical_layout.global_debug);
+                }
+
+                // Store some IDs needed for per-variable debug info below.
+                Some((
+                    debug_func_id,
+                    debug_source,
+                    empty_expression,
+                    ext_id,
+                    enc_bool,
+                    enc_float,
+                    enc_sint,
+                    enc_uint,
+                ))
+            } else {
+                None
+            };
+
+        // Extract IDs from the Option tuple for use in the local variable loop.
+        let (
+            ns_debug_func_id,
+            ns_debug_source,
+            ns_empty_expr,
+            ns_ext_id,
+            enc_bool,
+            enc_float,
+            enc_sint,
+            enc_uint,
+        ) = match ns_debug_function_id {
+            Some((a, b, c, d, e, f, g, h)) => {
+                (Some(a), Some(b), Some(c), Some(d), e, f, g, h)
+            }
+            None => (None, None, None, None, 0, 0, 0, 0),
+        };
+
         // Create a `BlockContext` for generating SPIR-V for the function's
         // body.
         let mut context = BlockContext {
@@ -1572,6 +1826,130 @@ impl Writer {
                 .function
                 .variables
                 .insert(handle, LocalVariable { id, instruction });
+
+            // Emit DebugLocalVariable + DebugDeclare for named local variables.
+            if let (
+                Some(ref name),
+                Some(debug_func_id),
+                Some(debug_source),
+                Some(empty_expression),
+                Some(ext_id),
+            ) = (
+                &variable.name,
+                ns_debug_func_id,
+                ns_debug_source,
+                ns_empty_expr,
+                ns_ext_id,
+            ) {
+                use super::debuginfo::opcodes;
+
+                let void_type = context.writer.void_type;
+
+                // Get a debug type for this variable.  Returns None for types
+                // that can't be represented as a NonSemantic debug type (e.g.
+                // structs, arrays, samplers).  DebugTypeBasic/DebugTypeVector go
+                // to global_debug per spirv-val requirements.
+                // spirv-val rejects DebugInfoNone as the Type operand of
+                // DebugLocalVariable, so we skip the declaration entirely when
+                // we have no representable type.
+                let debug_type: Option<Word> = match ir_module.types[variable.ty].inner {
+                    crate::TypeInner::Scalar(scalar) => context
+                        .writer
+                        .emit_debug_type_basic(
+                            ext_id,
+                            scalar,
+                            enc_bool,
+                            enc_float,
+                            enc_sint,
+                            enc_uint,
+                        ),
+                    crate::TypeInner::Vector { scalar, size } => {
+                        context
+                            .writer
+                            .emit_debug_type_basic(
+                                ext_id,
+                                scalar,
+                                enc_bool,
+                                enc_float,
+                                enc_sint,
+                                enc_uint,
+                            )
+                            .map(|base| {
+                                let count_id = context
+                                    .writer
+                                    .get_constant_scalar(crate::Literal::U32(size as u32));
+                                let vec_type_id = context.writer.id_gen.next();
+                                Instruction::ext_inst(
+                                    ext_id,
+                                    opcodes::DEBUG_TYPE_VECTOR,
+                                    void_type,
+                                    vec_type_id,
+                                    &[base, count_id],
+                                )
+                                .to_words(
+                                    &mut context.writer.logical_layout.global_debug,
+                                );
+                                vec_type_id
+                            })
+                    }
+                    _ => None,
+                };
+
+                // Only emit DebugLocalVariable + DebugDeclare when we have a
+                // representable debug type; spirv-val rejects DebugInfoNone here.
+                if let Some(debug_type) = debug_type {
+                let span = ir_function.local_variables.get_span(handle);
+                let (line, col) = if span.is_defined() {
+                    if let Some(ref di) = *debug_info {
+                        let loc = span.location(di.source_code);
+                        (loc.line_number, loc.line_position)
+                    } else {
+                        (1, 1)
+                    }
+                } else {
+                    (1, 1)
+                };
+                let line_id =
+                    context.writer.get_constant_scalar(crate::Literal::U32(line));
+                let col_id =
+                    context.writer.get_constant_scalar(crate::Literal::U32(col));
+                let flags_id = context.writer.get_constant_scalar(crate::Literal::U32(0));
+
+                // OpString for the variable name goes to the debug strings section.
+                let var_name_id = context.writer.id_gen.next();
+                context.writer.debug_strings.push(Instruction::string(name, var_name_id));
+
+                // DebugLocalVariable goes to global_debug.
+                let debug_local_var_id = context.writer.id_gen.next();
+                Instruction::ext_inst(
+                    ext_id,
+                    opcodes::DEBUG_LOCAL_VARIABLE,
+                    void_type,
+                    debug_local_var_id,
+                    &[
+                        var_name_id,
+                        debug_type,
+                        debug_source,
+                        line_id,
+                        col_id,
+                        debug_func_id,
+                        flags_id,
+                    ],
+                )
+                .to_words(&mut context.writer.logical_layout.global_debug);
+
+                // DebugDeclare is allowed in function bodies.
+                let debug_declare_id = context.writer.id_gen.next();
+                prelude.body.push(Instruction::ext_inst(
+                    ext_id,
+                    opcodes::DEBUG_DECLARE,
+                    void_type,
+                    debug_declare_id,
+                    &[debug_local_var_id, id, empty_expression],
+                ));
+                } // if let Some(debug_type)
+
+            }
 
             if let crate::TypeInner::RayQuery { .. } = ir_module.types[variable.ty].inner {
                 // Don't refactor this into a struct: Although spirv itself allows opaque types in structs,
@@ -3672,6 +4050,12 @@ impl Writer {
             self.global_variables.insert(handle, gvar);
         }
 
+        // Register the NonSemantic.Shader.DebugInfo.100 extension import.
+        // Per-function DebugXxx instructions are emitted inside function bodies.
+        if self.flags.contains(WriterFlags::DEBUG) && debug_info.is_some() {
+            self.init_nonsemantic_shader_debug_info();
+        }
+
         // write all functions
         for (handle, ir_function) in ir_module.functions.iter() {
             let info = &mod_info[handle];
@@ -3802,6 +4186,94 @@ impl Writer {
 
     pub(super) fn needs_f16_polyfill(&self, ty_inner: &crate::TypeInner) -> bool {
         self.io_f16_polyfills.needs_polyfill(ty_inner)
+    }
+
+    // -----------------------------------------------------------------
+    // NonSemantic.Shader.DebugInfo.100 helpers
+    // -----------------------------------------------------------------
+
+    /// Emit a `DebugTypeBasic` instruction into the global debug section
+    /// (`logical_layout.global_debug`) for the given Naga scalar, returning
+    /// its result ID.
+    ///
+    /// The corresponding `OpString` is pushed to `self.debug_strings` so it
+    /// appears in the SPIR-V debug strings section before any OpName/OpSource
+    /// and before function bodies, satisfying the SPIR-V layout requirements.
+    ///
+    /// Returns `None` for abstract scalars that have no GLSL equivalent.
+    fn emit_debug_type_basic(
+        &mut self,
+        ext_id: Word,
+        scalar: crate::Scalar,
+        enc_bool: Word,
+        enc_float: Word,
+        enc_sint: Word,
+        enc_uint: Word,
+    ) -> Option<Word> {
+        use super::debuginfo::opcodes;
+
+        let void_type = self.void_type;
+
+        let (name, size_bits, enc) = match scalar.kind {
+            crate::ScalarKind::Bool => ("bool", 8u32, enc_bool),
+            crate::ScalarKind::Sint => {
+                let n = match scalar.width {
+                    1 => "int8_t",
+                    2 => "int16_t",
+                    8 => "int64_t",
+                    _ => "int",
+                };
+                (n, scalar.width as u32 * 8, enc_sint)
+            }
+            crate::ScalarKind::Uint => {
+                let n = match scalar.width {
+                    1 => "uint8_t",
+                    2 => "uint16_t",
+                    8 => "uint64_t",
+                    _ => "uint",
+                };
+                (n, scalar.width as u32 * 8, enc_uint)
+            }
+            crate::ScalarKind::Float => {
+                let n = match scalar.width {
+                    2 => "float16_t",
+                    8 => "double",
+                    _ => "float",
+                };
+                (n, scalar.width as u32 * 8, enc_float)
+            }
+            crate::ScalarKind::AbstractInt | crate::ScalarKind::AbstractFloat => return None,
+        };
+
+        let name_id = self.id_gen.next();
+        self.debug_strings.push(Instruction::string(name, name_id));
+        let size_id = self.get_constant_scalar(crate::Literal::U32(size_bits));
+        let flags_zero = self.get_constant_scalar(crate::Literal::U32(0));
+        let type_id = self.id_gen.next();
+        Instruction::ext_inst(
+            ext_id,
+            opcodes::DEBUG_TYPE_BASIC,
+            void_type,
+            type_id,
+            &[name_id, size_id, enc, flags_zero],
+        )
+        .to_words(&mut self.logical_layout.global_debug);
+        Some(type_id)
+    }
+
+    /// Register the `NonSemantic.Shader.DebugInfo.100` extension import.
+    ///
+    /// All `DebugXxx` instructions are emitted into function bodies rather
+    /// than the global declarations section, so that parsers that don't support
+    /// non-semantic instructions in global scope (e.g. rspirv) can still
+    /// consume the output.
+    fn init_nonsemantic_shader_debug_info(&mut self) {
+        self.use_extension("SPV_KHR_non_semantic_info");
+        let ext_id = self.id_gen.next();
+        Instruction::ext_inst_import(ext_id, "NonSemantic.Shader.DebugInfo.100")
+            .to_words(&mut self.logical_layout.ext_inst_imports);
+        self.nonsemantic_shader_debug_info =
+            Some(super::debuginfo::NonSemanticShaderDebugInfo { ext_id });
     }
 
     pub(super) fn write_debug_printf(

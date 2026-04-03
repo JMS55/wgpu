@@ -1,15 +1,18 @@
 ; SPIR-V
 ; Version: 1.1
-; Generator: rspirv
-; Bound: 106
-OpCapability Shader
-OpCapability ImageQuery
-%1 = OpExtInstImport "GLSL.std.450"
-OpMemoryModel Logical GLSL450
-OpEntryPoint Fragment %91 "fragment_shader" %89
-OpExecutionMode %91 OriginUpperLeft
-%3 = OpString "bounds-check-image-restrict-depth.wgsl"
-OpSource Unknown 0 %3 "// Cases from bounds-check-image-restrict that GLSL does not yet support.
+; Generator: Khronos; 28
+; Bound: 183
+; Schema: 0
+               OpCapability Shader
+               OpCapability ImageQuery
+               OpExtension "SPV_KHR_non_semantic_info"
+          %1 = OpExtInstImport "GLSL.std.450"
+         %18 = OpExtInstImport "NonSemantic.Shader.DebugInfo.100"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %fragment_shader "fragment_shader" %150
+               OpExecutionMode %fragment_shader OriginUpperLeft
+         %25 = OpString "test_textureLoad_depth_2d"
+         %36 = OpString "// Cases from bounds-check-image-restrict that GLSL does not yet support.
 
 @group(0) @binding(0)
 var image_depth_2d: texture_depth_2d;
@@ -46,156 +49,412 @@ fn fragment_shader() -> @location(0) vec4<f32> {
     return vec4<f32>(0.,0.,0.,0.);
 }
 "
-OpName %12 "image_depth_2d"
-OpName %14 "image_depth_2d_array"
-OpName %16 "image_depth_multisampled_2d"
-OpName %19 "coords"
-OpName %20 "level"
-OpName %21 "test_textureLoad_depth_2d"
-OpName %36 "coords"
-OpName %37 "index"
-OpName %38 "level"
-OpName %39 "test_textureLoad_depth_2d_array_u"
-OpName %56 "coords"
-OpName %57 "index"
-OpName %58 "level"
-OpName %59 "test_textureLoad_depth_2d_array_s"
-OpName %74 "coords"
-OpName %75 "_sample"
-OpName %76 "test_textureLoad_depth_multisampled_2d"
-OpName %91 "fragment_shader"
-OpDecorate %12 DescriptorSet 0
-OpDecorate %12 Binding 0
-OpDecorate %14 DescriptorSet 0
-OpDecorate %14 Binding 1
-OpDecorate %16 DescriptorSet 0
-OpDecorate %16 Binding 2
-OpDecorate %89 Location 0
-%2 = OpTypeVoid
-%5 = OpTypeFloat 32
-%4 = OpTypeImage %5 2D 1 0 0 1 Unknown
-%6 = OpTypeInt 32 1
-%7 = OpTypeVector %6 2
-%8 = OpTypeImage %5 2D 1 1 0 1 Unknown
-%9 = OpTypeInt 32 0
-%10 = OpTypeImage %5 2D 1 0 1 1 Unknown
-%11 = OpTypeVector %5 4
-%13 = OpTypePointer UniformConstant %4
-%12 = OpVariable  %13  UniformConstant
-%15 = OpTypePointer UniformConstant %8
-%14 = OpVariable  %15  UniformConstant
-%17 = OpTypePointer UniformConstant %10
-%16 = OpVariable  %17  UniformConstant
-%22 = OpTypeFunction %5 %7 %6
-%26 = OpConstant  %6  1
-%30 = OpConstantComposite  %7  %26 %26
-%40 = OpTypeFunction %5 %7 %9 %6
-%44 = OpTypeVector %6 3
-%50 = OpConstantComposite  %44  %26 %26 %26
-%60 = OpTypeFunction %5 %7 %6 %6
-%68 = OpConstantComposite  %44  %26 %26 %26
-%83 = OpConstantComposite  %7  %26 %26
-%90 = OpTypePointer Output %11
-%89 = OpVariable  %90  Output
-%92 = OpTypeFunction %2
-%96 = OpConstantNull  %7
-%97 = OpConstant  %6  0
-%98 = OpConstant  %9  0
-%99 = OpConstant  %5  0
-%100 = OpConstantComposite  %11  %99 %99 %99 %99
-%21 = OpFunction  %5  None %22
-%19 = OpFunctionParameter  %7
-%20 = OpFunctionParameter  %6
-%18 = OpLabel
-%23 = OpLoad  %4  %12
-OpBranch %24
-%24 = OpLabel
-OpLine %3 7 11
-%25 = OpImageQueryLevels  %6  %23
-%27 = OpISub  %6  %25 %26
-%28 = OpExtInst  %6  %1 UMin %20 %27
-%29 = OpImageQuerySizeLod  %7  %23 %28
-%31 = OpISub  %7  %29 %30
-%32 = OpExtInst  %7  %1 UMin %19 %31
-%33 = OpImageFetch  %11  %23 %32 Lod %28
-%34 = OpCompositeExtract  %5  %33 0
-OpReturnValue %34
-OpFunctionEnd
-%39 = OpFunction  %5  None %40
-%36 = OpFunctionParameter  %7
-%37 = OpFunctionParameter  %9
-%38 = OpFunctionParameter  %6
-%35 = OpLabel
-%41 = OpLoad  %8  %14
-OpBranch %42
-%42 = OpLabel
-OpLine %3 14 11
-%43 = OpBitcast  %6  %37
-%45 = OpCompositeConstruct  %44  %36 %43
-%46 = OpImageQueryLevels  %6  %41
-%47 = OpISub  %6  %46 %26
-%48 = OpExtInst  %6  %1 UMin %38 %47
-%49 = OpImageQuerySizeLod  %44  %41 %48
-%51 = OpISub  %44  %49 %50
-%52 = OpExtInst  %44  %1 UMin %45 %51
-%53 = OpImageFetch  %11  %41 %52 Lod %48
-%54 = OpCompositeExtract  %5  %53 0
-OpReturnValue %54
-OpFunctionEnd
-%59 = OpFunction  %5  None %60
-%56 = OpFunctionParameter  %7
-%57 = OpFunctionParameter  %6
-%58 = OpFunctionParameter  %6
-%55 = OpLabel
-%61 = OpLoad  %8  %14
-OpBranch %62
-%62 = OpLabel
-OpLine %3 18 11
-%63 = OpCompositeConstruct  %44  %56 %57
-%64 = OpImageQueryLevels  %6  %61
-%65 = OpISub  %6  %64 %26
-%66 = OpExtInst  %6  %1 UMin %58 %65
-%67 = OpImageQuerySizeLod  %44  %61 %66
-%69 = OpISub  %44  %67 %68
-%70 = OpExtInst  %44  %1 UMin %63 %69
-%71 = OpImageFetch  %11  %61 %70 Lod %66
-%72 = OpCompositeExtract  %5  %71 0
-OpReturnValue %72
-OpFunctionEnd
-%76 = OpFunction  %5  None %22
-%74 = OpFunctionParameter  %7
-%75 = OpFunctionParameter  %6
-%73 = OpLabel
-%77 = OpLoad  %10  %16
-OpBranch %78
-%78 = OpLabel
-OpLine %3 25 11
-%79 = OpImageQuerySamples  %6  %77
-%80 = OpISub  %6  %79 %26
-%81 = OpExtInst  %6  %1 UMin %75 %80
-%82 = OpImageQuerySize  %7  %77
-%84 = OpISub  %7  %82 %83
-%85 = OpExtInst  %7  %1 UMin %74 %84
-%86 = OpImageFetch  %11  %77 %85 Sample %81
-%87 = OpCompositeExtract  %5  %86 0
-OpReturnValue %87
-OpFunctionEnd
-%91 = OpFunction  %2  None %92
-%88 = OpLabel
-%93 = OpLoad  %4  %12
-%94 = OpLoad  %8  %14
-%95 = OpLoad  %10  %16
-OpBranch %101
-%101 = OpLabel
-OpLine %3 30 5
-%102 = OpFunctionCall  %5  %21 %96 %97
-OpLine %3 31 5
-%103 = OpFunctionCall  %5  %39 %96 %98 %97
-OpLine %3 32 5
-%104 = OpFunctionCall  %5  %59 %96 %97 %97
-OpLine %3 33 5
-%105 = OpFunctionCall  %5  %76 %96 %97
-OpLine %3 35 12
-OpStore %89 %100
-OpReturn
-OpFunctionEnd
+         %40 = OpString "void"
+         %64 = OpString "test_textureLoad_depth_2d_array_u"
+         %67 = OpString "// Cases from bounds-check-image-restrict that GLSL does not yet support.
+
+@group(0) @binding(0)
+var image_depth_2d: texture_depth_2d;
+
+fn test_textureLoad_depth_2d(coords: vec2<i32>, level: i32) -> f32 {
+   return textureLoad(image_depth_2d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_depth_2d_array: texture_depth_2d_array;
+
+fn test_textureLoad_depth_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> f32 {
+   return textureLoad(image_depth_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_depth_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> f32 {
+   return textureLoad(image_depth_2d_array, coords, index, level);
+}
+
+@group(0) @binding(2)
+var image_depth_multisampled_2d: texture_depth_multisampled_2d;
+
+fn test_textureLoad_depth_multisampled_2d(coords: vec2<i32>, _sample: i32) -> f32 {
+   return textureLoad(image_depth_multisampled_2d, coords, _sample);
+}
+
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_depth_2d(vec2<i32>(), 0);
+    test_textureLoad_depth_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_depth_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_depth_multisampled_2d(vec2<i32>(), 0);
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+         %71 = OpString "void"
+         %97 = OpString "test_textureLoad_depth_2d_array_s"
+        %100 = OpString "// Cases from bounds-check-image-restrict that GLSL does not yet support.
+
+@group(0) @binding(0)
+var image_depth_2d: texture_depth_2d;
+
+fn test_textureLoad_depth_2d(coords: vec2<i32>, level: i32) -> f32 {
+   return textureLoad(image_depth_2d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_depth_2d_array: texture_depth_2d_array;
+
+fn test_textureLoad_depth_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> f32 {
+   return textureLoad(image_depth_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_depth_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> f32 {
+   return textureLoad(image_depth_2d_array, coords, index, level);
+}
+
+@group(0) @binding(2)
+var image_depth_multisampled_2d: texture_depth_multisampled_2d;
+
+fn test_textureLoad_depth_multisampled_2d(coords: vec2<i32>, _sample: i32) -> f32 {
+   return textureLoad(image_depth_multisampled_2d, coords, _sample);
+}
+
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_depth_2d(vec2<i32>(), 0);
+    test_textureLoad_depth_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_depth_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_depth_multisampled_2d(vec2<i32>(), 0);
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+        %104 = OpString "void"
+        %126 = OpString "test_textureLoad_depth_multisampled_2d"
+        %129 = OpString "// Cases from bounds-check-image-restrict that GLSL does not yet support.
+
+@group(0) @binding(0)
+var image_depth_2d: texture_depth_2d;
+
+fn test_textureLoad_depth_2d(coords: vec2<i32>, level: i32) -> f32 {
+   return textureLoad(image_depth_2d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_depth_2d_array: texture_depth_2d_array;
+
+fn test_textureLoad_depth_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> f32 {
+   return textureLoad(image_depth_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_depth_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> f32 {
+   return textureLoad(image_depth_2d_array, coords, index, level);
+}
+
+@group(0) @binding(2)
+var image_depth_multisampled_2d: texture_depth_multisampled_2d;
+
+fn test_textureLoad_depth_multisampled_2d(coords: vec2<i32>, _sample: i32) -> f32 {
+   return textureLoad(image_depth_multisampled_2d, coords, _sample);
+}
+
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_depth_2d(vec2<i32>(), 0);
+    test_textureLoad_depth_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_depth_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_depth_multisampled_2d(vec2<i32>(), 0);
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+        %133 = OpString "void"
+        %157 = OpString "fragment_shader"
+        %161 = OpString "// Cases from bounds-check-image-restrict that GLSL does not yet support.
+
+@group(0) @binding(0)
+var image_depth_2d: texture_depth_2d;
+
+fn test_textureLoad_depth_2d(coords: vec2<i32>, level: i32) -> f32 {
+   return textureLoad(image_depth_2d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_depth_2d_array: texture_depth_2d_array;
+
+fn test_textureLoad_depth_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> f32 {
+   return textureLoad(image_depth_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_depth_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> f32 {
+   return textureLoad(image_depth_2d_array, coords, index, level);
+}
+
+@group(0) @binding(2)
+var image_depth_multisampled_2d: texture_depth_multisampled_2d;
+
+fn test_textureLoad_depth_multisampled_2d(coords: vec2<i32>, _sample: i32) -> f32 {
+   return textureLoad(image_depth_multisampled_2d, coords, _sample);
+}
+
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_depth_2d(vec2<i32>(), 0);
+    test_textureLoad_depth_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_depth_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_depth_multisampled_2d(vec2<i32>(), 0);
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+        %165 = OpString "void"
+        %171 = OpString "naga"
+        %172 = OpString ""
+          %3 = OpString "bounds-check-image-restrict-depth.wgsl"
+               OpSource GLSL 0 %3 "// Cases from bounds-check-image-restrict that GLSL does not yet support.
+
+@group(0) @binding(0)
+var image_depth_2d: texture_depth_2d;
+
+fn test_textureLoad_depth_2d(coords: vec2<i32>, level: i32) -> f32 {
+   return textureLoad(image_depth_2d, coords, level);
+}
+
+@group(0) @binding(1)
+var image_depth_2d_array: texture_depth_2d_array;
+
+fn test_textureLoad_depth_2d_array_u(coords: vec2<i32>, index: u32, level: i32) -> f32 {
+   return textureLoad(image_depth_2d_array, coords, index, level);
+}
+
+fn test_textureLoad_depth_2d_array_s(coords: vec2<i32>, index: i32, level: i32) -> f32 {
+   return textureLoad(image_depth_2d_array, coords, index, level);
+}
+
+@group(0) @binding(2)
+var image_depth_multisampled_2d: texture_depth_multisampled_2d;
+
+fn test_textureLoad_depth_multisampled_2d(coords: vec2<i32>, _sample: i32) -> f32 {
+   return textureLoad(image_depth_multisampled_2d, coords, _sample);
+}
+
+@fragment
+fn fragment_shader() -> @location(0) vec4<f32> {
+    test_textureLoad_depth_2d(vec2<i32>(), 0);
+    test_textureLoad_depth_2d_array_u(vec2<i32>(), 0u, 0);
+    test_textureLoad_depth_2d_array_s(vec2<i32>(), 0, 0);
+    test_textureLoad_depth_multisampled_2d(vec2<i32>(), 0);
+
+    return vec4<f32>(0.,0.,0.,0.);
+}
+"
+               OpName %image_depth_2d "image_depth_2d"
+               OpName %image_depth_2d_array "image_depth_2d_array"
+               OpName %image_depth_multisampled_2d "image_depth_multisampled_2d"
+               OpName %coords "coords"
+               OpName %level "level"
+               OpName %test_textureLoad_depth_2d "test_textureLoad_depth_2d"
+               OpName %coords_0 "coords"
+               OpName %index "index"
+               OpName %level_0 "level"
+               OpName %test_textureLoad_depth_2d_array_u "test_textureLoad_depth_2d_array_u"
+               OpName %coords_1 "coords"
+               OpName %index_0 "index"
+               OpName %level_1 "level"
+               OpName %test_textureLoad_depth_2d_array_s "test_textureLoad_depth_2d_array_s"
+               OpName %coords_2 "coords"
+               OpName %_sample "_sample"
+               OpName %test_textureLoad_depth_multisampled_2d "test_textureLoad_depth_multisampled_2d"
+               OpName %fragment_shader "fragment_shader"
+               OpDecorate %image_depth_2d DescriptorSet 0
+               OpDecorate %image_depth_2d Binding 0
+               OpDecorate %image_depth_2d_array DescriptorSet 0
+               OpDecorate %image_depth_2d_array Binding 1
+               OpDecorate %image_depth_multisampled_2d DescriptorSet 0
+               OpDecorate %image_depth_multisampled_2d Binding 2
+               OpDecorate %150 Location 0
+       %void = OpTypeVoid
+      %float = OpTypeFloat 32
+          %4 = OpTypeImage %float 2D 1 0 0 1 Unknown
+        %int = OpTypeInt 32 1
+      %v2int = OpTypeVector %int 2
+          %8 = OpTypeImage %float 2D 1 1 0 1 Unknown
+       %uint = OpTypeInt 32 0
+         %10 = OpTypeImage %float 2D 1 0 1 1 Unknown
+    %v4float = OpTypeVector %float 4
+%_ptr_UniformConstant_4 = OpTypePointer UniformConstant %4
+%image_depth_2d = OpVariable %_ptr_UniformConstant_4 UniformConstant
+%_ptr_UniformConstant_8 = OpTypePointer UniformConstant %8
+%image_depth_2d_array = OpVariable %_ptr_UniformConstant_8 UniformConstant
+%_ptr_UniformConstant_10 = OpTypePointer UniformConstant %10
+%image_depth_multisampled_2d = OpVariable %_ptr_UniformConstant_10 UniformConstant
+         %23 = OpTypeFunction %float %v2int %int
+     %uint_1 = OpConstant %uint 1
+     %uint_4 = OpConstant %uint 4
+     %uint_2 = OpConstant %uint 2
+     %uint_7 = OpConstant %uint 7
+    %uint_11 = OpConstant %uint 11
+     %uint_8 = OpConstant %uint 8
+     %uint_0 = OpConstant %uint 0
+     %uint_3 = OpConstant %uint 3
+     %uint_6 = OpConstant %uint 6
+      %int_1 = OpConstant %int 1
+         %52 = OpConstantComposite %v2int %int_1 %int_1
+         %62 = OpTypeFunction %float %v2int %uint %int
+    %uint_14 = OpConstant %uint 14
+      %v3int = OpTypeVector %int 3
+         %85 = OpConstantComposite %v3int %int_1 %int_1 %int_1
+         %95 = OpTypeFunction %float %v2int %int %int
+    %uint_18 = OpConstant %uint 18
+        %116 = OpConstantComposite %v3int %int_1 %int_1 %int_1
+    %uint_25 = OpConstant %uint 25
+        %144 = OpConstantComposite %v2int %int_1 %int_1
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+        %150 = OpVariable %_ptr_Output_v4float Output
+        %153 = OpTypeFunction %void
+    %uint_30 = OpConstant %uint 30
+     %uint_5 = OpConstant %uint 5
+        %174 = OpConstantNull %v2int
+      %int_0 = OpConstant %int 0
+    %float_0 = OpConstant %float 0
+        %177 = OpConstantComposite %v4float %float_0 %float_0 %float_0 %float_0
+         %35 = OpExtInst %void %18 DebugInfoNone
+         %37 = OpExtInst %void %18 DebugSource %3 %36
+         %38 = OpExtInst %void %18 DebugCompilationUnit %uint_1 %uint_4 %37 %uint_2
+         %39 = OpExtInst %void %18 DebugExpression
+         %41 = OpExtInst %void %18 DebugTypeBasic %40 %uint_0 %uint_0 %uint_0
+         %42 = OpExtInst %void %18 DebugTypeFunction %uint_0 %41
+         %43 = OpExtInst %void %18 DebugFunction %25 %42 %37 %uint_7 %uint_11 %38 %25 %uint_8 %uint_7
+         %66 = OpExtInst %void %18 DebugInfoNone
+         %68 = OpExtInst %void %18 DebugSource %3 %67
+         %69 = OpExtInst %void %18 DebugCompilationUnit %uint_1 %uint_4 %68 %uint_2
+         %70 = OpExtInst %void %18 DebugExpression
+         %72 = OpExtInst %void %18 DebugTypeBasic %71 %uint_0 %uint_0 %uint_0
+         %73 = OpExtInst %void %18 DebugTypeFunction %uint_0 %72
+         %74 = OpExtInst %void %18 DebugFunction %64 %73 %68 %uint_14 %uint_11 %69 %64 %uint_8 %uint_14
+         %99 = OpExtInst %void %18 DebugInfoNone
+        %101 = OpExtInst %void %18 DebugSource %3 %100
+        %102 = OpExtInst %void %18 DebugCompilationUnit %uint_1 %uint_4 %101 %uint_2
+        %103 = OpExtInst %void %18 DebugExpression
+        %105 = OpExtInst %void %18 DebugTypeBasic %104 %uint_0 %uint_0 %uint_0
+        %106 = OpExtInst %void %18 DebugTypeFunction %uint_0 %105
+        %107 = OpExtInst %void %18 DebugFunction %97 %106 %101 %uint_18 %uint_11 %102 %97 %uint_8 %uint_18
+        %128 = OpExtInst %void %18 DebugInfoNone
+        %130 = OpExtInst %void %18 DebugSource %3 %129
+        %131 = OpExtInst %void %18 DebugCompilationUnit %uint_1 %uint_4 %130 %uint_2
+        %132 = OpExtInst %void %18 DebugExpression
+        %134 = OpExtInst %void %18 DebugTypeBasic %133 %uint_0 %uint_0 %uint_0
+        %135 = OpExtInst %void %18 DebugTypeFunction %uint_0 %134
+        %136 = OpExtInst %void %18 DebugFunction %126 %135 %130 %uint_25 %uint_11 %131 %126 %uint_8 %uint_25
+        %160 = OpExtInst %void %18 DebugInfoNone
+        %162 = OpExtInst %void %18 DebugSource %3 %161
+        %163 = OpExtInst %void %18 DebugCompilationUnit %uint_1 %uint_4 %162 %uint_2
+        %164 = OpExtInst %void %18 DebugExpression
+        %166 = OpExtInst %void %18 DebugTypeBasic %165 %uint_0 %uint_0 %uint_0
+        %167 = OpExtInst %void %18 DebugTypeFunction %uint_0 %166
+        %168 = OpExtInst %void %18 DebugFunction %157 %167 %162 %uint_30 %uint_5 %163 %157 %uint_8 %uint_30
+        %173 = OpExtInst %void %18 DebugEntryPoint %168 %163 %171 %172
+%test_textureLoad_depth_2d = OpFunction %float None %23
+     %coords = OpFunctionParameter %v2int
+      %level = OpFunctionParameter %int
+         %19 = OpLabel
+         %24 = OpLoad %4 %image_depth_2d
+         %44 = OpExtInst %void %18 DebugScope %43
+         %45 = OpExtInst %void %18 DebugFunctionDefinition %43 %test_textureLoad_depth_2d
+               OpBranch %46
+         %46 = OpLabel
+               OpLine %3 7 11
+         %47 = OpImageQueryLevels %int %24
+         %49 = OpISub %int %47 %int_1
+         %50 = OpExtInst %int %1 UMin %level %49
+         %51 = OpImageQuerySizeLod %v2int %24 %50
+         %53 = OpISub %v2int %51 %52
+         %54 = OpExtInst %v2int %1 UMin %coords %53
+         %55 = OpImageFetch %v4float %24 %54 Lod %50
+         %56 = OpCompositeExtract %float %55 0
+               OpReturnValue %56
+               OpFunctionEnd
+%test_textureLoad_depth_2d_array_u = OpFunction %float None %62
+   %coords_0 = OpFunctionParameter %v2int
+      %index = OpFunctionParameter %uint
+    %level_0 = OpFunctionParameter %int
+         %57 = OpLabel
+         %63 = OpLoad %8 %image_depth_2d_array
+         %75 = OpExtInst %void %18 DebugScope %74
+         %76 = OpExtInst %void %18 DebugFunctionDefinition %74 %test_textureLoad_depth_2d_array_u
+               OpBranch %77
+         %77 = OpLabel
+               OpLine %3 14 11
+         %78 = OpBitcast %int %index
+         %80 = OpCompositeConstruct %v3int %coords_0 %78
+         %81 = OpImageQueryLevels %int %63
+         %82 = OpISub %int %81 %int_1
+         %83 = OpExtInst %int %1 UMin %level_0 %82
+         %84 = OpImageQuerySizeLod %v3int %63 %83
+         %86 = OpISub %v3int %84 %85
+         %87 = OpExtInst %v3int %1 UMin %80 %86
+         %88 = OpImageFetch %v4float %63 %87 Lod %83
+         %89 = OpCompositeExtract %float %88 0
+               OpReturnValue %89
+               OpFunctionEnd
+%test_textureLoad_depth_2d_array_s = OpFunction %float None %95
+   %coords_1 = OpFunctionParameter %v2int
+    %index_0 = OpFunctionParameter %int
+    %level_1 = OpFunctionParameter %int
+         %90 = OpLabel
+         %96 = OpLoad %8 %image_depth_2d_array
+        %108 = OpExtInst %void %18 DebugScope %107
+        %109 = OpExtInst %void %18 DebugFunctionDefinition %107 %test_textureLoad_depth_2d_array_s
+               OpBranch %110
+        %110 = OpLabel
+               OpLine %3 18 11
+        %111 = OpCompositeConstruct %v3int %coords_1 %index_0
+        %112 = OpImageQueryLevels %int %96
+        %113 = OpISub %int %112 %int_1
+        %114 = OpExtInst %int %1 UMin %level_1 %113
+        %115 = OpImageQuerySizeLod %v3int %96 %114
+        %117 = OpISub %v3int %115 %116
+        %118 = OpExtInst %v3int %1 UMin %111 %117
+        %119 = OpImageFetch %v4float %96 %118 Lod %114
+        %120 = OpCompositeExtract %float %119 0
+               OpReturnValue %120
+               OpFunctionEnd
+%test_textureLoad_depth_multisampled_2d = OpFunction %float None %23
+   %coords_2 = OpFunctionParameter %v2int
+    %_sample = OpFunctionParameter %int
+        %121 = OpLabel
+        %125 = OpLoad %10 %image_depth_multisampled_2d
+        %137 = OpExtInst %void %18 DebugScope %136
+        %138 = OpExtInst %void %18 DebugFunctionDefinition %136 %test_textureLoad_depth_multisampled_2d
+               OpBranch %139
+        %139 = OpLabel
+               OpLine %3 25 11
+        %140 = OpImageQuerySamples %int %125
+        %141 = OpISub %int %140 %int_1
+        %142 = OpExtInst %int %1 UMin %_sample %141
+        %143 = OpImageQuerySize %v2int %125
+        %145 = OpISub %v2int %143 %144
+        %146 = OpExtInst %v2int %1 UMin %coords_2 %145
+        %147 = OpImageFetch %v4float %125 %146 Sample %142
+        %148 = OpCompositeExtract %float %147 0
+               OpReturnValue %148
+               OpFunctionEnd
+%fragment_shader = OpFunction %void None %153
+        %149 = OpLabel
+        %154 = OpLoad %4 %image_depth_2d
+        %155 = OpLoad %8 %image_depth_2d_array
+        %156 = OpLoad %10 %image_depth_multisampled_2d
+        %169 = OpExtInst %void %18 DebugScope %168
+        %170 = OpExtInst %void %18 DebugFunctionDefinition %168 %fragment_shader
+               OpBranch %178
+        %178 = OpLabel
+               OpLine %3 30 5
+        %179 = OpFunctionCall %float %test_textureLoad_depth_2d %174 %int_0
+               OpLine %3 31 5
+        %180 = OpFunctionCall %float %test_textureLoad_depth_2d_array_u %174 %uint_0 %int_0
+               OpLine %3 32 5
+        %181 = OpFunctionCall %float %test_textureLoad_depth_2d_array_s %174 %int_0 %int_0
+               OpLine %3 33 5
+        %182 = OpFunctionCall %float %test_textureLoad_depth_multisampled_2d %174 %int_0
+               OpLine %3 35 12
+               OpStore %150 %177
+               OpReturn
+               OpFunctionEnd

@@ -97,6 +97,7 @@ are read-only.
 */
 
 mod block;
+mod debuginfo;
 mod f16_polyfill;
 mod helpers;
 mod image;
@@ -143,6 +144,11 @@ struct LogicalLayout {
     debugs: Vec<Word>,
     annotations: Vec<Word>,
     declarations: Vec<Word>,
+    /// Global-scope NonSemantic debug instructions (DebugInfoNone, DebugSource,
+    /// DebugCompilationUnit, DebugTypeBasic, DebugFunction, etc.).  These must
+    /// appear after all type/constant/variable declarations (section 9) and
+    /// before function declarations (section 10), as required by spirv-val.
+    global_debug: Vec<Word>,
     function_declarations: Vec<Word>,
     function_definitions: Vec<Word>,
 }
@@ -968,6 +974,10 @@ pub struct Writer {
 
     /// Non semantic debug printf extension `OpExtInstImport`
     debug_printf: Option<Word>,
+
+    /// State for `NonSemantic.Shader.DebugInfo.100`, present when debug info is enabled.
+    nonsemantic_shader_debug_info: Option<debuginfo::NonSemanticShaderDebugInfo>,
+
     pub(crate) ray_query_initialization_tracking: bool,
 
     /// See docs in [`Options`]

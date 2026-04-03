@@ -1,15 +1,18 @@
 ; SPIR-V
 ; Version: 1.1
-; Generator: rspirv
-; Bound: 38
-OpCapability Shader
-OpExtension "SPV_KHR_storage_buffer_storage_class"
-%1 = OpExtInstImport "GLSL.std.450"
-OpMemoryModel Logical GLSL450
-OpEntryPoint GLCompute %18 "main" %25
-OpExecutionMode %18 LocalSize 1 1 1
-%3 = OpString "workgroup-var-init.wgsl"
-OpSource Unknown 0 %3 "struct WStruct {
+; Generator: Khronos; 28
+; Bound: 59
+; Schema: 0
+               OpCapability Shader
+               OpExtension "SPV_KHR_storage_buffer_storage_class"
+               OpExtension "SPV_KHR_non_semantic_info"
+          %1 = OpExtInstImport "GLSL.std.450"
+         %17 = OpExtInstImport "NonSemantic.Shader.DebugInfo.100"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main" %gl_LocalInvocationIndex
+               OpExecutionMode %main LocalSize 1 1 1
+         %24 = OpString "main"
+         %32 = OpString "struct WStruct {
     arr: array<u32, 512>,
     atom: atomic<i32>,
     atom_arr: array<array<atomic<i32>, 8>, 8>,
@@ -24,68 +27,102 @@ var<storage, read_write> output: array<u32, 512>;
 fn main() {
     output = w_mem.arr;
 }"
-OpMemberName %11 0 "arr"
-OpMemberName %11 1 "atom"
-OpMemberName %11 2 "atom_arr"
-OpName %11 "WStruct"
-OpName %12 "w_mem"
-OpName %14 "output"
-OpName %18 "main"
-OpDecorate %5 ArrayStride 4
-OpDecorate %8 ArrayStride 4
-OpDecorate %10 ArrayStride 32
-OpMemberDecorate %11 0 Offset 0
-OpMemberDecorate %11 1 Offset 2048
-OpMemberDecorate %11 2 Offset 2052
-OpDecorate %14 DescriptorSet 0
-OpDecorate %14 Binding 0
-OpDecorate %15 Block
-OpMemberDecorate %15 0 Offset 0
-OpDecorate %25 BuiltIn LocalInvocationIndex
-%2 = OpTypeVoid
-%4 = OpTypeInt 32 0
-%6 = OpConstant  %4  512
-%5 = OpTypeArray %4 %6
-%7 = OpTypeInt 32 1
-%9 = OpConstant  %4  8
-%8 = OpTypeArray %7 %9
-%10 = OpTypeArray %8 %9
-%11 = OpTypeStruct %5 %7 %10
-%13 = OpTypePointer Workgroup %11
-%12 = OpVariable  %13  Workgroup
-%15 = OpTypeStruct %5
-%16 = OpTypePointer StorageBuffer %15
-%14 = OpVariable  %16  StorageBuffer
-%19 = OpTypeFunction %2
-%20 = OpTypePointer StorageBuffer %5
-%21 = OpConstant  %4  0
-%24 = OpConstantNull  %11
-%26 = OpTypePointer Input %4
-%25 = OpVariable  %26  Input
-%29 = OpTypeBool
-%32 = OpConstant  %4  2
-%33 = OpConstant  %4  264
-%35 = OpTypePointer Workgroup %5
-%18 = OpFunction  %2  None %19
-%17 = OpLabel
-%22 = OpAccessChain  %20  %14 %21
-OpBranch %23
-%23 = OpLabel
-%27 = OpLoad  %4  %25
-%28 = OpIEqual  %29  %27 %21
-OpSelectionMerge %30 None
-OpBranchConditional %28 %31 %30
-%31 = OpLabel
-OpStore %12 %24
-OpBranch %30
-%30 = OpLabel
-OpControlBarrier %32 %32 %33
-OpBranch %34
-%34 = OpLabel
-OpLine %3 14 14
-%36 = OpAccessChain  %35  %12 %21
-%37 = OpLoad  %5  %36
-OpLine %3 14 5
-OpStore %22 %37
-OpReturn
-OpFunctionEnd
+         %36 = OpString "void"
+         %42 = OpString "naga"
+         %43 = OpString ""
+          %3 = OpString "workgroup-var-init.wgsl"
+               OpSource GLSL 0 %3 "struct WStruct {
+    arr: array<u32, 512>,
+    atom: atomic<i32>,
+    atom_arr: array<array<atomic<i32>, 8>, 8>,
+}
+
+var<workgroup> w_mem: WStruct;
+
+@group(0) @binding(0)
+var<storage, read_write> output: array<u32, 512>;
+
+@compute @workgroup_size(1)
+fn main() {
+    output = w_mem.arr;
+}"
+               OpMemberName %WStruct 0 "arr"
+               OpMemberName %WStruct 1 "atom"
+               OpMemberName %WStruct 2 "atom_arr"
+               OpName %WStruct "WStruct"
+               OpName %w_mem "w_mem"
+               OpName %output "output"
+               OpName %main "main"
+               OpDecorate %_arr_uint_uint_512 ArrayStride 4
+               OpDecorate %_arr_int_uint_8 ArrayStride 4
+               OpDecorate %_arr__arr_int_uint_8_uint_8 ArrayStride 32
+               OpMemberDecorate %WStruct 0 Offset 0
+               OpMemberDecorate %WStruct 1 Offset 2048
+               OpMemberDecorate %WStruct 2 Offset 2052
+               OpDecorate %output DescriptorSet 0
+               OpDecorate %output Binding 0
+               OpDecorate %_struct_15 Block
+               OpMemberDecorate %_struct_15 0 Offset 0
+               OpDecorate %gl_LocalInvocationIndex BuiltIn LocalInvocationIndex
+       %void = OpTypeVoid
+       %uint = OpTypeInt 32 0
+   %uint_512 = OpConstant %uint 512
+%_arr_uint_uint_512 = OpTypeArray %uint %uint_512
+        %int = OpTypeInt 32 1
+     %uint_8 = OpConstant %uint 8
+%_arr_int_uint_8 = OpTypeArray %int %uint_8
+%_arr__arr_int_uint_8_uint_8 = OpTypeArray %_arr_int_uint_8 %uint_8
+    %WStruct = OpTypeStruct %_arr_uint_uint_512 %int %_arr__arr_int_uint_8_uint_8
+%_ptr_Workgroup_WStruct = OpTypePointer Workgroup %WStruct
+      %w_mem = OpVariable %_ptr_Workgroup_WStruct Workgroup
+ %_struct_15 = OpTypeStruct %_arr_uint_uint_512
+%_ptr_StorageBuffer__struct_15 = OpTypePointer StorageBuffer %_struct_15
+     %output = OpVariable %_ptr_StorageBuffer__struct_15 StorageBuffer
+         %20 = OpTypeFunction %void
+%_ptr_StorageBuffer__arr_uint_uint_512 = OpTypePointer StorageBuffer %_arr_uint_uint_512
+     %uint_0 = OpConstant %uint 0
+     %uint_1 = OpConstant %uint 1
+     %uint_4 = OpConstant %uint 4
+     %uint_2 = OpConstant %uint 2
+    %uint_14 = OpConstant %uint 14
+     %uint_3 = OpConstant %uint 3
+     %uint_6 = OpConstant %uint 6
+         %46 = OpConstantNull %WStruct
+%_ptr_Input_uint = OpTypePointer Input %uint
+%gl_LocalInvocationIndex = OpVariable %_ptr_Input_uint Input
+       %bool = OpTypeBool
+   %uint_264 = OpConstant %uint 264
+%_ptr_Workgroup__arr_uint_uint_512 = OpTypePointer Workgroup %_arr_uint_uint_512
+         %31 = OpExtInst %void %17 DebugInfoNone
+         %33 = OpExtInst %void %17 DebugSource %3 %32
+         %34 = OpExtInst %void %17 DebugCompilationUnit %uint_1 %uint_4 %33 %uint_2
+         %35 = OpExtInst %void %17 DebugExpression
+         %37 = OpExtInst %void %17 DebugTypeBasic %36 %uint_0 %uint_0 %uint_0
+         %38 = OpExtInst %void %17 DebugTypeFunction %uint_0 %37
+         %39 = OpExtInst %void %17 DebugFunction %24 %38 %33 %uint_14 %uint_14 %34 %24 %uint_8 %uint_14
+         %44 = OpExtInst %void %17 DebugEntryPoint %39 %34 %42 %43
+       %main = OpFunction %void None %20
+         %18 = OpLabel
+         %23 = OpAccessChain %_ptr_StorageBuffer__arr_uint_uint_512 %output %uint_0
+         %40 = OpExtInst %void %17 DebugScope %39
+         %41 = OpExtInst %void %17 DebugFunctionDefinition %39 %main
+               OpBranch %45
+         %45 = OpLabel
+         %49 = OpLoad %uint %gl_LocalInvocationIndex
+         %50 = OpIEqual %bool %49 %uint_0
+               OpSelectionMerge %52 None
+               OpBranchConditional %50 %53 %52
+         %53 = OpLabel
+               OpStore %w_mem %46
+               OpBranch %52
+         %52 = OpLabel
+               OpControlBarrier %uint_2 %uint_2 %uint_264
+               OpBranch %55
+         %55 = OpLabel
+               OpLine %3 14 14
+         %57 = OpAccessChain %_ptr_Workgroup__arr_uint_uint_512 %w_mem %uint_0
+         %58 = OpLoad %_arr_uint_uint_512 %57
+               OpLine %3 14 5
+               OpStore %23 %58
+               OpReturn
+               OpFunctionEnd

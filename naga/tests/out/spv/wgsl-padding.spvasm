@@ -1,13 +1,16 @@
 ; SPIR-V
 ; Version: 1.1
-; Generator: rspirv
-; Bound: 50
-OpCapability Shader
-%1 = OpExtInstImport "GLSL.std.450"
-OpMemoryModel Logical GLSL450
-OpEntryPoint Vertex %27 "vertex" %25
-%3 = OpString "padding.wgsl"
-OpSource Unknown 0 %3 "struct S {
+; Generator: Khronos; 28
+; Bound: 72
+; Schema: 0
+               OpCapability Shader
+               OpExtension "SPV_KHR_non_semantic_info"
+          %1 = OpExtInstImport "GLSL.std.450"
+         %24 = OpExtInstImport "NonSemantic.Shader.DebugInfo.100"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %vertex "vertex" %gl_Position
+         %37 = OpString "vertex"
+         %46 = OpString "struct S {
     a: vec3<f32>,
 }
 
@@ -41,96 +44,150 @@ fn vertex() -> @builtin(position) vec4<f32> {
     return vec4<f32>(1.0) * input1.b * input2.b * input3.b;
 }
 "
-OpMemberName %6 0 "a"
-OpName %6 "S"
-OpMemberName %7 0 "a"
-OpMemberName %7 1 "b"
-OpName %7 "Test"
-OpMemberName %11 0 "a"
-OpMemberName %11 1 "b"
-OpName %11 "Test2"
-OpMemberName %13 0 "a"
-OpMemberName %13 1 "b"
-OpName %13 "Test3"
-OpName %15 "input1"
-OpName %18 "input2"
-OpName %21 "input3"
-OpName %27 "vertex"
-OpMemberDecorate %6 0 Offset 0
-OpMemberDecorate %7 0 Offset 0
-OpMemberDecorate %7 1 Offset 16
-OpDecorate %8 ArrayStride 16
-OpMemberDecorate %11 0 Offset 0
-OpMemberDecorate %11 1 Offset 32
-OpMemberDecorate %13 0 Offset 0
-OpMemberDecorate %13 0 ColMajor
-OpMemberDecorate %13 0 MatrixStride 16
-OpMemberDecorate %13 1 Offset 64
-OpDecorate %15 DescriptorSet 0
-OpDecorate %15 Binding 0
-OpDecorate %16 Block
-OpMemberDecorate %16 0 Offset 0
-OpDecorate %18 DescriptorSet 0
-OpDecorate %18 Binding 1
-OpDecorate %19 Block
-OpMemberDecorate %19 0 Offset 0
-OpDecorate %21 DescriptorSet 0
-OpDecorate %21 Binding 2
-OpDecorate %22 Block
-OpMemberDecorate %22 0 Offset 0
-OpDecorate %25 BuiltIn Position
-%2 = OpTypeVoid
-%4 = OpTypeFloat 32
-%5 = OpTypeVector %4 3
-%6 = OpTypeStruct %5
-%7 = OpTypeStruct %6 %4
-%10 = OpTypeInt 32 0
-%9 = OpConstant  %10  2
-%8 = OpTypeArray %5 %9
-%11 = OpTypeStruct %8 %4
-%12 = OpTypeMatrix %5 4
-%13 = OpTypeStruct %12 %4
-%14 = OpTypeVector %4 4
-%16 = OpTypeStruct %7
-%17 = OpTypePointer Uniform %16
-%15 = OpVariable  %17  Uniform
-%19 = OpTypeStruct %11
-%20 = OpTypePointer Uniform %19
-%18 = OpVariable  %20  Uniform
-%22 = OpTypeStruct %13
-%23 = OpTypePointer Uniform %22
-%21 = OpVariable  %23  Uniform
-%26 = OpTypePointer Output %14
-%25 = OpVariable  %26  Output
-%28 = OpTypeFunction %2
-%29 = OpTypePointer Uniform %7
-%30 = OpConstant  %10  0
-%32 = OpTypePointer Uniform %11
-%34 = OpTypePointer Uniform %13
-%36 = OpConstant  %4  1
-%37 = OpConstantComposite  %14  %36 %36 %36 %36
-%39 = OpTypePointer Uniform %4
-%40 = OpConstant  %10  1
-%27 = OpFunction  %2  None %28
-%24 = OpLabel
-%31 = OpAccessChain  %29  %15 %30
-%33 = OpAccessChain  %32  %18 %30
-%35 = OpAccessChain  %34  %21 %30
-OpBranch %38
-%38 = OpLabel
-OpLine %3 32 12
-OpLine %3 32 12
-%41 = OpAccessChain  %39  %31 %40
-%42 = OpLoad  %4  %41
-%43 = OpVectorTimesScalar  %14  %37 %42
-OpLine %3 32 12
-%44 = OpAccessChain  %39  %33 %40
-%45 = OpLoad  %4  %44
-%46 = OpVectorTimesScalar  %14  %43 %45
-OpLine %3 32 12
-%47 = OpAccessChain  %39  %35 %40
-%48 = OpLoad  %4  %47
-%49 = OpVectorTimesScalar  %14  %46 %48
-OpStore %25 %49
-OpReturn
-OpFunctionEnd
+         %50 = OpString "void"
+         %56 = OpString "naga"
+         %57 = OpString ""
+          %3 = OpString "padding.wgsl"
+               OpSource GLSL 0 %3 "struct S {
+    a: vec3<f32>,
+}
+
+struct Test {
+    a: S,
+    b: f32, // offset: 16
+}
+
+struct Test2 {
+    a: array<vec3<f32>, 2>,
+    b: f32, // offset: 32
+}
+
+struct Test3 {
+    a: mat4x3<f32>,
+    b: f32, // offset: 64
+}
+
+@group(0) @binding(0)
+var<uniform> input1: Test;
+
+@group(0) @binding(1)
+var<uniform> input2: Test2;
+
+@group(0) @binding(2)
+var<uniform> input3: Test3;
+
+
+@vertex
+fn vertex() -> @builtin(position) vec4<f32> {
+    return vec4<f32>(1.0) * input1.b * input2.b * input3.b;
+}
+"
+               OpMemberName %S 0 "a"
+               OpName %S "S"
+               OpMemberName %Test 0 "a"
+               OpMemberName %Test 1 "b"
+               OpName %Test "Test"
+               OpMemberName %Test2 0 "a"
+               OpMemberName %Test2 1 "b"
+               OpName %Test2 "Test2"
+               OpMemberName %Test3 0 "a"
+               OpMemberName %Test3 1 "b"
+               OpName %Test3 "Test3"
+               OpName %input1 "input1"
+               OpName %input2 "input2"
+               OpName %input3 "input3"
+               OpName %vertex "vertex"
+               OpMemberDecorate %S 0 Offset 0
+               OpMemberDecorate %Test 0 Offset 0
+               OpMemberDecorate %Test 1 Offset 16
+               OpDecorate %_arr_v3float_uint_2 ArrayStride 16
+               OpMemberDecorate %Test2 0 Offset 0
+               OpMemberDecorate %Test2 1 Offset 32
+               OpMemberDecorate %Test3 0 Offset 0
+               OpMemberDecorate %Test3 0 ColMajor
+               OpMemberDecorate %Test3 0 MatrixStride 16
+               OpMemberDecorate %Test3 1 Offset 64
+               OpDecorate %input1 DescriptorSet 0
+               OpDecorate %input1 Binding 0
+               OpDecorate %_struct_16 Block
+               OpMemberDecorate %_struct_16 0 Offset 0
+               OpDecorate %input2 DescriptorSet 0
+               OpDecorate %input2 Binding 1
+               OpDecorate %_struct_19 Block
+               OpMemberDecorate %_struct_19 0 Offset 0
+               OpDecorate %input3 DescriptorSet 0
+               OpDecorate %input3 Binding 2
+               OpDecorate %_struct_22 Block
+               OpMemberDecorate %_struct_22 0 Offset 0
+               OpDecorate %gl_Position BuiltIn Position
+       %void = OpTypeVoid
+      %float = OpTypeFloat 32
+    %v3float = OpTypeVector %float 3
+          %S = OpTypeStruct %v3float
+       %Test = OpTypeStruct %S %float
+       %uint = OpTypeInt 32 0
+     %uint_2 = OpConstant %uint 2
+%_arr_v3float_uint_2 = OpTypeArray %v3float %uint_2
+      %Test2 = OpTypeStruct %_arr_v3float_uint_2 %float
+%mat4v3float = OpTypeMatrix %v3float 4
+      %Test3 = OpTypeStruct %mat4v3float %float
+    %v4float = OpTypeVector %float 4
+ %_struct_16 = OpTypeStruct %Test
+%_ptr_Uniform__struct_16 = OpTypePointer Uniform %_struct_16
+     %input1 = OpVariable %_ptr_Uniform__struct_16 Uniform
+ %_struct_19 = OpTypeStruct %Test2
+%_ptr_Uniform__struct_19 = OpTypePointer Uniform %_struct_19
+     %input2 = OpVariable %_ptr_Uniform__struct_19 Uniform
+ %_struct_22 = OpTypeStruct %Test3
+%_ptr_Uniform__struct_22 = OpTypePointer Uniform %_struct_22
+     %input3 = OpVariable %_ptr_Uniform__struct_22 Uniform
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+%gl_Position = OpVariable %_ptr_Output_v4float Output
+         %29 = OpTypeFunction %void
+%_ptr_Uniform_Test = OpTypePointer Uniform %Test
+     %uint_0 = OpConstant %uint 0
+%_ptr_Uniform_Test2 = OpTypePointer Uniform %Test2
+%_ptr_Uniform_Test3 = OpTypePointer Uniform %Test3
+     %uint_1 = OpConstant %uint 1
+     %uint_4 = OpConstant %uint 4
+    %uint_32 = OpConstant %uint 32
+    %uint_12 = OpConstant %uint 12
+     %uint_8 = OpConstant %uint 8
+     %uint_3 = OpConstant %uint 3
+     %uint_6 = OpConstant %uint 6
+    %float_1 = OpConstant %float 1
+         %60 = OpConstantComposite %v4float %float_1 %float_1 %float_1 %float_1
+%_ptr_Uniform_float = OpTypePointer Uniform %float
+         %45 = OpExtInst %void %24 DebugInfoNone
+         %47 = OpExtInst %void %24 DebugSource %3 %46
+         %48 = OpExtInst %void %24 DebugCompilationUnit %uint_1 %uint_4 %47 %uint_2
+         %49 = OpExtInst %void %24 DebugExpression
+         %51 = OpExtInst %void %24 DebugTypeBasic %50 %uint_0 %uint_0 %uint_0
+         %52 = OpExtInst %void %24 DebugTypeFunction %uint_0 %51
+         %53 = OpExtInst %void %24 DebugFunction %37 %52 %47 %uint_32 %uint_12 %48 %37 %uint_8 %uint_32
+         %58 = OpExtInst %void %24 DebugEntryPoint %53 %48 %56 %57
+     %vertex = OpFunction %void None %29
+         %25 = OpLabel
+         %32 = OpAccessChain %_ptr_Uniform_Test %input1 %uint_0
+         %34 = OpAccessChain %_ptr_Uniform_Test2 %input2 %uint_0
+         %36 = OpAccessChain %_ptr_Uniform_Test3 %input3 %uint_0
+         %54 = OpExtInst %void %24 DebugScope %53
+         %55 = OpExtInst %void %24 DebugFunctionDefinition %53 %vertex
+               OpBranch %61
+         %61 = OpLabel
+               OpLine %3 32 12
+               OpLine %3 32 12
+         %63 = OpAccessChain %_ptr_Uniform_float %32 %uint_1
+         %64 = OpLoad %float %63
+         %65 = OpVectorTimesScalar %v4float %60 %64
+               OpLine %3 32 12
+         %66 = OpAccessChain %_ptr_Uniform_float %34 %uint_1
+         %67 = OpLoad %float %66
+         %68 = OpVectorTimesScalar %v4float %65 %67
+               OpLine %3 32 12
+         %69 = OpAccessChain %_ptr_Uniform_float %36 %uint_1
+         %70 = OpLoad %float %69
+         %71 = OpVectorTimesScalar %v4float %68 %70
+               OpStore %gl_Position %71
+               OpReturn
+               OpFunctionEnd

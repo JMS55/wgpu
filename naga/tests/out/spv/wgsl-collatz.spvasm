@@ -1,15 +1,18 @@
 ; SPIR-V
 ; Version: 1.0
-; Generator: rspirv
-; Bound: 95
-OpCapability Shader
-OpExtension "SPV_KHR_storage_buffer_storage_class"
-%1 = OpExtInstImport "GLSL.std.450"
-OpMemoryModel Logical GLSL450
-OpEntryPoint GLCompute %84 "main" %81
-OpExecutionMode %84 LocalSize 1 1 1
-%3 = OpString "collatz.wgsl"
-OpSource Unknown 0 %3 "struct PrimeIndices {
+; Generator: Khronos; 28
+; Bound: 141
+; Schema: 0
+               OpCapability Shader
+               OpExtension "SPV_KHR_storage_buffer_storage_class"
+               OpExtension "SPV_KHR_non_semantic_info"
+          %1 = OpExtInstImport "GLSL.std.450"
+         %10 = OpExtInstImport "NonSemantic.Shader.DebugInfo.100"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main" %global_id
+               OpExecutionMode %main LocalSize 1 1 1
+         %33 = OpString "collatz_iterations"
+         %42 = OpString "struct PrimeIndices {
     data: array<u32>
 } // this is used as both input and output for convenience
 
@@ -42,173 +45,282 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     v_indices.data[global_id.x] = collatz_iterations(v_indices.data[global_id.x]);
 }
 "
-OpMemberName %6 0 "data"
-OpName %6 "PrimeIndices"
-OpName %8 "v_indices"
-OpName %10 "naga_mod"
-OpName %12 "lhs"
-OpName %13 "rhs"
-OpName %21 "naga_div"
-OpName %22 "lhs"
-OpName %23 "rhs"
-OpName %29 "n_base"
-OpName %30 "collatz_iterations"
-OpName %34 "n"
-OpName %37 "i"
-OpName %49 "loop_bound"
-OpName %81 "global_id"
-OpName %84 "main"
-OpDecorate %5 ArrayStride 4
-OpMemberDecorate %6 0 Offset 0
-OpDecorate %6 Block
-OpDecorate %8 DescriptorSet 0
-OpDecorate %8 Binding 0
-OpDecorate %81 BuiltIn GlobalInvocationId
-%2 = OpTypeVoid
-%4 = OpTypeInt 32 0
-%5 = OpTypeRuntimeArray %4
-%6 = OpTypeStruct %5
-%7 = OpTypeVector %4 3
-%9 = OpTypePointer StorageBuffer %6
-%8 = OpVariable  %9  StorageBuffer
-%11 = OpTypeFunction %4 %4 %4
-%15 = OpTypeBool
-%16 = OpConstant  %4  0
-%18 = OpConstant  %4  1
-%31 = OpTypeFunction %4 %4
-%32 = OpConstant  %4  2
-%33 = OpConstant  %4  3
-%35 = OpTypePointer Function %4
-%36 = OpConstantNull  %4
-%43 = OpTypeVector %4 2
-%44 = OpTypePointer Function %43
-%45 = OpTypeVector %15 2
-%46 = OpConstantComposite  %43  %16 %16
-%47 = OpConstant  %4  4294967295
-%48 = OpConstantComposite  %43  %47 %47
-%82 = OpTypePointer Input %7
-%81 = OpVariable  %82  Input
-%85 = OpTypeFunction %2
-%87 = OpTypePointer StorageBuffer %5
-%89 = OpTypePointer StorageBuffer %4
-%10 = OpFunction  %4  None %11
-%12 = OpFunctionParameter  %4
-%13 = OpFunctionParameter  %4
-%14 = OpLabel
-%17 = OpIEqual  %15  %13 %16
-%19 = OpSelect  %4  %17 %18 %13
-%20 = OpUMod  %4  %12 %19
-OpReturnValue %20
-OpFunctionEnd
-%21 = OpFunction  %4  None %11
-%22 = OpFunctionParameter  %4
-%23 = OpFunctionParameter  %4
-%24 = OpLabel
-%25 = OpIEqual  %15  %23 %16
-%26 = OpSelect  %4  %25 %18 %23
-%27 = OpUDiv  %4  %22 %26
-OpReturnValue %27
-OpFunctionEnd
-%30 = OpFunction  %4  None %31
-%29 = OpFunctionParameter  %4
-%28 = OpLabel
-%34 = OpVariable  %35  Function %36
-%37 = OpVariable  %35  Function %16
-%49 = OpVariable  %44  Function %48
-OpBranch %38
-%38 = OpLabel
-OpLine %3 15 5
-OpStore %34 %29
-OpBranch %39
-%39 = OpLabel
-OpLine %3 17 5
-OpLoopMerge %40 %42 None
-OpBranch %50
-%50 = OpLabel
-%51 = OpLoad  %43  %49
-%52 = OpIEqual  %45  %46 %51
-%53 = OpAll  %15  %52
-OpSelectionMerge %54 None
-OpBranchConditional %53 %40 %54
-%54 = OpLabel
-%55 = OpCompositeExtract  %4  %51 1
-%56 = OpIEqual  %15  %55 %16
-%57 = OpSelect  %4  %56 %18 %16
-%58 = OpCompositeConstruct  %43  %57 %18
-%59 = OpISub  %43  %51 %58
-OpStore %49 %59
-OpBranch %41
-%41 = OpLabel
-OpLine %3 1 1
-%60 = OpLoad  %4  %34
-OpLine %3 17 11
-%61 = OpUGreaterThan  %15  %60 %18
-OpLine %3 17 10
-OpSelectionMerge %62 None
-OpBranchConditional %61 %62 %63
-%63 = OpLabel
-OpBranch %40
-%62 = OpLabel
-OpBranch %64
-%64 = OpLabel
-OpLine %3 1 1
-%66 = OpLoad  %4  %34
-OpLine %3 18 12
-%67 = OpFunctionCall  %4  %10 %66 %32
-OpLine %3 18 12
-%68 = OpIEqual  %15  %67 %16
-OpLine %3 18 9
-OpSelectionMerge %69 None
-OpBranchConditional %68 %70 %71
-%70 = OpLabel
-OpLine %3 1 1
-%72 = OpLoad  %4  %34
-OpLine %3 19 17
-%73 = OpFunctionCall  %4  %21 %72 %32
-OpLine %3 19 13
-OpStore %34 %73
-OpBranch %69
-%71 = OpLabel
-OpLine %3 22 17
-%74 = OpLoad  %4  %34
-%75 = OpIMul  %4  %33 %74
-OpLine %3 22 17
-%76 = OpIAdd  %4  %75 %18
-OpLine %3 22 13
-OpStore %34 %76
-OpBranch %69
-%69 = OpLabel
-OpLine %3 1 1
-%77 = OpLoad  %4  %37
-OpLine %3 24 13
-%78 = OpIAdd  %4  %77 %18
-OpLine %3 24 9
-OpStore %37 %78
-OpBranch %65
-%65 = OpLabel
-OpBranch %42
-%42 = OpLabel
-OpBranch %39
-%40 = OpLabel
-OpLine %3 1 1
-%79 = OpLoad  %4  %37
-OpReturnValue %79
-OpFunctionEnd
-%84 = OpFunction  %2  None %85
-%80 = OpLabel
-%83 = OpLoad  %7  %81
-OpBranch %86
-%86 = OpLabel
-OpLine %3 31 5
-%88 = OpCompositeExtract  %4  %83 0
-OpLine %3 31 54
-%90 = OpCompositeExtract  %4  %83 0
-%91 = OpAccessChain  %89  %8 %16 %90
-%92 = OpLoad  %4  %91
-OpLine %3 31 35
-%93 = OpFunctionCall  %4  %30 %92
-OpLine %3 31 5
-%94 = OpAccessChain  %89  %8 %16 %88
-OpStore %94 %93
-OpReturn
-OpFunctionEnd
+         %46 = OpString "void"
+         %55 = OpString "uint"
+         %58 = OpString "n"
+         %62 = OpString "uint"
+         %65 = OpString "i"
+        %116 = OpString "main"
+        %119 = OpString "struct PrimeIndices {
+    data: array<u32>
+} // this is used as both input and output for convenience
+
+@group(0) @binding(0)
+var<storage,read_write> v_indices: PrimeIndices;
+
+// The Collatz Conjecture states that for any integer n:
+// If n is even, n = n/2
+// If n is odd, n = 3n+1
+// And repeat this process for each new n, you will always eventually reach 1.
+// Though the conjecture has not been proven, no counterexample has ever been found.
+// This function returns how many times this recurrence needs to be applied to reach 1.
+fn collatz_iterations(n_base: u32) -> u32 {
+    var n = n_base;
+    var i: u32 = 0u;
+    while n > 1u {
+        if n % 2u == 0u {
+            n = n / 2u;
+        }
+        else {
+            n = 3u * n + 1u;
+        }
+        i = i + 1u;
+    }
+    return i;
+}
+
+@compute @workgroup_size(1)
+fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
+    v_indices.data[global_id.x] = collatz_iterations(v_indices.data[global_id.x]);
+}
+"
+        %123 = OpString "void"
+        %129 = OpString "naga"
+        %130 = OpString ""
+          %3 = OpString "collatz.wgsl"
+               OpSource GLSL 0 %3 "struct PrimeIndices {
+    data: array<u32>
+} // this is used as both input and output for convenience
+
+@group(0) @binding(0)
+var<storage,read_write> v_indices: PrimeIndices;
+
+// The Collatz Conjecture states that for any integer n:
+// If n is even, n = n/2
+// If n is odd, n = 3n+1
+// And repeat this process for each new n, you will always eventually reach 1.
+// Though the conjecture has not been proven, no counterexample has ever been found.
+// This function returns how many times this recurrence needs to be applied to reach 1.
+fn collatz_iterations(n_base: u32) -> u32 {
+    var n = n_base;
+    var i: u32 = 0u;
+    while n > 1u {
+        if n % 2u == 0u {
+            n = n / 2u;
+        }
+        else {
+            n = 3u * n + 1u;
+        }
+        i = i + 1u;
+    }
+    return i;
+}
+
+@compute @workgroup_size(1)
+fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
+    v_indices.data[global_id.x] = collatz_iterations(v_indices.data[global_id.x]);
+}
+"
+               OpMemberName %PrimeIndices 0 "data"
+               OpName %PrimeIndices "PrimeIndices"
+               OpName %v_indices "v_indices"
+               OpName %naga_mod "naga_mod"
+               OpName %lhs "lhs"
+               OpName %rhs "rhs"
+               OpName %naga_div "naga_div"
+               OpName %lhs_0 "lhs"
+               OpName %rhs_0 "rhs"
+               OpName %n_base "n_base"
+               OpName %collatz_iterations "collatz_iterations"
+               OpName %n "n"
+               OpName %i "i"
+               OpName %loop_bound "loop_bound"
+               OpName %global_id "global_id"
+               OpName %main "main"
+               OpDecorate %_runtimearr_uint ArrayStride 4
+               OpMemberDecorate %PrimeIndices 0 Offset 0
+               OpDecorate %PrimeIndices Block
+               OpDecorate %v_indices DescriptorSet 0
+               OpDecorate %v_indices Binding 0
+               OpDecorate %global_id BuiltIn GlobalInvocationId
+       %void = OpTypeVoid
+       %uint = OpTypeInt 32 0
+%_runtimearr_uint = OpTypeRuntimeArray %uint
+%PrimeIndices = OpTypeStruct %_runtimearr_uint
+     %v3uint = OpTypeVector %uint 3
+%_ptr_StorageBuffer_PrimeIndices = OpTypePointer StorageBuffer %PrimeIndices
+  %v_indices = OpVariable %_ptr_StorageBuffer_PrimeIndices StorageBuffer
+         %12 = OpTypeFunction %uint %uint %uint
+       %bool = OpTypeBool
+     %uint_0 = OpConstant %uint 0
+     %uint_1 = OpConstant %uint 1
+         %32 = OpTypeFunction %uint %uint
+     %uint_4 = OpConstant %uint 4
+     %uint_2 = OpConstant %uint 2
+    %uint_15 = OpConstant %uint 15
+     %uint_5 = OpConstant %uint 5
+     %uint_8 = OpConstant %uint 8
+     %uint_3 = OpConstant %uint 3
+     %uint_6 = OpConstant %uint 6
+%_ptr_Function_uint = OpTypePointer Function %uint
+         %54 = OpConstantNull %uint
+    %uint_32 = OpConstant %uint 32
+    %uint_16 = OpConstant %uint 16
+     %v2uint = OpTypeVector %uint 2
+%_ptr_Function_v2uint = OpTypePointer Function %v2uint
+     %v2bool = OpTypeVector %bool 2
+         %76 = OpConstantComposite %v2uint %uint_0 %uint_0
+%uint_4294967295 = OpConstant %uint 4294967295
+         %78 = OpConstantComposite %v2uint %uint_4294967295 %uint_4294967295
+%_ptr_Input_v3uint = OpTypePointer Input %v3uint
+  %global_id = OpVariable %_ptr_Input_v3uint Input
+        %115 = OpTypeFunction %void
+    %uint_31 = OpConstant %uint 31
+%_ptr_StorageBuffer__runtimearr_uint = OpTypePointer StorageBuffer %_runtimearr_uint
+%_ptr_StorageBuffer_uint = OpTypePointer StorageBuffer %uint
+         %41 = OpExtInst %void %10 DebugInfoNone
+         %43 = OpExtInst %void %10 DebugSource %3 %42
+         %44 = OpExtInst %void %10 DebugCompilationUnit %uint_1 %uint_4 %43 %uint_2
+         %45 = OpExtInst %void %10 DebugExpression
+         %47 = OpExtInst %void %10 DebugTypeBasic %46 %uint_0 %uint_0 %uint_0
+         %48 = OpExtInst %void %10 DebugTypeFunction %uint_0 %47
+         %49 = OpExtInst %void %10 DebugFunction %33 %48 %43 %uint_15 %uint_5 %44 %33 %uint_8 %uint_15
+         %57 = OpExtInst %void %10 DebugTypeBasic %55 %uint_32 %uint_6 %uint_0
+         %59 = OpExtInst %void %10 DebugLocalVariable %58 %57 %43 %uint_15 %uint_5 %49 %uint_0
+         %63 = OpExtInst %void %10 DebugTypeBasic %62 %uint_32 %uint_6 %uint_0
+         %66 = OpExtInst %void %10 DebugLocalVariable %65 %63 %43 %uint_16 %uint_5 %49 %uint_0
+        %118 = OpExtInst %void %10 DebugInfoNone
+        %120 = OpExtInst %void %10 DebugSource %3 %119
+        %121 = OpExtInst %void %10 DebugCompilationUnit %uint_1 %uint_4 %120 %uint_2
+        %122 = OpExtInst %void %10 DebugExpression
+        %124 = OpExtInst %void %10 DebugTypeBasic %123 %uint_0 %uint_0 %uint_0
+        %125 = OpExtInst %void %10 DebugTypeFunction %uint_0 %124
+        %126 = OpExtInst %void %10 DebugFunction %116 %125 %120 %uint_31 %uint_5 %121 %116 %uint_8 %uint_31
+        %131 = OpExtInst %void %10 DebugEntryPoint %126 %121 %129 %130
+   %naga_mod = OpFunction %uint None %12
+        %lhs = OpFunctionParameter %uint
+        %rhs = OpFunctionParameter %uint
+         %15 = OpLabel
+         %18 = OpIEqual %bool %rhs %uint_0
+         %20 = OpSelect %uint %18 %uint_1 %rhs
+         %21 = OpUMod %uint %lhs %20
+               OpReturnValue %21
+               OpFunctionEnd
+   %naga_div = OpFunction %uint None %12
+      %lhs_0 = OpFunctionParameter %uint
+      %rhs_0 = OpFunctionParameter %uint
+         %25 = OpLabel
+         %26 = OpIEqual %bool %rhs_0 %uint_0
+         %27 = OpSelect %uint %26 %uint_1 %rhs_0
+         %28 = OpUDiv %uint %lhs_0 %27
+               OpReturnValue %28
+               OpFunctionEnd
+%collatz_iterations = OpFunction %uint None %32
+     %n_base = OpFunctionParameter %uint
+         %29 = OpLabel
+          %n = OpVariable %_ptr_Function_uint Function %54
+          %i = OpVariable %_ptr_Function_uint Function %uint_0
+ %loop_bound = OpVariable %_ptr_Function_v2uint Function %78
+         %50 = OpExtInst %void %10 DebugScope %49
+         %51 = OpExtInst %void %10 DebugFunctionDefinition %49 %collatz_iterations
+         %60 = OpExtInst %void %10 DebugDeclare %59 %n %45
+         %67 = OpExtInst %void %10 DebugDeclare %66 %i %45
+               OpBranch %68
+         %68 = OpLabel
+               OpLine %3 15 5
+               OpStore %n %n_base
+               OpBranch %69
+         %69 = OpLabel
+               OpLine %3 17 5
+               OpLoopMerge %70 %72 None
+               OpBranch %80
+         %80 = OpLabel
+         %81 = OpLoad %v2uint %loop_bound
+         %82 = OpIEqual %v2bool %76 %81
+         %83 = OpAll %bool %82
+               OpSelectionMerge %84 None
+               OpBranchConditional %83 %70 %84
+         %84 = OpLabel
+         %85 = OpCompositeExtract %uint %81 1
+         %86 = OpIEqual %bool %85 %uint_0
+         %87 = OpSelect %uint %86 %uint_1 %uint_0
+         %88 = OpCompositeConstruct %v2uint %87 %uint_1
+         %89 = OpISub %v2uint %81 %88
+               OpStore %loop_bound %89
+               OpBranch %71
+         %71 = OpLabel
+               OpLine %3 1 1
+         %90 = OpLoad %uint %n
+               OpLine %3 17 11
+         %91 = OpUGreaterThan %bool %90 %uint_1
+               OpLine %3 17 10
+               OpSelectionMerge %92 None
+               OpBranchConditional %91 %92 %93
+         %93 = OpLabel
+               OpBranch %70
+         %92 = OpLabel
+               OpBranch %94
+         %94 = OpLabel
+               OpLine %3 1 1
+         %96 = OpLoad %uint %n
+               OpLine %3 18 12
+         %97 = OpFunctionCall %uint %naga_mod %96 %uint_2
+               OpLine %3 18 12
+         %98 = OpIEqual %bool %97 %uint_0
+               OpLine %3 18 9
+               OpSelectionMerge %99 None
+               OpBranchConditional %98 %100 %101
+        %100 = OpLabel
+               OpLine %3 1 1
+        %102 = OpLoad %uint %n
+               OpLine %3 19 17
+        %103 = OpFunctionCall %uint %naga_div %102 %uint_2
+               OpLine %3 19 13
+               OpStore %n %103
+               OpBranch %99
+        %101 = OpLabel
+               OpLine %3 22 17
+        %104 = OpLoad %uint %n
+        %105 = OpIMul %uint %uint_3 %104
+               OpLine %3 22 17
+        %106 = OpIAdd %uint %105 %uint_1
+               OpLine %3 22 13
+               OpStore %n %106
+               OpBranch %99
+         %99 = OpLabel
+               OpLine %3 1 1
+        %107 = OpLoad %uint %i
+               OpLine %3 24 13
+        %108 = OpIAdd %uint %107 %uint_1
+               OpLine %3 24 9
+               OpStore %i %108
+               OpBranch %95
+         %95 = OpLabel
+               OpBranch %72
+         %72 = OpLabel
+               OpBranch %69
+         %70 = OpLabel
+               OpLine %3 1 1
+        %109 = OpLoad %uint %i
+               OpReturnValue %109
+               OpFunctionEnd
+       %main = OpFunction %void None %115
+        %110 = OpLabel
+        %113 = OpLoad %v3uint %global_id
+        %127 = OpExtInst %void %10 DebugScope %126
+        %128 = OpExtInst %void %10 DebugFunctionDefinition %126 %main
+               OpBranch %132
+        %132 = OpLabel
+               OpLine %3 31 5
+        %134 = OpCompositeExtract %uint %113 0
+               OpLine %3 31 54
+        %136 = OpCompositeExtract %uint %113 0
+        %137 = OpAccessChain %_ptr_StorageBuffer_uint %v_indices %uint_0 %136
+        %138 = OpLoad %uint %137
+               OpLine %3 31 35
+        %139 = OpFunctionCall %uint %collatz_iterations %138
+               OpLine %3 31 5
+        %140 = OpAccessChain %_ptr_StorageBuffer_uint %v_indices %uint_0 %134
+               OpStore %140 %139
+               OpReturn
+               OpFunctionEnd

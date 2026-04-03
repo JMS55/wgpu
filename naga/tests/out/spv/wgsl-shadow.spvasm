@@ -1,18 +1,21 @@
 ; SPIR-V
 ; Version: 1.2
-; Generator: rspirv
-; Bound: 294
-OpCapability Shader
-OpExtension "SPV_KHR_storage_buffer_storage_class"
-%1 = OpExtInstImport "GLSL.std.450"
-OpMemoryModel Logical GLSL450
-OpEntryPoint Vertex %85 "vs_main" %75 %78 %80 %82 %84
-OpEntryPoint Fragment %143 "fs_main" %134 %137 %140 %142
-OpEntryPoint Fragment %228 "fs_main_without_storage" %221 %223 %225 %227
-OpExecutionMode %143 OriginUpperLeft
-OpExecutionMode %228 OriginUpperLeft
-%3 = OpString "shadow.wgsl"
-OpSource Unknown 0 %3 "struct Globals {
+; Generator: Khronos; 28
+; Bound: 391
+; Schema: 0
+               OpCapability Shader
+               OpExtension "SPV_KHR_storage_buffer_storage_class"
+               OpExtension "SPV_KHR_non_semantic_info"
+          %1 = OpExtInstImport "GLSL.std.450"
+         %41 = OpExtInstImport "NonSemantic.Shader.DebugInfo.100"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %vs_main "vs_main" %position %normal %proj_position %world_normal %world_position
+               OpEntryPoint Fragment %fs_main "fs_main" %proj_position_0 %world_normal_0 %world_position_0 %178
+               OpEntryPoint Fragment %fs_main_without_storage "fs_main_without_storage" %proj_position_1 %world_normal_1 %world_position_1 %295
+               OpExecutionMode %fs_main OriginUpperLeft
+               OpExecutionMode %fs_main_without_storage OriginUpperLeft
+         %49 = OpString "fetch_shadow"
+         %60 = OpString "struct Globals {
     view_proj: mat4x4<f32>,
     num_lights: vec4<u32>,
 }
@@ -130,508 +133,1072 @@ fn fs_main_without_storage(in: VertexOutput) -> @location(0) vec4<f32> {
     return vec4<f32>(color, 1.0) * u_entity.color;
 }
 "
-OpMemberName %9 0 "view_proj"
-OpMemberName %9 1 "num_lights"
-OpName %9 "Globals"
-OpMemberName %10 0 "world"
-OpMemberName %10 1 "color"
-OpName %10 "Entity"
-OpMemberName %12 0 "proj_position"
-OpMemberName %12 1 "world_normal"
-OpMemberName %12 2 "world_position"
-OpName %12 "VertexOutput"
-OpMemberName %16 0 "proj"
-OpMemberName %16 1 "pos"
-OpMemberName %16 2 "color"
-OpName %16 "Light"
-OpName %24 "c_ambient"
-OpName %19 "c_max_lights"
-OpName %25 "u_globals"
-OpName %28 "u_entity"
-OpName %31 "s_lights"
-OpName %34 "u_lights"
-OpName %37 "t_shadow"
-OpName %39 "sampler_shadow"
-OpName %42 "light_id"
-OpName %43 "homogeneous_coords"
-OpName %44 "fetch_shadow"
-OpName %75 "position"
-OpName %78 "normal"
-OpName %80 "proj_position"
-OpName %82 "world_normal"
-OpName %84 "world_position"
-OpName %85 "vs_main"
-OpName %92 "out"
-OpName %134 "proj_position"
-OpName %137 "world_normal"
-OpName %140 "world_position"
-OpName %143 "fs_main"
-OpName %150 "color"
-OpName %151 "i"
-OpName %166 "loop_bound"
-OpName %221 "proj_position"
-OpName %223 "world_normal"
-OpName %225 "world_position"
-OpName %228 "fs_main_without_storage"
-OpName %235 "color"
-OpName %236 "i"
-OpName %244 "loop_bound"
-OpMemberDecorate %9 0 Offset 0
-OpMemberDecorate %9 0 ColMajor
-OpMemberDecorate %9 0 MatrixStride 16
-OpMemberDecorate %9 1 Offset 64
-OpMemberDecorate %10 0 Offset 0
-OpMemberDecorate %10 0 ColMajor
-OpMemberDecorate %10 0 MatrixStride 16
-OpMemberDecorate %10 1 Offset 64
-OpMemberDecorate %12 0 Offset 0
-OpMemberDecorate %12 1 Offset 16
-OpMemberDecorate %12 2 Offset 32
-OpMemberDecorate %16 0 Offset 0
-OpMemberDecorate %16 0 ColMajor
-OpMemberDecorate %16 0 MatrixStride 16
-OpMemberDecorate %16 1 Offset 64
-OpMemberDecorate %16 2 Offset 80
-OpDecorate %17 ArrayStride 96
-OpDecorate %18 ArrayStride 96
-OpDecorate %25 DescriptorSet 0
-OpDecorate %25 Binding 0
-OpDecorate %26 Block
-OpMemberDecorate %26 0 Offset 0
-OpDecorate %28 DescriptorSet 1
-OpDecorate %28 Binding 0
-OpDecorate %29 Block
-OpMemberDecorate %29 0 Offset 0
-OpDecorate %31 NonWritable
-OpDecorate %31 DescriptorSet 0
-OpDecorate %31 Binding 1
-OpDecorate %32 Block
-OpMemberDecorate %32 0 Offset 0
-OpDecorate %34 DescriptorSet 0
-OpDecorate %34 Binding 1
-OpDecorate %35 Block
-OpMemberDecorate %35 0 Offset 0
-OpDecorate %37 DescriptorSet 0
-OpDecorate %37 Binding 2
-OpDecorate %39 DescriptorSet 0
-OpDecorate %39 Binding 3
-OpDecorate %75 Location 0
-OpDecorate %78 Location 1
-OpDecorate %80 BuiltIn Position
-OpDecorate %82 Location 0
-OpDecorate %84 Location 1
-OpDecorate %134 BuiltIn FragCoord
-OpDecorate %137 Location 0
-OpDecorate %140 Location 1
-OpDecorate %142 Location 0
-OpDecorate %221 BuiltIn FragCoord
-OpDecorate %223 Location 0
-OpDecorate %225 Location 1
-OpDecorate %227 Location 0
-%2 = OpTypeVoid
-%4 = OpTypeFloat 32
-%6 = OpTypeVector %4 4
-%5 = OpTypeMatrix %6 4
-%7 = OpTypeInt 32 0
-%8 = OpTypeVector %7 4
-%9 = OpTypeStruct %5 %8
-%10 = OpTypeStruct %5 %6
-%11 = OpTypeVector %4 3
-%12 = OpTypeStruct %6 %11 %6
-%14 = OpTypeInt 32 1
-%13 = OpTypeVector %14 4
-%15 = OpTypeMatrix %11 3
-%16 = OpTypeStruct %5 %6 %6
-%17 = OpTypeRuntimeArray %16
-%19 = OpConstant  %7  10
-%18 = OpTypeArray %16 %19
-%20 = OpTypeImage %4 2D 1 1 0 1 Unknown
-%21 = OpTypeSampler
-%22 = OpTypeVector %4 2
-%23 = OpConstant  %4  0.05
-%24 = OpConstantComposite  %11  %23 %23 %23
-%26 = OpTypeStruct %9
-%27 = OpTypePointer Uniform %26
-%25 = OpVariable  %27  Uniform
-%29 = OpTypeStruct %10
-%30 = OpTypePointer Uniform %29
-%28 = OpVariable  %30  Uniform
-%32 = OpTypeStruct %17
-%33 = OpTypePointer StorageBuffer %32
-%31 = OpVariable  %33  StorageBuffer
-%35 = OpTypeStruct %18
-%36 = OpTypePointer Uniform %35
-%34 = OpVariable  %36  Uniform
-%38 = OpTypePointer UniformConstant %20
-%37 = OpVariable  %38  UniformConstant
-%40 = OpTypePointer UniformConstant %21
-%39 = OpVariable  %40  UniformConstant
-%45 = OpTypeFunction %4 %7 %6
-%48 = OpConstant  %4  0
-%49 = OpConstant  %4  1
-%50 = OpConstant  %4  0.5
-%51 = OpConstant  %4  -0.5
-%52 = OpConstantComposite  %22  %50 %51
-%53 = OpConstantComposite  %22  %50 %50
-%56 = OpTypeBool
-%69 = OpTypeSampledImage %20
-%76 = OpTypePointer Input %13
-%75 = OpVariable  %76  Input
-%78 = OpVariable  %76  Input
-%81 = OpTypePointer Output %6
-%80 = OpVariable  %81  Output
-%83 = OpTypePointer Output %11
-%82 = OpVariable  %83  Output
-%84 = OpVariable  %81  Output
-%86 = OpTypeFunction %2
-%87 = OpTypePointer Uniform %9
-%88 = OpConstant  %7  0
-%90 = OpTypePointer Uniform %10
-%93 = OpTypePointer Function %12
-%94 = OpConstantNull  %12
-%96 = OpTypePointer Uniform %5
-%103 = OpTypePointer Function %11
-%111 = OpTypeVector %14 3
-%115 = OpConstant  %7  1
-%117 = OpTypePointer Function %6
-%118 = OpConstant  %7  2
-%126 = OpTypePointer Output %4
-%135 = OpTypePointer Input %6
-%134 = OpVariable  %135  Input
-%138 = OpTypePointer Input %11
-%137 = OpVariable  %138  Input
-%140 = OpVariable  %135  Input
-%142 = OpVariable  %81  Output
-%146 = OpTypePointer StorageBuffer %17
-%152 = OpTypePointer Function %7
-%160 = OpTypeVector %7 2
-%161 = OpTypePointer Function %160
-%162 = OpTypeVector %56 2
-%163 = OpConstantComposite  %160  %88 %88
-%164 = OpConstant  %7  4294967295
-%165 = OpConstantComposite  %160  %164 %164
-%178 = OpTypePointer Uniform %8
-%179 = OpTypePointer Uniform %7
-%189 = OpTypePointer StorageBuffer %16
-%215 = OpTypePointer Uniform %6
-%221 = OpVariable  %135  Input
-%223 = OpVariable  %138  Input
-%225 = OpVariable  %135  Input
-%227 = OpVariable  %81  Output
-%231 = OpTypePointer Uniform %18
-%265 = OpTypePointer Uniform %16
-%44 = OpFunction  %4  None %45
-%42 = OpFunctionParameter  %7
-%43 = OpFunctionParameter  %6
-%41 = OpLabel
-%46 = OpLoad  %20  %37
-%47 = OpLoad  %21  %39
-OpBranch %54
-%54 = OpLabel
-OpLine %3 68 9
-%55 = OpCompositeExtract  %4  %43 3
-OpLine %3 68 9
-%57 = OpFOrdLessThanEqual  %56  %55 %48
-OpLine %3 68 5
-OpSelectionMerge %58 None
-OpBranchConditional %57 %59 %58
-%59 = OpLabel
-OpReturnValue %49
-%58 = OpLabel
-OpLine %3 72 27
-OpLine %3 74 33
-%60 = OpCompositeExtract  %4  %43 3
-OpLine %3 74 27
-%61 = OpFDiv  %4  %49 %60
-OpLine %3 75 23
-%62 = OpVectorShuffle  %22  %43 %43 0 1
-%63 = OpFMul  %22  %62 %52
-%64 = OpVectorTimesScalar  %22  %63 %61
-OpLine %3 75 23
-%65 = OpFAdd  %22  %64 %53
-OpLine %3 77 12
-%66 = OpBitcast  %14  %42
-%67 = OpCompositeExtract  %4  %43 2
-%68 = OpFMul  %4  %67 %61
-%70 = OpConvertSToF  %4  %66
-%71 = OpCompositeConstruct  %11  %65 %70
-%72 = OpSampledImage  %69  %46 %47
-%73 = OpImageSampleDrefExplicitLod  %4  %72 %71 %68 Lod %48
-OpReturnValue %73
-OpFunctionEnd
-%85 = OpFunction  %2  None %86
-%74 = OpLabel
-%92 = OpVariable  %93  Function %94
-%77 = OpLoad  %13  %75
-%79 = OpLoad  %13  %78
-%89 = OpAccessChain  %87  %25 %88
-%91 = OpAccessChain  %90  %28 %88
-OpBranch %95
-%95 = OpLabel
-OpLine %3 37 13
-%97 = OpAccessChain  %96  %91 %88
-%98 = OpLoad  %5  %97
-OpLine %3 38 21
-%99 = OpAccessChain  %96  %91 %88
-%100 = OpLoad  %5  %99
-%101 = OpConvertSToF  %6  %77
-%102 = OpMatrixTimesVector  %6  %100 %101
-OpLine %3 40 5
-OpLine %3 40 36
-%104 = OpCompositeExtract  %6  %98 0
-%105 = OpVectorShuffle  %11  %104 %104 0 1 2
-OpLine %3 40 46
-%106 = OpCompositeExtract  %6  %98 1
-%107 = OpVectorShuffle  %11  %106 %106 0 1 2
-OpLine %3 40 24
-%108 = OpCompositeExtract  %6  %98 2
-%109 = OpVectorShuffle  %11  %108 %108 0 1 2
-%110 = OpCompositeConstruct  %15  %105 %107 %109
-%112 = OpVectorShuffle  %111  %79 %79 0 1 2
-%113 = OpConvertSToF  %11  %112
-%114 = OpMatrixTimesVector  %11  %110 %113
-OpLine %3 40 5
-%116 = OpAccessChain  %103  %92 %115
-OpStore %116 %114
-OpLine %3 41 5
-OpLine %3 41 5
-%119 = OpAccessChain  %117  %92 %118
-OpStore %119 %102
-OpLine %3 42 5
-OpLine %3 42 25
-%120 = OpAccessChain  %96  %89 %88
-%121 = OpLoad  %5  %120
-%122 = OpMatrixTimesVector  %6  %121 %102
-OpLine %3 42 5
-%123 = OpAccessChain  %117  %92 %88
-OpStore %123 %122
-OpLine %3 1 1
-%124 = OpLoad  %12  %92
-%125 = OpCompositeExtract  %6  %124 0
-OpStore %80 %125
-%127 = OpAccessChain  %126  %80 %115
-%128 = OpLoad  %4  %127
-%129 = OpFNegate  %4  %128
-OpStore %127 %129
-%130 = OpCompositeExtract  %11  %124 1
-OpStore %82 %130
-%131 = OpCompositeExtract  %6  %124 2
-OpStore %84 %131
-OpReturn
-OpFunctionEnd
-%143 = OpFunction  %2  None %86
-%132 = OpLabel
-%150 = OpVariable  %103  Function %24
-%151 = OpVariable  %152  Function %88
-%166 = OpVariable  %161  Function %165
-%136 = OpLoad  %6  %134
-%139 = OpLoad  %11  %137
-%141 = OpLoad  %6  %140
-%133 = OpCompositeConstruct  %12  %136 %139 %141
-%144 = OpAccessChain  %87  %25 %88
-%145 = OpAccessChain  %90  %28 %88
-%147 = OpAccessChain  %146  %31 %88
-%148 = OpLoad  %20  %37
-%149 = OpLoad  %21  %39
-OpBranch %153
-%153 = OpLabel
-OpLine %3 85 18
-%154 = OpCompositeExtract  %11  %133 1
-%155 = OpExtInst  %11  %1 Normalize %154
-OpBranch %156
-%156 = OpLabel
-OpLine %3 88 5
-OpLoopMerge %157 %159 None
-OpBranch %167
-%167 = OpLabel
-%168 = OpLoad  %160  %166
-%169 = OpIEqual  %162  %163 %168
-%170 = OpAll  %56  %169
-OpSelectionMerge %171 None
-OpBranchConditional %170 %157 %171
-%171 = OpLabel
-%172 = OpCompositeExtract  %7  %168 1
-%173 = OpIEqual  %56  %172 %88
-%174 = OpSelect  %7  %173 %115 %88
-%175 = OpCompositeConstruct  %160  %174 %115
-%176 = OpISub  %160  %168 %175
-OpStore %166 %176
-OpBranch %158
-%158 = OpLabel
-OpLine %3 1 1
-%177 = OpLoad  %7  %151
-OpLine %3 88 29
-%180 = OpAccessChain  %179  %144 %115 %88
-%181 = OpLoad  %7  %180
-OpLine %3 88 21
-%182 = OpExtInst  %7  %1 UMin %181 %19
-%183 = OpULessThan  %56  %177 %182
-OpLine %3 88 20
-OpSelectionMerge %184 None
-OpBranchConditional %183 %184 %185
-%185 = OpLabel
-OpBranch %157
-%184 = OpLabel
-OpBranch %186
-%186 = OpLabel
-OpLine %3 89 21
-%188 = OpLoad  %7  %151
-%190 = OpAccessChain  %189  %147 %188
-%191 = OpLoad  %16  %190
-OpLine %3 91 38
-%192 = OpLoad  %7  %151
-%193 = OpCompositeExtract  %5  %191 0
-%194 = OpCompositeExtract  %6  %133 2
-%195 = OpMatrixTimesVector  %6  %193 %194
-OpLine %3 91 22
-%196 = OpFunctionCall  %4  %44 %192 %195
-OpLine %3 93 25
-%197 = OpCompositeExtract  %6  %191 1
-%198 = OpVectorShuffle  %11  %197 %197 0 1 2
-%199 = OpCompositeExtract  %6  %133 2
-%200 = OpVectorShuffle  %11  %199 %199 0 1 2
-%201 = OpFSub  %11  %198 %200
-%202 = OpExtInst  %11  %1 Normalize %201
-OpLine %3 94 32
-%203 = OpDot  %4  %155 %202
-OpLine %3 94 23
-%204 = OpExtInst  %4  %1 FMax %48 %203
-OpLine %3 96 9
-%205 = OpLoad  %11  %150
-%206 = OpFMul  %4  %196 %204
-%207 = OpCompositeExtract  %6  %191 2
-%208 = OpVectorShuffle  %11  %207 %207 0 1 2
-%209 = OpVectorTimesScalar  %11  %208 %206
-%210 = OpFAdd  %11  %205 %209
-OpLine %3 96 9
-OpStore %150 %210
-OpBranch %187
-%187 = OpLabel
-OpBranch %159
-%159 = OpLabel
-OpLine %3 88 68
-%211 = OpLoad  %7  %151
-%212 = OpIAdd  %7  %211 %115
-OpLine %3 88 68
-OpStore %151 %212
-OpBranch %156
-%157 = OpLabel
-OpLine %3 1 1
-%213 = OpLoad  %11  %150
-OpLine %3 99 12
-%214 = OpCompositeConstruct  %6  %213 %49
-OpLine %3 99 12
-%216 = OpAccessChain  %215  %145 %115
-%217 = OpLoad  %6  %216
-%218 = OpFMul  %6  %214 %217
-OpStore %142 %218
-OpReturn
-OpFunctionEnd
-%228 = OpFunction  %2  None %86
-%219 = OpLabel
-%235 = OpVariable  %103  Function %24
-%236 = OpVariable  %152  Function %88
-%244 = OpVariable  %161  Function %165
-%222 = OpLoad  %6  %221
-%224 = OpLoad  %11  %223
-%226 = OpLoad  %6  %225
-%220 = OpCompositeConstruct  %12  %222 %224 %226
-%229 = OpAccessChain  %87  %25 %88
-%230 = OpAccessChain  %90  %28 %88
-%232 = OpAccessChain  %231  %34 %88
-%233 = OpLoad  %20  %37
-%234 = OpLoad  %21  %39
-OpBranch %237
-%237 = OpLabel
-OpLine %3 105 18
-%238 = OpCompositeExtract  %11  %220 1
-%239 = OpExtInst  %11  %1 Normalize %238
-OpBranch %240
-%240 = OpLabel
-OpLine %3 107 5
-OpLoopMerge %241 %243 None
-OpBranch %245
-%245 = OpLabel
-%246 = OpLoad  %160  %244
-%247 = OpIEqual  %162  %163 %246
-%248 = OpAll  %56  %247
-OpSelectionMerge %249 None
-OpBranchConditional %248 %241 %249
-%249 = OpLabel
-%250 = OpCompositeExtract  %7  %246 1
-%251 = OpIEqual  %56  %250 %88
-%252 = OpSelect  %7  %251 %115 %88
-%253 = OpCompositeConstruct  %160  %252 %115
-%254 = OpISub  %160  %246 %253
-OpStore %244 %254
-OpBranch %242
-%242 = OpLabel
-OpLine %3 1 1
-%255 = OpLoad  %7  %236
-OpLine %3 107 29
-%256 = OpAccessChain  %179  %229 %115 %88
-%257 = OpLoad  %7  %256
-OpLine %3 107 21
-%258 = OpExtInst  %7  %1 UMin %257 %19
-%259 = OpULessThan  %56  %255 %258
-OpLine %3 107 20
-OpSelectionMerge %260 None
-OpBranchConditional %259 %260 %261
-%261 = OpLabel
-OpBranch %241
-%260 = OpLabel
-OpBranch %262
-%262 = OpLabel
-OpLine %3 110 21
-%264 = OpLoad  %7  %236
-%266 = OpAccessChain  %265  %232 %264
-%267 = OpLoad  %16  %266
-OpLine %3 111 38
-%268 = OpLoad  %7  %236
-%269 = OpCompositeExtract  %5  %267 0
-%270 = OpCompositeExtract  %6  %220 2
-%271 = OpMatrixTimesVector  %6  %269 %270
-OpLine %3 111 22
-%272 = OpFunctionCall  %4  %44 %268 %271
-OpLine %3 112 25
-%273 = OpCompositeExtract  %6  %267 1
-%274 = OpVectorShuffle  %11  %273 %273 0 1 2
-%275 = OpCompositeExtract  %6  %220 2
-%276 = OpVectorShuffle  %11  %275 %275 0 1 2
-%277 = OpFSub  %11  %274 %276
-%278 = OpExtInst  %11  %1 Normalize %277
-OpLine %3 113 32
-%279 = OpDot  %4  %239 %278
-OpLine %3 113 23
-%280 = OpExtInst  %4  %1 FMax %48 %279
-OpLine %3 114 9
-%281 = OpLoad  %11  %235
-%282 = OpFMul  %4  %272 %280
-%283 = OpCompositeExtract  %6  %267 2
-%284 = OpVectorShuffle  %11  %283 %283 0 1 2
-%285 = OpVectorTimesScalar  %11  %284 %282
-%286 = OpFAdd  %11  %281 %285
-OpLine %3 114 9
-OpStore %235 %286
-OpBranch %263
-%263 = OpLabel
-OpBranch %243
-%243 = OpLabel
-OpLine %3 107 68
-%287 = OpLoad  %7  %236
-%288 = OpIAdd  %7  %287 %115
-OpLine %3 107 68
-OpStore %236 %288
-OpBranch %240
-%241 = OpLabel
-OpLine %3 1 1
-%289 = OpLoad  %11  %235
-OpLine %3 116 12
-%290 = OpCompositeConstruct  %6  %289 %49
-OpLine %3 116 12
-%291 = OpAccessChain  %215  %230 %115
-%292 = OpLoad  %6  %291
-%293 = OpFMul  %6  %290 %292
-OpStore %227 %293
-OpReturn
-OpFunctionEnd
+         %64 = OpString "void"
+        %113 = OpString "vs_main"
+        %117 = OpString "struct Globals {
+    view_proj: mat4x4<f32>,
+    num_lights: vec4<u32>,
+}
+
+@group(0)
+@binding(0)
+var<uniform> u_globals: Globals;
+
+struct Entity {
+    world: mat4x4<f32>,
+    color: vec4<f32>,
+}
+
+@group(1)
+@binding(0)
+var<uniform> u_entity: Entity;
+
+/* Not useful for testing
+@vertex
+fn vs_bake(@location(0) position: vec4<i32>) -> @builtin(position) vec4<f32> {
+    return u_globals.view_proj * u_entity.world * vec4<f32>(position);
+}
+*/
+
+struct VertexOutput {
+    @builtin(position) proj_position: vec4<f32>,
+    @location(0) world_normal: vec3<f32>,
+    @location(1) world_position: vec4<f32>,
+}
+
+@vertex
+fn vs_main(
+    @location(0) position: vec4<i32>,
+    @location(1) normal: vec4<i32>,
+) -> VertexOutput {
+    let w = u_entity.world;
+    let world_pos = u_entity.world * vec4<f32>(position);
+    var out: VertexOutput;
+    out.world_normal = mat3x3<f32>(w[0].xyz, w[1].xyz, w[2].xyz) * vec3<f32>(normal.xyz);
+    out.world_position = world_pos;
+    out.proj_position = u_globals.view_proj * world_pos;
+    return out;
+}
+
+// fragment shader
+
+struct Light {
+    proj: mat4x4<f32>,
+    pos: vec4<f32>,
+    color: vec4<f32>,
+}
+
+@group(0)
+@binding(1)
+var<storage, read> s_lights: array<Light>;
+@group(0)
+@binding(1)
+var<uniform> u_lights: array<Light, 10>; // Used when storage types are not supported
+@group(0)
+@binding(2)
+var t_shadow: texture_depth_2d_array;
+@group(0)
+@binding(3)
+var sampler_shadow: sampler_comparison;
+
+fn fetch_shadow(light_id: u32, homogeneous_coords: vec4<f32>) -> f32 {
+    if (homogeneous_coords.w <= 0.0) {
+        return 1.0;
+    }
+    // compensate for the Y-flip difference between the NDC and texture coordinates
+    let flip_correction = vec2<f32>(0.5, -0.5);
+    // compute texture coordinates for shadow lookup
+    let proj_correction = 1.0 / homogeneous_coords.w;
+    let light_local = homogeneous_coords.xy * flip_correction * proj_correction + vec2<f32>(0.5, 0.5);
+    // do the lookup, using HW PCF and comparison
+    return textureSampleCompareLevel(t_shadow, sampler_shadow, light_local, i32(light_id), homogeneous_coords.z * proj_correction);
+}
+
+const c_ambient: vec3<f32> = vec3<f32>(0.05, 0.05, 0.05);
+const c_max_lights: u32 = 10u;
+
+@fragment
+fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
+    let normal = normalize(in.world_normal);
+    // accumulate color
+    var color: vec3<f32> = c_ambient;
+    for(var i = 0u; i < min(u_globals.num_lights.x, c_max_lights); i++) {
+        let light = s_lights[i];
+        // project into the light space
+        let shadow = fetch_shadow(i, light.proj * in.world_position);
+        // compute Lambertian diffuse term
+        let light_dir = normalize(light.pos.xyz - in.world_position.xyz);
+        let diffuse = max(0.0, dot(normal, light_dir));
+        // add light contribution
+        color += shadow * diffuse * light.color.xyz;
+    }
+    // multiply the light by material color
+    return vec4<f32>(color, 1.0) * u_entity.color;
+}
+
+// The fragment entrypoint used when storage buffers are not available for the lights
+@fragment
+fn fs_main_without_storage(in: VertexOutput) -> @location(0) vec4<f32> {
+    let normal = normalize(in.world_normal);
+    var color: vec3<f32> = c_ambient;
+    for(var i = 0u; i < min(u_globals.num_lights.x, c_max_lights); i++) {
+        // This line is the only difference from the entrypoint above. It uses the lights
+        // uniform instead of the lights storage buffer
+        let light = u_lights[i];
+        let shadow = fetch_shadow(i, light.proj * in.world_position);
+        let light_dir = normalize(light.pos.xyz - in.world_position.xyz);
+        let diffuse = max(0.0, dot(normal, light_dir));
+        color += shadow * diffuse * light.color.xyz;
+    }
+    return vec4<f32>(color, 1.0) * u_entity.color;
+}
+"
+        %121 = OpString "void"
+        %127 = OpString "naga"
+        %128 = OpString ""
+        %186 = OpString "fs_main"
+        %190 = OpString "struct Globals {
+    view_proj: mat4x4<f32>,
+    num_lights: vec4<u32>,
+}
+
+@group(0)
+@binding(0)
+var<uniform> u_globals: Globals;
+
+struct Entity {
+    world: mat4x4<f32>,
+    color: vec4<f32>,
+}
+
+@group(1)
+@binding(0)
+var<uniform> u_entity: Entity;
+
+/* Not useful for testing
+@vertex
+fn vs_bake(@location(0) position: vec4<i32>) -> @builtin(position) vec4<f32> {
+    return u_globals.view_proj * u_entity.world * vec4<f32>(position);
+}
+*/
+
+struct VertexOutput {
+    @builtin(position) proj_position: vec4<f32>,
+    @location(0) world_normal: vec3<f32>,
+    @location(1) world_position: vec4<f32>,
+}
+
+@vertex
+fn vs_main(
+    @location(0) position: vec4<i32>,
+    @location(1) normal: vec4<i32>,
+) -> VertexOutput {
+    let w = u_entity.world;
+    let world_pos = u_entity.world * vec4<f32>(position);
+    var out: VertexOutput;
+    out.world_normal = mat3x3<f32>(w[0].xyz, w[1].xyz, w[2].xyz) * vec3<f32>(normal.xyz);
+    out.world_position = world_pos;
+    out.proj_position = u_globals.view_proj * world_pos;
+    return out;
+}
+
+// fragment shader
+
+struct Light {
+    proj: mat4x4<f32>,
+    pos: vec4<f32>,
+    color: vec4<f32>,
+}
+
+@group(0)
+@binding(1)
+var<storage, read> s_lights: array<Light>;
+@group(0)
+@binding(1)
+var<uniform> u_lights: array<Light, 10>; // Used when storage types are not supported
+@group(0)
+@binding(2)
+var t_shadow: texture_depth_2d_array;
+@group(0)
+@binding(3)
+var sampler_shadow: sampler_comparison;
+
+fn fetch_shadow(light_id: u32, homogeneous_coords: vec4<f32>) -> f32 {
+    if (homogeneous_coords.w <= 0.0) {
+        return 1.0;
+    }
+    // compensate for the Y-flip difference between the NDC and texture coordinates
+    let flip_correction = vec2<f32>(0.5, -0.5);
+    // compute texture coordinates for shadow lookup
+    let proj_correction = 1.0 / homogeneous_coords.w;
+    let light_local = homogeneous_coords.xy * flip_correction * proj_correction + vec2<f32>(0.5, 0.5);
+    // do the lookup, using HW PCF and comparison
+    return textureSampleCompareLevel(t_shadow, sampler_shadow, light_local, i32(light_id), homogeneous_coords.z * proj_correction);
+}
+
+const c_ambient: vec3<f32> = vec3<f32>(0.05, 0.05, 0.05);
+const c_max_lights: u32 = 10u;
+
+@fragment
+fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
+    let normal = normalize(in.world_normal);
+    // accumulate color
+    var color: vec3<f32> = c_ambient;
+    for(var i = 0u; i < min(u_globals.num_lights.x, c_max_lights); i++) {
+        let light = s_lights[i];
+        // project into the light space
+        let shadow = fetch_shadow(i, light.proj * in.world_position);
+        // compute Lambertian diffuse term
+        let light_dir = normalize(light.pos.xyz - in.world_position.xyz);
+        let diffuse = max(0.0, dot(normal, light_dir));
+        // add light contribution
+        color += shadow * diffuse * light.color.xyz;
+    }
+    // multiply the light by material color
+    return vec4<f32>(color, 1.0) * u_entity.color;
+}
+
+// The fragment entrypoint used when storage buffers are not available for the lights
+@fragment
+fn fs_main_without_storage(in: VertexOutput) -> @location(0) vec4<f32> {
+    let normal = normalize(in.world_normal);
+    var color: vec3<f32> = c_ambient;
+    for(var i = 0u; i < min(u_globals.num_lights.x, c_max_lights); i++) {
+        // This line is the only difference from the entrypoint above. It uses the lights
+        // uniform instead of the lights storage buffer
+        let light = u_lights[i];
+        let shadow = fetch_shadow(i, light.proj * in.world_position);
+        let light_dir = normalize(light.pos.xyz - in.world_position.xyz);
+        let diffuse = max(0.0, dot(normal, light_dir));
+        color += shadow * diffuse * light.color.xyz;
+    }
+    return vec4<f32>(color, 1.0) * u_entity.color;
+}
+"
+        %194 = OpString "void"
+        %200 = OpString "naga"
+        %201 = OpString ""
+        %204 = OpString "float"
+        %210 = OpString "color"
+        %215 = OpString "uint"
+        %218 = OpString "i"
+        %303 = OpString "fs_main_without_storage"
+        %306 = OpString "struct Globals {
+    view_proj: mat4x4<f32>,
+    num_lights: vec4<u32>,
+}
+
+@group(0)
+@binding(0)
+var<uniform> u_globals: Globals;
+
+struct Entity {
+    world: mat4x4<f32>,
+    color: vec4<f32>,
+}
+
+@group(1)
+@binding(0)
+var<uniform> u_entity: Entity;
+
+/* Not useful for testing
+@vertex
+fn vs_bake(@location(0) position: vec4<i32>) -> @builtin(position) vec4<f32> {
+    return u_globals.view_proj * u_entity.world * vec4<f32>(position);
+}
+*/
+
+struct VertexOutput {
+    @builtin(position) proj_position: vec4<f32>,
+    @location(0) world_normal: vec3<f32>,
+    @location(1) world_position: vec4<f32>,
+}
+
+@vertex
+fn vs_main(
+    @location(0) position: vec4<i32>,
+    @location(1) normal: vec4<i32>,
+) -> VertexOutput {
+    let w = u_entity.world;
+    let world_pos = u_entity.world * vec4<f32>(position);
+    var out: VertexOutput;
+    out.world_normal = mat3x3<f32>(w[0].xyz, w[1].xyz, w[2].xyz) * vec3<f32>(normal.xyz);
+    out.world_position = world_pos;
+    out.proj_position = u_globals.view_proj * world_pos;
+    return out;
+}
+
+// fragment shader
+
+struct Light {
+    proj: mat4x4<f32>,
+    pos: vec4<f32>,
+    color: vec4<f32>,
+}
+
+@group(0)
+@binding(1)
+var<storage, read> s_lights: array<Light>;
+@group(0)
+@binding(1)
+var<uniform> u_lights: array<Light, 10>; // Used when storage types are not supported
+@group(0)
+@binding(2)
+var t_shadow: texture_depth_2d_array;
+@group(0)
+@binding(3)
+var sampler_shadow: sampler_comparison;
+
+fn fetch_shadow(light_id: u32, homogeneous_coords: vec4<f32>) -> f32 {
+    if (homogeneous_coords.w <= 0.0) {
+        return 1.0;
+    }
+    // compensate for the Y-flip difference between the NDC and texture coordinates
+    let flip_correction = vec2<f32>(0.5, -0.5);
+    // compute texture coordinates for shadow lookup
+    let proj_correction = 1.0 / homogeneous_coords.w;
+    let light_local = homogeneous_coords.xy * flip_correction * proj_correction + vec2<f32>(0.5, 0.5);
+    // do the lookup, using HW PCF and comparison
+    return textureSampleCompareLevel(t_shadow, sampler_shadow, light_local, i32(light_id), homogeneous_coords.z * proj_correction);
+}
+
+const c_ambient: vec3<f32> = vec3<f32>(0.05, 0.05, 0.05);
+const c_max_lights: u32 = 10u;
+
+@fragment
+fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
+    let normal = normalize(in.world_normal);
+    // accumulate color
+    var color: vec3<f32> = c_ambient;
+    for(var i = 0u; i < min(u_globals.num_lights.x, c_max_lights); i++) {
+        let light = s_lights[i];
+        // project into the light space
+        let shadow = fetch_shadow(i, light.proj * in.world_position);
+        // compute Lambertian diffuse term
+        let light_dir = normalize(light.pos.xyz - in.world_position.xyz);
+        let diffuse = max(0.0, dot(normal, light_dir));
+        // add light contribution
+        color += shadow * diffuse * light.color.xyz;
+    }
+    // multiply the light by material color
+    return vec4<f32>(color, 1.0) * u_entity.color;
+}
+
+// The fragment entrypoint used when storage buffers are not available for the lights
+@fragment
+fn fs_main_without_storage(in: VertexOutput) -> @location(0) vec4<f32> {
+    let normal = normalize(in.world_normal);
+    var color: vec3<f32> = c_ambient;
+    for(var i = 0u; i < min(u_globals.num_lights.x, c_max_lights); i++) {
+        // This line is the only difference from the entrypoint above. It uses the lights
+        // uniform instead of the lights storage buffer
+        let light = u_lights[i];
+        let shadow = fetch_shadow(i, light.proj * in.world_position);
+        let light_dir = normalize(light.pos.xyz - in.world_position.xyz);
+        let diffuse = max(0.0, dot(normal, light_dir));
+        color += shadow * diffuse * light.color.xyz;
+    }
+    return vec4<f32>(color, 1.0) * u_entity.color;
+}
+"
+        %310 = OpString "void"
+        %316 = OpString "naga"
+        %317 = OpString ""
+        %320 = OpString "float"
+        %324 = OpString "color"
+        %328 = OpString "uint"
+        %331 = OpString "i"
+          %3 = OpString "shadow.wgsl"
+               OpSource GLSL 0 %3 "struct Globals {
+    view_proj: mat4x4<f32>,
+    num_lights: vec4<u32>,
+}
+
+@group(0)
+@binding(0)
+var<uniform> u_globals: Globals;
+
+struct Entity {
+    world: mat4x4<f32>,
+    color: vec4<f32>,
+}
+
+@group(1)
+@binding(0)
+var<uniform> u_entity: Entity;
+
+/* Not useful for testing
+@vertex
+fn vs_bake(@location(0) position: vec4<i32>) -> @builtin(position) vec4<f32> {
+    return u_globals.view_proj * u_entity.world * vec4<f32>(position);
+}
+*/
+
+struct VertexOutput {
+    @builtin(position) proj_position: vec4<f32>,
+    @location(0) world_normal: vec3<f32>,
+    @location(1) world_position: vec4<f32>,
+}
+
+@vertex
+fn vs_main(
+    @location(0) position: vec4<i32>,
+    @location(1) normal: vec4<i32>,
+) -> VertexOutput {
+    let w = u_entity.world;
+    let world_pos = u_entity.world * vec4<f32>(position);
+    var out: VertexOutput;
+    out.world_normal = mat3x3<f32>(w[0].xyz, w[1].xyz, w[2].xyz) * vec3<f32>(normal.xyz);
+    out.world_position = world_pos;
+    out.proj_position = u_globals.view_proj * world_pos;
+    return out;
+}
+
+// fragment shader
+
+struct Light {
+    proj: mat4x4<f32>,
+    pos: vec4<f32>,
+    color: vec4<f32>,
+}
+
+@group(0)
+@binding(1)
+var<storage, read> s_lights: array<Light>;
+@group(0)
+@binding(1)
+var<uniform> u_lights: array<Light, 10>; // Used when storage types are not supported
+@group(0)
+@binding(2)
+var t_shadow: texture_depth_2d_array;
+@group(0)
+@binding(3)
+var sampler_shadow: sampler_comparison;
+
+fn fetch_shadow(light_id: u32, homogeneous_coords: vec4<f32>) -> f32 {
+    if (homogeneous_coords.w <= 0.0) {
+        return 1.0;
+    }
+    // compensate for the Y-flip difference between the NDC and texture coordinates
+    let flip_correction = vec2<f32>(0.5, -0.5);
+    // compute texture coordinates for shadow lookup
+    let proj_correction = 1.0 / homogeneous_coords.w;
+    let light_local = homogeneous_coords.xy * flip_correction * proj_correction + vec2<f32>(0.5, 0.5);
+    // do the lookup, using HW PCF and comparison
+    return textureSampleCompareLevel(t_shadow, sampler_shadow, light_local, i32(light_id), homogeneous_coords.z * proj_correction);
+}
+
+const c_ambient: vec3<f32> = vec3<f32>(0.05, 0.05, 0.05);
+const c_max_lights: u32 = 10u;
+
+@fragment
+fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
+    let normal = normalize(in.world_normal);
+    // accumulate color
+    var color: vec3<f32> = c_ambient;
+    for(var i = 0u; i < min(u_globals.num_lights.x, c_max_lights); i++) {
+        let light = s_lights[i];
+        // project into the light space
+        let shadow = fetch_shadow(i, light.proj * in.world_position);
+        // compute Lambertian diffuse term
+        let light_dir = normalize(light.pos.xyz - in.world_position.xyz);
+        let diffuse = max(0.0, dot(normal, light_dir));
+        // add light contribution
+        color += shadow * diffuse * light.color.xyz;
+    }
+    // multiply the light by material color
+    return vec4<f32>(color, 1.0) * u_entity.color;
+}
+
+// The fragment entrypoint used when storage buffers are not available for the lights
+@fragment
+fn fs_main_without_storage(in: VertexOutput) -> @location(0) vec4<f32> {
+    let normal = normalize(in.world_normal);
+    var color: vec3<f32> = c_ambient;
+    for(var i = 0u; i < min(u_globals.num_lights.x, c_max_lights); i++) {
+        // This line is the only difference from the entrypoint above. It uses the lights
+        // uniform instead of the lights storage buffer
+        let light = u_lights[i];
+        let shadow = fetch_shadow(i, light.proj * in.world_position);
+        let light_dir = normalize(light.pos.xyz - in.world_position.xyz);
+        let diffuse = max(0.0, dot(normal, light_dir));
+        color += shadow * diffuse * light.color.xyz;
+    }
+    return vec4<f32>(color, 1.0) * u_entity.color;
+}
+"
+               OpMemberName %Globals 0 "view_proj"
+               OpMemberName %Globals 1 "num_lights"
+               OpName %Globals "Globals"
+               OpMemberName %Entity 0 "world"
+               OpMemberName %Entity 1 "color"
+               OpName %Entity "Entity"
+               OpMemberName %VertexOutput 0 "proj_position"
+               OpMemberName %VertexOutput 1 "world_normal"
+               OpMemberName %VertexOutput 2 "world_position"
+               OpName %VertexOutput "VertexOutput"
+               OpMemberName %Light 0 "proj"
+               OpMemberName %Light 1 "pos"
+               OpMemberName %Light 2 "color"
+               OpName %Light "Light"
+               OpName %c_ambient "c_ambient"
+               OpName %c_max_lights "c_max_lights"
+               OpName %u_globals "u_globals"
+               OpName %u_entity "u_entity"
+               OpName %s_lights "s_lights"
+               OpName %u_lights "u_lights"
+               OpName %t_shadow "t_shadow"
+               OpName %sampler_shadow "sampler_shadow"
+               OpName %light_id "light_id"
+               OpName %homogeneous_coords "homogeneous_coords"
+               OpName %fetch_shadow "fetch_shadow"
+               OpName %position "position"
+               OpName %normal "normal"
+               OpName %proj_position "proj_position"
+               OpName %world_normal "world_normal"
+               OpName %world_position "world_position"
+               OpName %vs_main "vs_main"
+               OpName %out "out"
+               OpName %proj_position_0 "proj_position"
+               OpName %world_normal_0 "world_normal"
+               OpName %world_position_0 "world_position"
+               OpName %fs_main "fs_main"
+               OpName %color "color"
+               OpName %i "i"
+               OpName %loop_bound "loop_bound"
+               OpName %proj_position_1 "proj_position"
+               OpName %world_normal_1 "world_normal"
+               OpName %world_position_1 "world_position"
+               OpName %fs_main_without_storage "fs_main_without_storage"
+               OpName %color_0 "color"
+               OpName %i_0 "i"
+               OpName %loop_bound_0 "loop_bound"
+               OpMemberDecorate %Globals 0 Offset 0
+               OpMemberDecorate %Globals 0 ColMajor
+               OpMemberDecorate %Globals 0 MatrixStride 16
+               OpMemberDecorate %Globals 1 Offset 64
+               OpMemberDecorate %Entity 0 Offset 0
+               OpMemberDecorate %Entity 0 ColMajor
+               OpMemberDecorate %Entity 0 MatrixStride 16
+               OpMemberDecorate %Entity 1 Offset 64
+               OpMemberDecorate %VertexOutput 0 Offset 0
+               OpMemberDecorate %VertexOutput 1 Offset 16
+               OpMemberDecorate %VertexOutput 2 Offset 32
+               OpMemberDecorate %Light 0 Offset 0
+               OpMemberDecorate %Light 0 ColMajor
+               OpMemberDecorate %Light 0 MatrixStride 16
+               OpMemberDecorate %Light 1 Offset 64
+               OpMemberDecorate %Light 2 Offset 80
+               OpDecorate %_runtimearr_Light ArrayStride 96
+               OpDecorate %_arr_Light_c_max_lights ArrayStride 96
+               OpDecorate %u_globals DescriptorSet 0
+               OpDecorate %u_globals Binding 0
+               OpDecorate %_struct_26 Block
+               OpMemberDecorate %_struct_26 0 Offset 0
+               OpDecorate %u_entity DescriptorSet 1
+               OpDecorate %u_entity Binding 0
+               OpDecorate %_struct_29 Block
+               OpMemberDecorate %_struct_29 0 Offset 0
+               OpDecorate %s_lights NonWritable
+               OpDecorate %s_lights DescriptorSet 0
+               OpDecorate %s_lights Binding 1
+               OpDecorate %_struct_32 Block
+               OpMemberDecorate %_struct_32 0 Offset 0
+               OpDecorate %u_lights DescriptorSet 0
+               OpDecorate %u_lights Binding 1
+               OpDecorate %_struct_35 Block
+               OpMemberDecorate %_struct_35 0 Offset 0
+               OpDecorate %t_shadow DescriptorSet 0
+               OpDecorate %t_shadow Binding 2
+               OpDecorate %sampler_shadow DescriptorSet 0
+               OpDecorate %sampler_shadow Binding 3
+               OpDecorate %position Location 0
+               OpDecorate %normal Location 1
+               OpDecorate %proj_position BuiltIn Position
+               OpDecorate %world_normal Location 0
+               OpDecorate %world_position Location 1
+               OpDecorate %proj_position_0 BuiltIn FragCoord
+               OpDecorate %world_normal_0 Location 0
+               OpDecorate %world_position_0 Location 1
+               OpDecorate %178 Location 0
+               OpDecorate %proj_position_1 BuiltIn FragCoord
+               OpDecorate %world_normal_1 Location 0
+               OpDecorate %world_position_1 Location 1
+               OpDecorate %295 Location 0
+       %void = OpTypeVoid
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%mat4v4float = OpTypeMatrix %v4float 4
+       %uint = OpTypeInt 32 0
+     %v4uint = OpTypeVector %uint 4
+    %Globals = OpTypeStruct %mat4v4float %v4uint
+     %Entity = OpTypeStruct %mat4v4float %v4float
+    %v3float = OpTypeVector %float 3
+%VertexOutput = OpTypeStruct %v4float %v3float %v4float
+        %int = OpTypeInt 32 1
+      %v4int = OpTypeVector %int 4
+%mat3v3float = OpTypeMatrix %v3float 3
+      %Light = OpTypeStruct %mat4v4float %v4float %v4float
+%_runtimearr_Light = OpTypeRuntimeArray %Light
+%c_max_lights = OpConstant %uint 10
+%_arr_Light_c_max_lights = OpTypeArray %Light %c_max_lights
+         %20 = OpTypeImage %float 2D 1 1 0 1 Unknown
+         %21 = OpTypeSampler
+    %v2float = OpTypeVector %float 2
+%float_0_0500000007 = OpConstant %float 0.0500000007
+  %c_ambient = OpConstantComposite %v3float %float_0_0500000007 %float_0_0500000007 %float_0_0500000007
+ %_struct_26 = OpTypeStruct %Globals
+%_ptr_Uniform__struct_26 = OpTypePointer Uniform %_struct_26
+  %u_globals = OpVariable %_ptr_Uniform__struct_26 Uniform
+ %_struct_29 = OpTypeStruct %Entity
+%_ptr_Uniform__struct_29 = OpTypePointer Uniform %_struct_29
+   %u_entity = OpVariable %_ptr_Uniform__struct_29 Uniform
+ %_struct_32 = OpTypeStruct %_runtimearr_Light
+%_ptr_StorageBuffer__struct_32 = OpTypePointer StorageBuffer %_struct_32
+   %s_lights = OpVariable %_ptr_StorageBuffer__struct_32 StorageBuffer
+ %_struct_35 = OpTypeStruct %_arr_Light_c_max_lights
+%_ptr_Uniform__struct_35 = OpTypePointer Uniform %_struct_35
+   %u_lights = OpVariable %_ptr_Uniform__struct_35 Uniform
+%_ptr_UniformConstant_20 = OpTypePointer UniformConstant %20
+   %t_shadow = OpVariable %_ptr_UniformConstant_20 UniformConstant
+%_ptr_UniformConstant_21 = OpTypePointer UniformConstant %21
+%sampler_shadow = OpVariable %_ptr_UniformConstant_21 UniformConstant
+         %46 = OpTypeFunction %float %uint %v4float
+     %uint_1 = OpConstant %uint 1
+     %uint_4 = OpConstant %uint 4
+     %uint_2 = OpConstant %uint 2
+    %uint_68 = OpConstant %uint 68
+     %uint_9 = OpConstant %uint 9
+     %uint_8 = OpConstant %uint 8
+     %uint_0 = OpConstant %uint 0
+     %uint_3 = OpConstant %uint 3
+     %uint_6 = OpConstant %uint 6
+    %float_0 = OpConstant %float 0
+    %float_1 = OpConstant %float 1
+  %float_0_5 = OpConstant %float 0.5
+ %float_n0_5 = OpConstant %float -0.5
+         %74 = OpConstantComposite %v2float %float_0_5 %float_n0_5
+         %75 = OpConstantComposite %v2float %float_0_5 %float_0_5
+       %bool = OpTypeBool
+         %91 = OpTypeSampledImage %20
+%_ptr_Input_v4int = OpTypePointer Input %v4int
+   %position = OpVariable %_ptr_Input_v4int Input
+     %normal = OpVariable %_ptr_Input_v4int Input
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+%proj_position = OpVariable %_ptr_Output_v4float Output
+%_ptr_Output_v3float = OpTypePointer Output %v3float
+%world_normal = OpVariable %_ptr_Output_v3float Output
+%world_position = OpVariable %_ptr_Output_v4float Output
+        %108 = OpTypeFunction %void
+%_ptr_Uniform_Globals = OpTypePointer Uniform %Globals
+%_ptr_Uniform_Entity = OpTypePointer Uniform %Entity
+    %uint_37 = OpConstant %uint 37
+    %uint_13 = OpConstant %uint 13
+%_ptr_Function_VertexOutput = OpTypePointer Function %VertexOutput
+        %132 = OpConstantNull %VertexOutput
+%_ptr_Uniform_mat4v4float = OpTypePointer Uniform %mat4v4float
+%_ptr_Function_v3float = OpTypePointer Function %v3float
+      %v3int = OpTypeVector %int 3
+%_ptr_Function_v4float = OpTypePointer Function %v4float
+%_ptr_Output_float = OpTypePointer Output %float
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%proj_position_0 = OpVariable %_ptr_Input_v4float Input
+%_ptr_Input_v3float = OpTypePointer Input %v3float
+%world_normal_0 = OpVariable %_ptr_Input_v3float Input
+%world_position_0 = OpVariable %_ptr_Input_v4float Input
+        %178 = OpVariable %_ptr_Output_v4float Output
+%_ptr_StorageBuffer__runtimearr_Light = OpTypePointer StorageBuffer %_runtimearr_Light
+    %uint_85 = OpConstant %uint 85
+    %uint_18 = OpConstant %uint 18
+    %uint_32 = OpConstant %uint 32
+    %uint_87 = OpConstant %uint 87
+     %uint_5 = OpConstant %uint 5
+%_ptr_Function_uint = OpTypePointer Function %uint
+    %uint_88 = OpConstant %uint 88
+     %v2uint = OpTypeVector %uint 2
+%_ptr_Function_v2uint = OpTypePointer Function %v2uint
+     %v2bool = OpTypeVector %bool 2
+        %231 = OpConstantComposite %v2uint %uint_0 %uint_0
+%uint_4294967295 = OpConstant %uint 4294967295
+        %233 = OpConstantComposite %v2uint %uint_4294967295 %uint_4294967295
+%_ptr_Uniform_v4uint = OpTypePointer Uniform %v4uint
+%_ptr_Uniform_uint = OpTypePointer Uniform %uint
+%_ptr_StorageBuffer_Light = OpTypePointer StorageBuffer %Light
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+%proj_position_1 = OpVariable %_ptr_Input_v4float Input
+%world_normal_1 = OpVariable %_ptr_Input_v3float Input
+%world_position_1 = OpVariable %_ptr_Input_v4float Input
+        %295 = OpVariable %_ptr_Output_v4float Output
+%_ptr_Uniform__arr_Light_c_max_lights = OpTypePointer Uniform %_arr_Light_c_max_lights
+   %uint_105 = OpConstant %uint 105
+   %uint_106 = OpConstant %uint 106
+   %uint_107 = OpConstant %uint 107
+%_ptr_Uniform_Light = OpTypePointer Uniform %Light
+         %59 = OpExtInst %void %41 DebugInfoNone
+         %61 = OpExtInst %void %41 DebugSource %3 %60
+         %62 = OpExtInst %void %41 DebugCompilationUnit %uint_1 %uint_4 %61 %uint_2
+         %63 = OpExtInst %void %41 DebugExpression
+         %65 = OpExtInst %void %41 DebugTypeBasic %64 %uint_0 %uint_0 %uint_0
+         %66 = OpExtInst %void %41 DebugTypeFunction %uint_0 %65
+         %67 = OpExtInst %void %41 DebugFunction %49 %66 %61 %uint_68 %uint_9 %62 %49 %uint_8 %uint_68
+        %116 = OpExtInst %void %41 DebugInfoNone
+        %118 = OpExtInst %void %41 DebugSource %3 %117
+        %119 = OpExtInst %void %41 DebugCompilationUnit %uint_1 %uint_4 %118 %uint_2
+        %120 = OpExtInst %void %41 DebugExpression
+        %122 = OpExtInst %void %41 DebugTypeBasic %121 %uint_0 %uint_0 %uint_0
+        %123 = OpExtInst %void %41 DebugTypeFunction %uint_0 %122
+        %124 = OpExtInst %void %41 DebugFunction %113 %123 %118 %uint_37 %uint_13 %119 %113 %uint_8 %uint_37
+        %129 = OpExtInst %void %41 DebugEntryPoint %124 %119 %127 %128
+        %189 = OpExtInst %void %41 DebugInfoNone
+        %191 = OpExtInst %void %41 DebugSource %3 %190
+        %192 = OpExtInst %void %41 DebugCompilationUnit %uint_1 %uint_4 %191 %uint_2
+        %193 = OpExtInst %void %41 DebugExpression
+        %195 = OpExtInst %void %41 DebugTypeBasic %194 %uint_0 %uint_0 %uint_0
+        %196 = OpExtInst %void %41 DebugTypeFunction %uint_0 %195
+        %197 = OpExtInst %void %41 DebugFunction %186 %196 %191 %uint_85 %uint_18 %192 %186 %uint_8 %uint_85
+        %202 = OpExtInst %void %41 DebugEntryPoint %197 %192 %200 %201
+        %206 = OpExtInst %void %41 DebugTypeBasic %204 %uint_32 %uint_3 %uint_0
+        %207 = OpExtInst %void %41 DebugTypeVector %206 %uint_3
+        %211 = OpExtInst %void %41 DebugLocalVariable %210 %207 %191 %uint_87 %uint_5 %197 %uint_0
+        %216 = OpExtInst %void %41 DebugTypeBasic %215 %uint_32 %uint_6 %uint_0
+        %219 = OpExtInst %void %41 DebugLocalVariable %218 %216 %191 %uint_88 %uint_9 %197 %uint_0
+        %305 = OpExtInst %void %41 DebugInfoNone
+        %307 = OpExtInst %void %41 DebugSource %3 %306
+        %308 = OpExtInst %void %41 DebugCompilationUnit %uint_1 %uint_4 %307 %uint_2
+        %309 = OpExtInst %void %41 DebugExpression
+        %311 = OpExtInst %void %41 DebugTypeBasic %310 %uint_0 %uint_0 %uint_0
+        %312 = OpExtInst %void %41 DebugTypeFunction %uint_0 %311
+        %313 = OpExtInst %void %41 DebugFunction %303 %312 %307 %uint_105 %uint_18 %308 %303 %uint_8 %uint_105
+        %318 = OpExtInst %void %41 DebugEntryPoint %313 %308 %316 %317
+        %321 = OpExtInst %void %41 DebugTypeBasic %320 %uint_32 %uint_3 %uint_0
+        %322 = OpExtInst %void %41 DebugTypeVector %321 %uint_3
+        %325 = OpExtInst %void %41 DebugLocalVariable %324 %322 %307 %uint_106 %uint_5 %313 %uint_0
+        %329 = OpExtInst %void %41 DebugTypeBasic %328 %uint_32 %uint_6 %uint_0
+        %332 = OpExtInst %void %41 DebugLocalVariable %331 %329 %307 %uint_107 %uint_9 %313 %uint_0
+%fetch_shadow = OpFunction %float None %46
+   %light_id = OpFunctionParameter %uint
+%homogeneous_coords = OpFunctionParameter %v4float
+         %42 = OpLabel
+         %47 = OpLoad %20 %t_shadow
+         %48 = OpLoad %21 %sampler_shadow
+         %68 = OpExtInst %void %41 DebugScope %67
+         %69 = OpExtInst %void %41 DebugFunctionDefinition %67 %fetch_shadow
+               OpBranch %76
+         %76 = OpLabel
+               OpLine %3 68 9
+         %77 = OpCompositeExtract %float %homogeneous_coords 3
+               OpLine %3 68 9
+         %79 = OpFOrdLessThanEqual %bool %77 %float_0
+               OpLine %3 68 5
+               OpSelectionMerge %80 None
+               OpBranchConditional %79 %81 %80
+         %81 = OpLabel
+               OpReturnValue %float_1
+         %80 = OpLabel
+               OpLine %3 72 27
+               OpLine %3 74 33
+         %82 = OpCompositeExtract %float %homogeneous_coords 3
+               OpLine %3 74 27
+         %83 = OpFDiv %float %float_1 %82
+               OpLine %3 75 23
+         %84 = OpVectorShuffle %v2float %homogeneous_coords %homogeneous_coords 0 1
+         %85 = OpFMul %v2float %84 %74
+         %86 = OpVectorTimesScalar %v2float %85 %83
+               OpLine %3 75 23
+         %87 = OpFAdd %v2float %86 %75
+               OpLine %3 77 12
+         %88 = OpBitcast %int %light_id
+         %89 = OpCompositeExtract %float %homogeneous_coords 2
+         %90 = OpFMul %float %89 %83
+         %92 = OpConvertSToF %float %88
+         %93 = OpCompositeConstruct %v3float %87 %92
+         %94 = OpSampledImage %91 %47 %48
+         %95 = OpImageSampleDrefExplicitLod %float %94 %93 %90 Lod %float_0
+               OpReturnValue %95
+               OpFunctionEnd
+    %vs_main = OpFunction %void None %108
+         %96 = OpLabel
+        %out = OpVariable %_ptr_Function_VertexOutput Function %132
+         %99 = OpLoad %v4int %position
+        %101 = OpLoad %v4int %normal
+        %110 = OpAccessChain %_ptr_Uniform_Globals %u_globals %uint_0
+        %112 = OpAccessChain %_ptr_Uniform_Entity %u_entity %uint_0
+        %125 = OpExtInst %void %41 DebugScope %124
+        %126 = OpExtInst %void %41 DebugFunctionDefinition %124 %vs_main
+               OpBranch %133
+        %133 = OpLabel
+               OpLine %3 37 13
+        %135 = OpAccessChain %_ptr_Uniform_mat4v4float %112 %uint_0
+        %136 = OpLoad %mat4v4float %135
+               OpLine %3 38 21
+        %137 = OpAccessChain %_ptr_Uniform_mat4v4float %112 %uint_0
+        %138 = OpLoad %mat4v4float %137
+        %139 = OpConvertSToF %v4float %99
+        %140 = OpMatrixTimesVector %v4float %138 %139
+               OpLine %3 40 5
+               OpLine %3 40 36
+        %142 = OpCompositeExtract %v4float %136 0
+        %143 = OpVectorShuffle %v3float %142 %142 0 1 2
+               OpLine %3 40 46
+        %144 = OpCompositeExtract %v4float %136 1
+        %145 = OpVectorShuffle %v3float %144 %144 0 1 2
+               OpLine %3 40 24
+        %146 = OpCompositeExtract %v4float %136 2
+        %147 = OpVectorShuffle %v3float %146 %146 0 1 2
+        %148 = OpCompositeConstruct %mat3v3float %143 %145 %147
+        %150 = OpVectorShuffle %v3int %101 %101 0 1 2
+        %151 = OpConvertSToF %v3float %150
+        %152 = OpMatrixTimesVector %v3float %148 %151
+               OpLine %3 40 5
+        %153 = OpAccessChain %_ptr_Function_v3float %out %uint_1
+               OpStore %153 %152
+               OpLine %3 41 5
+               OpLine %3 41 5
+        %155 = OpAccessChain %_ptr_Function_v4float %out %uint_2
+               OpStore %155 %140
+               OpLine %3 42 5
+               OpLine %3 42 25
+        %156 = OpAccessChain %_ptr_Uniform_mat4v4float %110 %uint_0
+        %157 = OpLoad %mat4v4float %156
+        %158 = OpMatrixTimesVector %v4float %157 %140
+               OpLine %3 42 5
+        %159 = OpAccessChain %_ptr_Function_v4float %out %uint_0
+               OpStore %159 %158
+               OpLine %3 1 1
+        %160 = OpLoad %VertexOutput %out
+        %161 = OpCompositeExtract %v4float %160 0
+               OpStore %proj_position %161
+        %163 = OpAccessChain %_ptr_Output_float %proj_position %uint_1
+        %164 = OpLoad %float %163
+        %165 = OpFNegate %float %164
+               OpStore %163 %165
+        %166 = OpCompositeExtract %v3float %160 1
+               OpStore %world_normal %166
+        %167 = OpCompositeExtract %v4float %160 2
+               OpStore %world_position %167
+               OpReturn
+               OpFunctionEnd
+    %fs_main = OpFunction %void None %108
+        %168 = OpLabel
+      %color = OpVariable %_ptr_Function_v3float Function %c_ambient
+          %i = OpVariable %_ptr_Function_uint Function %uint_0
+ %loop_bound = OpVariable %_ptr_Function_v2uint Function %233
+        %172 = OpLoad %v4float %proj_position_0
+        %175 = OpLoad %v3float %world_normal_0
+        %177 = OpLoad %v4float %world_position_0
+        %169 = OpCompositeConstruct %VertexOutput %172 %175 %177
+        %180 = OpAccessChain %_ptr_Uniform_Globals %u_globals %uint_0
+        %181 = OpAccessChain %_ptr_Uniform_Entity %u_entity %uint_0
+        %183 = OpAccessChain %_ptr_StorageBuffer__runtimearr_Light %s_lights %uint_0
+        %184 = OpLoad %20 %t_shadow
+        %185 = OpLoad %21 %sampler_shadow
+        %198 = OpExtInst %void %41 DebugScope %197
+        %199 = OpExtInst %void %41 DebugFunctionDefinition %197 %fs_main
+        %212 = OpExtInst %void %41 DebugDeclare %211 %color %193
+        %220 = OpExtInst %void %41 DebugDeclare %219 %i %193
+               OpBranch %221
+        %221 = OpLabel
+               OpLine %3 85 18
+        %222 = OpCompositeExtract %v3float %169 1
+        %223 = OpExtInst %v3float %1 Normalize %222
+               OpBranch %224
+        %224 = OpLabel
+               OpLine %3 88 5
+               OpLoopMerge %225 %227 None
+               OpBranch %235
+        %235 = OpLabel
+        %236 = OpLoad %v2uint %loop_bound
+        %237 = OpIEqual %v2bool %231 %236
+        %238 = OpAll %bool %237
+               OpSelectionMerge %239 None
+               OpBranchConditional %238 %225 %239
+        %239 = OpLabel
+        %240 = OpCompositeExtract %uint %236 1
+        %241 = OpIEqual %bool %240 %uint_0
+        %242 = OpSelect %uint %241 %uint_1 %uint_0
+        %243 = OpCompositeConstruct %v2uint %242 %uint_1
+        %244 = OpISub %v2uint %236 %243
+               OpStore %loop_bound %244
+               OpBranch %226
+        %226 = OpLabel
+               OpLine %3 1 1
+        %245 = OpLoad %uint %i
+               OpLine %3 88 29
+        %248 = OpAccessChain %_ptr_Uniform_uint %180 %uint_1 %uint_0
+        %249 = OpLoad %uint %248
+               OpLine %3 88 21
+        %250 = OpExtInst %uint %1 UMin %249 %c_max_lights
+        %251 = OpULessThan %bool %245 %250
+               OpLine %3 88 20
+               OpSelectionMerge %252 None
+               OpBranchConditional %251 %252 %253
+        %253 = OpLabel
+               OpBranch %225
+        %252 = OpLabel
+               OpBranch %254
+        %254 = OpLabel
+               OpLine %3 89 21
+        %256 = OpLoad %uint %i
+        %258 = OpAccessChain %_ptr_StorageBuffer_Light %183 %256
+        %259 = OpLoad %Light %258
+               OpLine %3 91 38
+        %260 = OpLoad %uint %i
+        %261 = OpCompositeExtract %mat4v4float %259 0
+        %262 = OpCompositeExtract %v4float %169 2
+        %263 = OpMatrixTimesVector %v4float %261 %262
+               OpLine %3 91 22
+        %264 = OpFunctionCall %float %fetch_shadow %260 %263
+               OpLine %3 93 25
+        %265 = OpCompositeExtract %v4float %259 1
+        %266 = OpVectorShuffle %v3float %265 %265 0 1 2
+        %267 = OpCompositeExtract %v4float %169 2
+        %268 = OpVectorShuffle %v3float %267 %267 0 1 2
+        %269 = OpFSub %v3float %266 %268
+        %270 = OpExtInst %v3float %1 Normalize %269
+               OpLine %3 94 32
+        %271 = OpDot %float %223 %270
+               OpLine %3 94 23
+        %272 = OpExtInst %float %1 FMax %float_0 %271
+               OpLine %3 96 9
+        %273 = OpLoad %v3float %color
+        %274 = OpFMul %float %264 %272
+        %275 = OpCompositeExtract %v4float %259 2
+        %276 = OpVectorShuffle %v3float %275 %275 0 1 2
+        %277 = OpVectorTimesScalar %v3float %276 %274
+        %278 = OpFAdd %v3float %273 %277
+               OpLine %3 96 9
+               OpStore %color %278
+               OpBranch %255
+        %255 = OpLabel
+               OpBranch %227
+        %227 = OpLabel
+               OpLine %3 88 68
+        %279 = OpLoad %uint %i
+        %280 = OpIAdd %uint %279 %uint_1
+               OpLine %3 88 68
+               OpStore %i %280
+               OpBranch %224
+        %225 = OpLabel
+               OpLine %3 1 1
+        %281 = OpLoad %v3float %color
+               OpLine %3 99 12
+        %282 = OpCompositeConstruct %v4float %281 %float_1
+               OpLine %3 99 12
+        %284 = OpAccessChain %_ptr_Uniform_v4float %181 %uint_1
+        %285 = OpLoad %v4float %284
+        %286 = OpFMul %v4float %282 %285
+               OpStore %178 %286
+               OpReturn
+               OpFunctionEnd
+%fs_main_without_storage = OpFunction %void None %108
+        %287 = OpLabel
+    %color_0 = OpVariable %_ptr_Function_v3float Function %c_ambient
+        %i_0 = OpVariable %_ptr_Function_uint Function %uint_0
+%loop_bound_0 = OpVariable %_ptr_Function_v2uint Function %233
+        %290 = OpLoad %v4float %proj_position_1
+        %292 = OpLoad %v3float %world_normal_1
+        %294 = OpLoad %v4float %world_position_1
+        %288 = OpCompositeConstruct %VertexOutput %290 %292 %294
+        %297 = OpAccessChain %_ptr_Uniform_Globals %u_globals %uint_0
+        %298 = OpAccessChain %_ptr_Uniform_Entity %u_entity %uint_0
+        %300 = OpAccessChain %_ptr_Uniform__arr_Light_c_max_lights %u_lights %uint_0
+        %301 = OpLoad %20 %t_shadow
+        %302 = OpLoad %21 %sampler_shadow
+        %314 = OpExtInst %void %41 DebugScope %313
+        %315 = OpExtInst %void %41 DebugFunctionDefinition %313 %fs_main_without_storage
+        %326 = OpExtInst %void %41 DebugDeclare %325 %color_0 %309
+        %333 = OpExtInst %void %41 DebugDeclare %332 %i_0 %309
+               OpBranch %334
+        %334 = OpLabel
+               OpLine %3 105 18
+        %335 = OpCompositeExtract %v3float %288 1
+        %336 = OpExtInst %v3float %1 Normalize %335
+               OpBranch %337
+        %337 = OpLabel
+               OpLine %3 107 5
+               OpLoopMerge %338 %340 None
+               OpBranch %342
+        %342 = OpLabel
+        %343 = OpLoad %v2uint %loop_bound_0
+        %344 = OpIEqual %v2bool %231 %343
+        %345 = OpAll %bool %344
+               OpSelectionMerge %346 None
+               OpBranchConditional %345 %338 %346
+        %346 = OpLabel
+        %347 = OpCompositeExtract %uint %343 1
+        %348 = OpIEqual %bool %347 %uint_0
+        %349 = OpSelect %uint %348 %uint_1 %uint_0
+        %350 = OpCompositeConstruct %v2uint %349 %uint_1
+        %351 = OpISub %v2uint %343 %350
+               OpStore %loop_bound_0 %351
+               OpBranch %339
+        %339 = OpLabel
+               OpLine %3 1 1
+        %352 = OpLoad %uint %i_0
+               OpLine %3 107 29
+        %353 = OpAccessChain %_ptr_Uniform_uint %297 %uint_1 %uint_0
+        %354 = OpLoad %uint %353
+               OpLine %3 107 21
+        %355 = OpExtInst %uint %1 UMin %354 %c_max_lights
+        %356 = OpULessThan %bool %352 %355
+               OpLine %3 107 20
+               OpSelectionMerge %357 None
+               OpBranchConditional %356 %357 %358
+        %358 = OpLabel
+               OpBranch %338
+        %357 = OpLabel
+               OpBranch %359
+        %359 = OpLabel
+               OpLine %3 110 21
+        %361 = OpLoad %uint %i_0
+        %363 = OpAccessChain %_ptr_Uniform_Light %300 %361
+        %364 = OpLoad %Light %363
+               OpLine %3 111 38
+        %365 = OpLoad %uint %i_0
+        %366 = OpCompositeExtract %mat4v4float %364 0
+        %367 = OpCompositeExtract %v4float %288 2
+        %368 = OpMatrixTimesVector %v4float %366 %367
+               OpLine %3 111 22
+        %369 = OpFunctionCall %float %fetch_shadow %365 %368
+               OpLine %3 112 25
+        %370 = OpCompositeExtract %v4float %364 1
+        %371 = OpVectorShuffle %v3float %370 %370 0 1 2
+        %372 = OpCompositeExtract %v4float %288 2
+        %373 = OpVectorShuffle %v3float %372 %372 0 1 2
+        %374 = OpFSub %v3float %371 %373
+        %375 = OpExtInst %v3float %1 Normalize %374
+               OpLine %3 113 32
+        %376 = OpDot %float %336 %375
+               OpLine %3 113 23
+        %377 = OpExtInst %float %1 FMax %float_0 %376
+               OpLine %3 114 9
+        %378 = OpLoad %v3float %color_0
+        %379 = OpFMul %float %369 %377
+        %380 = OpCompositeExtract %v4float %364 2
+        %381 = OpVectorShuffle %v3float %380 %380 0 1 2
+        %382 = OpVectorTimesScalar %v3float %381 %379
+        %383 = OpFAdd %v3float %378 %382
+               OpLine %3 114 9
+               OpStore %color_0 %383
+               OpBranch %360
+        %360 = OpLabel
+               OpBranch %340
+        %340 = OpLabel
+               OpLine %3 107 68
+        %384 = OpLoad %uint %i_0
+        %385 = OpIAdd %uint %384 %uint_1
+               OpLine %3 107 68
+               OpStore %i_0 %385
+               OpBranch %337
+        %338 = OpLabel
+               OpLine %3 1 1
+        %386 = OpLoad %v3float %color_0
+               OpLine %3 116 12
+        %387 = OpCompositeConstruct %v4float %386 %float_1
+               OpLine %3 116 12
+        %388 = OpAccessChain %_ptr_Uniform_v4float %298 %uint_1
+        %389 = OpLoad %v4float %388
+        %390 = OpFMul %v4float %387 %389
+               OpStore %295 %390
+               OpReturn
+               OpFunctionEnd

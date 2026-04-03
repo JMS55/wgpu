@@ -1,14 +1,17 @@
 ; SPIR-V
 ; Version: 1.0
-; Generator: rspirv
-; Bound: 35
-OpCapability Shader
-%1 = OpExtInstImport "GLSL.std.450"
-OpMemoryModel Logical GLSL450
-OpEntryPoint Fragment %29 "main" %27
-OpExecutionMode %29 OriginUpperLeft
-%3 = OpString "texture-arg.wgsl"
-OpSource Unknown 0 %3 "@group(0) @binding(0)
+; Generator: Khronos; 28
+; Bound: 73
+; Schema: 0
+               OpCapability Shader
+               OpExtension "SPV_KHR_non_semantic_info"
+          %1 = OpExtInstImport "GLSL.std.450"
+         %13 = OpExtInstImport "NonSemantic.Shader.DebugInfo.100"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %50
+               OpExecutionMode %main OriginUpperLeft
+         %21 = OpString "test"
+         %33 = OpString "@group(0) @binding(0)
 var Texture: texture_2d<f32>;
 @group(0) @binding(1)
 var Sampler: sampler;
@@ -22,55 +25,118 @@ fn main() -> @location(0) vec4<f32> {
     return test(Texture, Sampler);
 }
 "
-OpName %9 "Texture"
-OpName %11 "Sampler"
-OpName %14 "Passed_Texture"
-OpName %16 "Passed_Sampler"
-OpName %18 "test"
-OpName %29 "main"
-OpDecorate %9 DescriptorSet 0
-OpDecorate %9 Binding 0
-OpDecorate %11 DescriptorSet 0
-OpDecorate %11 Binding 1
-OpDecorate %27 Location 0
-%2 = OpTypeVoid
-%5 = OpTypeFloat 32
-%4 = OpTypeImage %5 2D 0 0 0 1 Unknown
-%6 = OpTypeSampler
-%7 = OpTypeVector %5 4
-%8 = OpTypeVector %5 2
-%10 = OpTypePointer UniformConstant %4
-%9 = OpVariable  %10  UniformConstant
-%12 = OpTypePointer UniformConstant %6
-%11 = OpVariable  %12  UniformConstant
-%19 = OpTypeFunction %7 %10 %12
-%20 = OpConstant  %5  0
-%21 = OpConstantComposite  %8  %20 %20
-%23 = OpTypeSampledImage %4
-%28 = OpTypePointer Output %7
-%27 = OpVariable  %28  Output
-%30 = OpTypeFunction %2
-%18 = OpFunction  %7  None %19
-%14 = OpFunctionParameter  %10
-%16 = OpFunctionParameter  %12
-%13 = OpLabel
-%15 = OpLoad  %4  %14
-%17 = OpLoad  %6  %16
-OpBranch %22
-%22 = OpLabel
-OpLine %3 7 12
-%24 = OpSampledImage  %23  %15 %17
-%25 = OpImageSampleImplicitLod  %7  %24 %21
-OpReturnValue %25
-OpFunctionEnd
-%29 = OpFunction  %2  None %30
-%26 = OpLabel
-%31 = OpLoad  %4  %9
-%32 = OpLoad  %6  %11
-OpBranch %33
-%33 = OpLabel
-OpLine %3 12 12
-%34 = OpFunctionCall  %7  %18 %9 %11
-OpStore %27 %34
-OpReturn
-OpFunctionEnd
+         %37 = OpString "void"
+         %56 = OpString "main"
+         %58 = OpString "@group(0) @binding(0)
+var Texture: texture_2d<f32>;
+@group(0) @binding(1)
+var Sampler: sampler;
+
+fn test(Passed_Texture: texture_2d<f32>, Passed_Sampler: sampler) -> vec4<f32> {
+    return textureSample(Passed_Texture, Passed_Sampler, vec2<f32>(0.0, 0.0));
+}
+
+@fragment
+fn main() -> @location(0) vec4<f32> {
+    return test(Texture, Sampler);
+}
+"
+         %62 = OpString "void"
+         %68 = OpString "naga"
+         %69 = OpString ""
+          %3 = OpString "texture-arg.wgsl"
+               OpSource GLSL 0 %3 "@group(0) @binding(0)
+var Texture: texture_2d<f32>;
+@group(0) @binding(1)
+var Sampler: sampler;
+
+fn test(Passed_Texture: texture_2d<f32>, Passed_Sampler: sampler) -> vec4<f32> {
+    return textureSample(Passed_Texture, Passed_Sampler, vec2<f32>(0.0, 0.0));
+}
+
+@fragment
+fn main() -> @location(0) vec4<f32> {
+    return test(Texture, Sampler);
+}
+"
+               OpName %Texture "Texture"
+               OpName %Sampler "Sampler"
+               OpName %Passed_Texture "Passed_Texture"
+               OpName %Passed_Sampler "Passed_Sampler"
+               OpName %test "test"
+               OpName %main "main"
+               OpDecorate %Texture DescriptorSet 0
+               OpDecorate %Texture Binding 0
+               OpDecorate %Sampler DescriptorSet 0
+               OpDecorate %Sampler Binding 1
+               OpDecorate %50 Location 0
+       %void = OpTypeVoid
+      %float = OpTypeFloat 32
+          %4 = OpTypeImage %float 2D 0 0 0 1 Unknown
+          %6 = OpTypeSampler
+    %v4float = OpTypeVector %float 4
+    %v2float = OpTypeVector %float 2
+%_ptr_UniformConstant_4 = OpTypePointer UniformConstant %4
+    %Texture = OpVariable %_ptr_UniformConstant_4 UniformConstant
+%_ptr_UniformConstant_6 = OpTypePointer UniformConstant %6
+    %Sampler = OpVariable %_ptr_UniformConstant_6 UniformConstant
+         %20 = OpTypeFunction %v4float %_ptr_UniformConstant_4 %_ptr_UniformConstant_6
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+     %uint_4 = OpConstant %uint 4
+     %uint_2 = OpConstant %uint 2
+     %uint_7 = OpConstant %uint 7
+    %uint_12 = OpConstant %uint 12
+     %uint_8 = OpConstant %uint 8
+     %uint_0 = OpConstant %uint 0
+     %uint_3 = OpConstant %uint 3
+     %uint_6 = OpConstant %uint 6
+    %float_0 = OpConstant %float 0
+         %44 = OpConstantComposite %v2float %float_0 %float_0
+         %46 = OpTypeSampledImage %4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+         %50 = OpVariable %_ptr_Output_v4float Output
+         %53 = OpTypeFunction %void
+         %32 = OpExtInst %void %13 DebugInfoNone
+         %34 = OpExtInst %void %13 DebugSource %3 %33
+         %35 = OpExtInst %void %13 DebugCompilationUnit %uint_1 %uint_4 %34 %uint_2
+         %36 = OpExtInst %void %13 DebugExpression
+         %38 = OpExtInst %void %13 DebugTypeBasic %37 %uint_0 %uint_0 %uint_0
+         %39 = OpExtInst %void %13 DebugTypeFunction %uint_0 %38
+         %40 = OpExtInst %void %13 DebugFunction %21 %39 %34 %uint_7 %uint_12 %35 %21 %uint_8 %uint_7
+         %57 = OpExtInst %void %13 DebugInfoNone
+         %59 = OpExtInst %void %13 DebugSource %3 %58
+         %60 = OpExtInst %void %13 DebugCompilationUnit %uint_1 %uint_4 %59 %uint_2
+         %61 = OpExtInst %void %13 DebugExpression
+         %63 = OpExtInst %void %13 DebugTypeBasic %62 %uint_0 %uint_0 %uint_0
+         %64 = OpExtInst %void %13 DebugTypeFunction %uint_0 %63
+         %65 = OpExtInst %void %13 DebugFunction %56 %64 %59 %uint_12 %uint_12 %60 %56 %uint_8 %uint_12
+         %70 = OpExtInst %void %13 DebugEntryPoint %65 %60 %68 %69
+       %test = OpFunction %v4float None %20
+%Passed_Texture = OpFunctionParameter %_ptr_UniformConstant_4
+%Passed_Sampler = OpFunctionParameter %_ptr_UniformConstant_6
+         %14 = OpLabel
+         %16 = OpLoad %4 %Passed_Texture
+         %18 = OpLoad %6 %Passed_Sampler
+         %41 = OpExtInst %void %13 DebugScope %40
+         %42 = OpExtInst %void %13 DebugFunctionDefinition %40 %test
+               OpBranch %45
+         %45 = OpLabel
+               OpLine %3 7 12
+         %47 = OpSampledImage %46 %16 %18
+         %48 = OpImageSampleImplicitLod %v4float %47 %44
+               OpReturnValue %48
+               OpFunctionEnd
+       %main = OpFunction %void None %53
+         %49 = OpLabel
+         %54 = OpLoad %4 %Texture
+         %55 = OpLoad %6 %Sampler
+         %66 = OpExtInst %void %13 DebugScope %65
+         %67 = OpExtInst %void %13 DebugFunctionDefinition %65 %main
+               OpBranch %71
+         %71 = OpLabel
+               OpLine %3 12 12
+         %72 = OpFunctionCall %v4float %test %Texture %Sampler
+               OpStore %50 %72
+               OpReturn
+               OpFunctionEnd

@@ -1,27 +1,30 @@
 ; SPIR-V
 ; Version: 1.1
-; Generator: rspirv
-; Bound: 318
-OpCapability Shader
-OpCapability Float16
-OpCapability StorageBuffer16BitAccess
-OpCapability UniformAndStorageBuffer16BitAccess
-OpCapability StorageInputOutput16
-OpExtension "SPV_KHR_16bit_storage"
-%1 = OpExtInstImport "GLSL.std.450"
-OpMemoryModel Logical GLSL450
-OpEntryPoint Fragment %54 "test_direct" %14 %17 %20 %23 %26 %29 %32 %35 %38 %40 %42 %44 %46 %48 %50 %52
-OpEntryPoint Fragment %136 "test_struct" %112 %114 %116 %118 %120 %122 %124 %126 %128 %129 %130 %131 %132 %133 %134 %135
-OpEntryPoint Fragment %199 "test_copy_input" %175 %177 %179 %181 %183 %185 %187 %189 %191 %192 %193 %194 %195 %196 %197 %198
-OpEntryPoint Fragment %265 "test_return_partial" %248 %250 %252 %254 %256 %258 %260 %262 %264
-OpEntryPoint Fragment %299 "test_component_access" %275 %277 %279 %281 %283 %285 %287 %289 %291 %292 %293 %294 %295 %296 %297 %298
-OpExecutionMode %54 OriginUpperLeft
-OpExecutionMode %136 OriginUpperLeft
-OpExecutionMode %199 OriginUpperLeft
-OpExecutionMode %265 OriginUpperLeft
-OpExecutionMode %299 OriginUpperLeft
-%3 = OpString "f16-native.wgsl"
-OpSource Unknown 0 %3 "enable f16;
+; Generator: Khronos; 28
+; Bound: 400
+; Schema: 0
+               OpCapability Shader
+               OpCapability Float16
+               OpCapability StorageBuffer16BitAccess
+               OpCapability UniformAndStorageBuffer16BitAccess
+               OpCapability StorageInputOutput16
+               OpExtension "SPV_KHR_16bit_storage"
+               OpExtension "SPV_KHR_non_semantic_info"
+          %1 = OpExtInstImport "GLSL.std.450"
+         %13 = OpExtInstImport "NonSemantic.Shader.DebugInfo.100"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %test_direct "test_direct" %scalar_f16 %scalar_f32 %vec2_f16 %vec2_f32 %vec3_f16 %vec3_f32 %vec4_f16 %vec4_f32 %scalar_f16_0 %scalar_f32_0 %vec2_f16_0 %vec2_f32_0 %vec3_f16_0 %vec3_f32_0 %vec4_f16_0 %vec4_f32_0
+               OpEntryPoint Fragment %test_struct "test_struct" %scalar_f16_1 %scalar_f32_1 %vec2_f16_1 %vec2_f32_1 %vec3_f16_1 %vec3_f32_1 %vec4_f16_1 %vec4_f32_1 %scalar_f16_2 %scalar_f32_2 %vec2_f16_2 %vec2_f32_2 %vec3_f16_2 %vec3_f32_2 %vec4_f16_2 %vec4_f32_2
+               OpEntryPoint Fragment %test_copy_input "test_copy_input" %scalar_f16_3 %scalar_f32_3 %vec2_f16_3 %vec2_f32_3 %vec3_f16_3 %vec3_f32_3 %vec4_f16_3 %vec4_f32_3 %scalar_f16_4 %scalar_f32_4 %vec2_f16_4 %vec2_f32_4 %vec3_f16_4 %vec3_f32_4 %vec4_f16_4 %vec4_f32_4
+               OpEntryPoint Fragment %test_return_partial "test_return_partial" %scalar_f16_5 %scalar_f32_5 %vec2_f16_5 %vec2_f32_5 %vec3_f16_5 %vec3_f32_5 %vec4_f16_5 %vec4_f32_5 %314
+               OpEntryPoint Fragment %test_component_access "test_component_access" %scalar_f16_6 %scalar_f32_6 %vec2_f16_6 %vec2_f32_6 %vec3_f16_6 %vec3_f32_6 %vec4_f16_6 %vec4_f32_6 %scalar_f16_7 %scalar_f32_7 %vec2_f16_7 %vec2_f32_7 %vec3_f16_7 %vec3_f32_7 %vec4_f16_7 %vec4_f32_7
+               OpExecutionMode %test_direct OriginUpperLeft
+               OpExecutionMode %test_struct OriginUpperLeft
+               OpExecutionMode %test_copy_input OriginUpperLeft
+               OpExecutionMode %test_return_partial OriginUpperLeft
+               OpExecutionMode %test_component_access OriginUpperLeft
+         %57 = OpString "test_direct"
+         %69 = OpString "enable f16;
 
 @fragment
 fn test_direct(
@@ -100,662 +103,1133 @@ fn test_component_access(input: F16IO) -> F16IO {
     output.vec2_f16.y = input.vec2_f16.x;
     return output;
 }"
-OpMemberName %12 0 "scalar_f16"
-OpMemberName %12 1 "scalar_f32"
-OpMemberName %12 2 "vec2_f16"
-OpMemberName %12 3 "vec2_f32"
-OpMemberName %12 4 "vec3_f16"
-OpMemberName %12 5 "vec3_f32"
-OpMemberName %12 6 "vec4_f16"
-OpMemberName %12 7 "vec4_f32"
-OpName %12 "F16IO"
-OpName %14 "scalar_f16"
-OpName %17 "scalar_f32"
-OpName %20 "vec2_f16"
-OpName %23 "vec2_f32"
-OpName %26 "vec3_f16"
-OpName %29 "vec3_f32"
-OpName %32 "vec4_f16"
-OpName %35 "vec4_f32"
-OpName %38 "scalar_f16"
-OpName %40 "scalar_f32"
-OpName %42 "vec2_f16"
-OpName %44 "vec2_f32"
-OpName %46 "vec3_f16"
-OpName %48 "vec3_f32"
-OpName %50 "vec4_f16"
-OpName %52 "vec4_f32"
-OpName %54 "test_direct"
-OpName %64 "output"
-OpName %112 "scalar_f16"
-OpName %114 "scalar_f32"
-OpName %116 "vec2_f16"
-OpName %118 "vec2_f32"
-OpName %120 "vec3_f16"
-OpName %122 "vec3_f32"
-OpName %124 "vec4_f16"
-OpName %126 "vec4_f32"
-OpName %128 "scalar_f16"
-OpName %129 "scalar_f32"
-OpName %130 "vec2_f16"
-OpName %131 "vec2_f32"
-OpName %132 "vec3_f16"
-OpName %133 "vec3_f32"
-OpName %134 "vec4_f16"
-OpName %135 "vec4_f32"
-OpName %136 "test_struct"
-OpName %137 "output"
-OpName %175 "scalar_f16"
-OpName %177 "scalar_f32"
-OpName %179 "vec2_f16"
-OpName %181 "vec2_f32"
-OpName %183 "vec3_f16"
-OpName %185 "vec3_f32"
-OpName %187 "vec4_f16"
-OpName %189 "vec4_f32"
-OpName %191 "scalar_f16"
-OpName %192 "scalar_f32"
-OpName %193 "vec2_f16"
-OpName %194 "vec2_f32"
-OpName %195 "vec3_f16"
-OpName %196 "vec3_f32"
-OpName %197 "vec4_f16"
-OpName %198 "vec4_f32"
-OpName %199 "test_copy_input"
-OpName %200 "input"
-OpName %202 "output"
-OpName %248 "scalar_f16"
-OpName %250 "scalar_f32"
-OpName %252 "vec2_f16"
-OpName %254 "vec2_f32"
-OpName %256 "vec3_f16"
-OpName %258 "vec3_f32"
-OpName %260 "vec4_f16"
-OpName %262 "vec4_f32"
-OpName %265 "test_return_partial"
-OpName %267 "input"
-OpName %275 "scalar_f16"
-OpName %277 "scalar_f32"
-OpName %279 "vec2_f16"
-OpName %281 "vec2_f32"
-OpName %283 "vec3_f16"
-OpName %285 "vec3_f32"
-OpName %287 "vec4_f16"
-OpName %289 "vec4_f32"
-OpName %291 "scalar_f16"
-OpName %292 "scalar_f32"
-OpName %293 "vec2_f16"
-OpName %294 "vec2_f32"
-OpName %295 "vec3_f16"
-OpName %296 "vec3_f32"
-OpName %297 "vec4_f16"
-OpName %298 "vec4_f32"
-OpName %299 "test_component_access"
-OpName %300 "output"
-OpMemberDecorate %12 0 Offset 0
-OpMemberDecorate %12 1 Offset 4
-OpMemberDecorate %12 2 Offset 8
-OpMemberDecorate %12 3 Offset 16
-OpMemberDecorate %12 4 Offset 24
-OpMemberDecorate %12 5 Offset 32
-OpMemberDecorate %12 6 Offset 48
-OpMemberDecorate %12 7 Offset 64
-OpDecorate %14 Location 0
-OpDecorate %17 Location 1
-OpDecorate %20 Location 2
-OpDecorate %23 Location 3
-OpDecorate %26 Location 4
-OpDecorate %29 Location 5
-OpDecorate %32 Location 6
-OpDecorate %35 Location 7
-OpDecorate %38 Location 0
-OpDecorate %40 Location 1
-OpDecorate %42 Location 2
-OpDecorate %44 Location 3
-OpDecorate %46 Location 4
-OpDecorate %48 Location 5
-OpDecorate %50 Location 6
-OpDecorate %52 Location 7
-OpDecorate %112 Location 0
-OpDecorate %114 Location 1
-OpDecorate %116 Location 2
-OpDecorate %118 Location 3
-OpDecorate %120 Location 4
-OpDecorate %122 Location 5
-OpDecorate %124 Location 6
-OpDecorate %126 Location 7
-OpDecorate %128 Location 0
-OpDecorate %129 Location 1
-OpDecorate %130 Location 2
-OpDecorate %131 Location 3
-OpDecorate %132 Location 4
-OpDecorate %133 Location 5
-OpDecorate %134 Location 6
-OpDecorate %135 Location 7
-OpDecorate %175 Location 0
-OpDecorate %177 Location 1
-OpDecorate %179 Location 2
-OpDecorate %181 Location 3
-OpDecorate %183 Location 4
-OpDecorate %185 Location 5
-OpDecorate %187 Location 6
-OpDecorate %189 Location 7
-OpDecorate %191 Location 0
-OpDecorate %192 Location 1
-OpDecorate %193 Location 2
-OpDecorate %194 Location 3
-OpDecorate %195 Location 4
-OpDecorate %196 Location 5
-OpDecorate %197 Location 6
-OpDecorate %198 Location 7
-OpDecorate %248 Location 0
-OpDecorate %250 Location 1
-OpDecorate %252 Location 2
-OpDecorate %254 Location 3
-OpDecorate %256 Location 4
-OpDecorate %258 Location 5
-OpDecorate %260 Location 6
-OpDecorate %262 Location 7
-OpDecorate %264 Location 0
-OpDecorate %275 Location 0
-OpDecorate %277 Location 1
-OpDecorate %279 Location 2
-OpDecorate %281 Location 3
-OpDecorate %283 Location 4
-OpDecorate %285 Location 5
-OpDecorate %287 Location 6
-OpDecorate %289 Location 7
-OpDecorate %291 Location 0
-OpDecorate %292 Location 1
-OpDecorate %293 Location 2
-OpDecorate %294 Location 3
-OpDecorate %295 Location 4
-OpDecorate %296 Location 5
-OpDecorate %297 Location 6
-OpDecorate %298 Location 7
-%2 = OpTypeVoid
-%4 = OpTypeFloat 16
-%5 = OpTypeFloat 32
-%6 = OpTypeVector %4 2
-%7 = OpTypeVector %5 2
-%8 = OpTypeVector %4 3
-%9 = OpTypeVector %5 3
-%10 = OpTypeVector %4 4
-%11 = OpTypeVector %5 4
-%12 = OpTypeStruct %4 %5 %6 %7 %8 %9 %10 %11
-%15 = OpTypePointer Input %4
-%14 = OpVariable  %15  Input
-%18 = OpTypePointer Input %5
-%17 = OpVariable  %18  Input
-%21 = OpTypePointer Input %6
-%20 = OpVariable  %21  Input
-%24 = OpTypePointer Input %7
-%23 = OpVariable  %24  Input
-%27 = OpTypePointer Input %8
-%26 = OpVariable  %27  Input
-%30 = OpTypePointer Input %9
-%29 = OpVariable  %30  Input
-%33 = OpTypePointer Input %10
-%32 = OpVariable  %33  Input
-%36 = OpTypePointer Input %11
-%35 = OpVariable  %36  Input
-%39 = OpTypePointer Output %4
-%38 = OpVariable  %39  Output
-%41 = OpTypePointer Output %5
-%40 = OpVariable  %41  Output
-%43 = OpTypePointer Output %6
-%42 = OpVariable  %43  Output
-%45 = OpTypePointer Output %7
-%44 = OpVariable  %45  Output
-%47 = OpTypePointer Output %8
-%46 = OpVariable  %47  Output
-%49 = OpTypePointer Output %9
-%48 = OpVariable  %49  Output
-%51 = OpTypePointer Output %10
-%50 = OpVariable  %51  Output
-%53 = OpTypePointer Output %11
-%52 = OpVariable  %53  Output
-%55 = OpTypeFunction %2
-%56 = OpConstant  %4  0.000000000000000000000000000000000000000021524
-%57 = OpConstant  %5  1
-%58 = OpConstantComposite  %6  %56 %56
-%59 = OpConstantComposite  %7  %57 %57
-%60 = OpConstantComposite  %8  %56 %56 %56
-%61 = OpConstantComposite  %9  %57 %57 %57
-%62 = OpConstantComposite  %10  %56 %56 %56 %56
-%63 = OpConstantComposite  %11  %57 %57 %57 %57
-%65 = OpTypePointer Function %12
-%66 = OpConstantNull  %12
-%68 = OpTypePointer Function %4
-%71 = OpTypeInt 32 0
-%70 = OpConstant  %71  0
-%73 = OpTypePointer Function %5
-%75 = OpConstant  %71  1
-%77 = OpTypePointer Function %6
-%79 = OpConstant  %71  2
-%81 = OpTypePointer Function %7
-%83 = OpConstant  %71  3
-%85 = OpTypePointer Function %8
-%87 = OpConstant  %71  4
-%89 = OpTypePointer Function %9
-%91 = OpConstant  %71  5
-%93 = OpTypePointer Function %10
-%95 = OpConstant  %71  6
-%97 = OpTypePointer Function %11
-%99 = OpConstant  %71  7
-%112 = OpVariable  %15  Input
-%114 = OpVariable  %18  Input
-%116 = OpVariable  %21  Input
-%118 = OpVariable  %24  Input
-%120 = OpVariable  %27  Input
-%122 = OpVariable  %30  Input
-%124 = OpVariable  %33  Input
-%126 = OpVariable  %36  Input
-%128 = OpVariable  %39  Output
-%129 = OpVariable  %41  Output
-%130 = OpVariable  %43  Output
-%131 = OpVariable  %45  Output
-%132 = OpVariable  %47  Output
-%133 = OpVariable  %49  Output
-%134 = OpVariable  %51  Output
-%135 = OpVariable  %53  Output
-%138 = OpConstantNull  %12
-%175 = OpVariable  %15  Input
-%177 = OpVariable  %18  Input
-%179 = OpVariable  %21  Input
-%181 = OpVariable  %24  Input
-%183 = OpVariable  %27  Input
-%185 = OpVariable  %30  Input
-%187 = OpVariable  %33  Input
-%189 = OpVariable  %36  Input
-%191 = OpVariable  %39  Output
-%192 = OpVariable  %41  Output
-%193 = OpVariable  %43  Output
-%194 = OpVariable  %45  Output
-%195 = OpVariable  %47  Output
-%196 = OpVariable  %49  Output
-%197 = OpVariable  %51  Output
-%198 = OpVariable  %53  Output
-%201 = OpConstantNull  %12
-%203 = OpConstantNull  %12
-%248 = OpVariable  %15  Input
-%250 = OpVariable  %18  Input
-%252 = OpVariable  %21  Input
-%254 = OpVariable  %24  Input
-%256 = OpVariable  %27  Input
-%258 = OpVariable  %30  Input
-%260 = OpVariable  %33  Input
-%262 = OpVariable  %36  Input
-%264 = OpVariable  %39  Output
-%266 = OpConstant  %4  0
-%268 = OpConstantNull  %12
-%275 = OpVariable  %15  Input
-%277 = OpVariable  %18  Input
-%279 = OpVariable  %21  Input
-%281 = OpVariable  %24  Input
-%283 = OpVariable  %27  Input
-%285 = OpVariable  %30  Input
-%287 = OpVariable  %33  Input
-%289 = OpVariable  %36  Input
-%291 = OpVariable  %39  Output
-%292 = OpVariable  %41  Output
-%293 = OpVariable  %43  Output
-%294 = OpVariable  %45  Output
-%295 = OpVariable  %47  Output
-%296 = OpVariable  %49  Output
-%297 = OpVariable  %51  Output
-%298 = OpVariable  %53  Output
-%301 = OpConstantNull  %12
-%54 = OpFunction  %2  None %55
-%13 = OpLabel
-%64 = OpVariable  %65  Function %66
-%16 = OpLoad  %4  %14
-%19 = OpLoad  %5  %17
-%22 = OpLoad  %6  %20
-%25 = OpLoad  %7  %23
-%28 = OpLoad  %8  %26
-%31 = OpLoad  %9  %29
-%34 = OpLoad  %10  %32
-%37 = OpLoad  %11  %35
-OpBranch %67
-%67 = OpLabel
-OpLine %3 15 5
-OpLine %3 15 25
-%69 = OpFAdd  %4  %16 %56
-OpLine %3 15 5
-%72 = OpAccessChain  %68  %64 %70
-OpStore %72 %69
-OpLine %3 16 5
-OpLine %3 16 25
-%74 = OpFAdd  %5  %19 %57
-OpLine %3 16 5
-%76 = OpAccessChain  %73  %64 %75
-OpStore %76 %74
-OpLine %3 17 5
-OpLine %3 17 23
-%78 = OpFAdd  %6  %22 %58
-OpLine %3 17 5
-%80 = OpAccessChain  %77  %64 %79
-OpStore %80 %78
-OpLine %3 18 5
-OpLine %3 18 34
-OpLine %3 18 23
-%82 = OpFAdd  %7  %25 %59
-OpLine %3 18 5
-%84 = OpAccessChain  %81  %64 %83
-OpStore %84 %82
-OpLine %3 19 5
-OpLine %3 19 23
-%86 = OpFAdd  %8  %28 %60
-OpLine %3 19 5
-%88 = OpAccessChain  %85  %64 %87
-OpStore %88 %86
-OpLine %3 20 5
-OpLine %3 20 34
-OpLine %3 20 23
-%90 = OpFAdd  %9  %31 %61
-OpLine %3 20 5
-%92 = OpAccessChain  %89  %64 %91
-OpStore %92 %90
-OpLine %3 21 5
-OpLine %3 21 23
-%94 = OpFAdd  %10  %34 %62
-OpLine %3 21 5
-%96 = OpAccessChain  %93  %64 %95
-OpStore %96 %94
-OpLine %3 22 5
-OpLine %3 22 34
-OpLine %3 22 23
-%98 = OpFAdd  %11  %37 %63
-OpLine %3 22 5
-%100 = OpAccessChain  %97  %64 %99
-OpStore %100 %98
-OpLine %3 1 1
-%101 = OpLoad  %12  %64
-%102 = OpCompositeExtract  %4  %101 0
-OpStore %38 %102
-%103 = OpCompositeExtract  %5  %101 1
-OpStore %40 %103
-%104 = OpCompositeExtract  %6  %101 2
-OpStore %42 %104
-%105 = OpCompositeExtract  %7  %101 3
-OpStore %44 %105
-%106 = OpCompositeExtract  %8  %101 4
-OpStore %46 %106
-%107 = OpCompositeExtract  %9  %101 5
-OpStore %48 %107
-%108 = OpCompositeExtract  %10  %101 6
-OpStore %50 %108
-%109 = OpCompositeExtract  %11  %101 7
-OpStore %52 %109
-OpReturn
-OpFunctionEnd
-%136 = OpFunction  %2  None %55
-%110 = OpLabel
-%137 = OpVariable  %65  Function %138
-%113 = OpLoad  %4  %112
-%115 = OpLoad  %5  %114
-%117 = OpLoad  %6  %116
-%119 = OpLoad  %7  %118
-%121 = OpLoad  %8  %120
-%123 = OpLoad  %9  %122
-%125 = OpLoad  %10  %124
-%127 = OpLoad  %11  %126
-%111 = OpCompositeConstruct  %12  %113 %115 %117 %119 %121 %123 %125 %127
-OpBranch %139
-%139 = OpLabel
-OpLine %3 40 5
-%140 = OpCompositeExtract  %4  %111 0
-OpLine %3 40 25
-%141 = OpFAdd  %4  %140 %56
-OpLine %3 40 5
-%142 = OpAccessChain  %68  %137 %70
-OpStore %142 %141
-OpLine %3 41 5
-%143 = OpCompositeExtract  %5  %111 1
-OpLine %3 41 25
-%144 = OpFAdd  %5  %143 %57
-OpLine %3 41 5
-%145 = OpAccessChain  %73  %137 %75
-OpStore %145 %144
-OpLine %3 42 5
-%146 = OpCompositeExtract  %6  %111 2
-OpLine %3 42 23
-%147 = OpFAdd  %6  %146 %58
-OpLine %3 42 5
-%148 = OpAccessChain  %77  %137 %79
-OpStore %148 %147
-OpLine %3 43 5
-%149 = OpCompositeExtract  %7  %111 3
-OpLine %3 43 40
-OpLine %3 43 23
-%150 = OpFAdd  %7  %149 %59
-OpLine %3 43 5
-%151 = OpAccessChain  %81  %137 %83
-OpStore %151 %150
-OpLine %3 44 5
-%152 = OpCompositeExtract  %8  %111 4
-OpLine %3 44 23
-%153 = OpFAdd  %8  %152 %60
-OpLine %3 44 5
-%154 = OpAccessChain  %85  %137 %87
-OpStore %154 %153
-OpLine %3 45 5
-%155 = OpCompositeExtract  %9  %111 5
-OpLine %3 45 40
-OpLine %3 45 23
-%156 = OpFAdd  %9  %155 %61
-OpLine %3 45 5
-%157 = OpAccessChain  %89  %137 %91
-OpStore %157 %156
-OpLine %3 46 5
-%158 = OpCompositeExtract  %10  %111 6
-OpLine %3 46 23
-%159 = OpFAdd  %10  %158 %62
-OpLine %3 46 5
-%160 = OpAccessChain  %93  %137 %95
-OpStore %160 %159
-OpLine %3 47 5
-%161 = OpCompositeExtract  %11  %111 7
-OpLine %3 47 40
-OpLine %3 47 23
-%162 = OpFAdd  %11  %161 %63
-OpLine %3 47 5
-%163 = OpAccessChain  %97  %137 %99
-OpStore %163 %162
-OpLine %3 1 1
-%164 = OpLoad  %12  %137
-%165 = OpCompositeExtract  %4  %164 0
-OpStore %128 %165
-%166 = OpCompositeExtract  %5  %164 1
-OpStore %129 %166
-%167 = OpCompositeExtract  %6  %164 2
-OpStore %130 %167
-%168 = OpCompositeExtract  %7  %164 3
-OpStore %131 %168
-%169 = OpCompositeExtract  %8  %164 4
-OpStore %132 %169
-%170 = OpCompositeExtract  %9  %164 5
-OpStore %133 %170
-%171 = OpCompositeExtract  %10  %164 6
-OpStore %134 %171
-%172 = OpCompositeExtract  %11  %164 7
-OpStore %135 %172
-OpReturn
-OpFunctionEnd
-%199 = OpFunction  %2  None %55
-%173 = OpLabel
-%200 = OpVariable  %65  Function %201
-%202 = OpVariable  %65  Function %203
-%176 = OpLoad  %4  %175
-%178 = OpLoad  %5  %177
-%180 = OpLoad  %6  %179
-%182 = OpLoad  %7  %181
-%184 = OpLoad  %8  %183
-%186 = OpLoad  %9  %185
-%188 = OpLoad  %10  %187
-%190 = OpLoad  %11  %189
-%174 = OpCompositeConstruct  %12  %176 %178 %180 %182 %184 %186 %188 %190
-OpBranch %204
-%204 = OpLabel
-OpLine %3 53 5
-OpStore %200 %174
-OpLine %3 55 5
-%205 = OpAccessChain  %68  %200 %70
-%206 = OpLoad  %4  %205
-OpLine %3 55 25
-%207 = OpFAdd  %4  %206 %56
-OpLine %3 55 5
-%208 = OpAccessChain  %68  %202 %70
-OpStore %208 %207
-OpLine %3 56 5
-%209 = OpAccessChain  %73  %200 %75
-%210 = OpLoad  %5  %209
-OpLine %3 56 25
-%211 = OpFAdd  %5  %210 %57
-OpLine %3 56 5
-%212 = OpAccessChain  %73  %202 %75
-OpStore %212 %211
-OpLine %3 57 5
-%213 = OpAccessChain  %77  %200 %79
-%214 = OpLoad  %6  %213
-OpLine %3 57 23
-%215 = OpFAdd  %6  %214 %58
-OpLine %3 57 5
-%216 = OpAccessChain  %77  %202 %79
-OpStore %216 %215
-OpLine %3 58 5
-%217 = OpAccessChain  %81  %200 %83
-%218 = OpLoad  %7  %217
-OpLine %3 58 40
-OpLine %3 58 23
-%219 = OpFAdd  %7  %218 %59
-OpLine %3 58 5
-%220 = OpAccessChain  %81  %202 %83
-OpStore %220 %219
-OpLine %3 59 5
-%221 = OpAccessChain  %85  %200 %87
-%222 = OpLoad  %8  %221
-OpLine %3 59 23
-%223 = OpFAdd  %8  %222 %60
-OpLine %3 59 5
-%224 = OpAccessChain  %85  %202 %87
-OpStore %224 %223
-OpLine %3 60 5
-%225 = OpAccessChain  %89  %200 %91
-%226 = OpLoad  %9  %225
-OpLine %3 60 40
-OpLine %3 60 23
-%227 = OpFAdd  %9  %226 %61
-OpLine %3 60 5
-%228 = OpAccessChain  %89  %202 %91
-OpStore %228 %227
-OpLine %3 61 5
-%229 = OpAccessChain  %93  %200 %95
-%230 = OpLoad  %10  %229
-OpLine %3 61 23
-%231 = OpFAdd  %10  %230 %62
-OpLine %3 61 5
-%232 = OpAccessChain  %93  %202 %95
-OpStore %232 %231
-OpLine %3 62 5
-%233 = OpAccessChain  %97  %200 %99
-%234 = OpLoad  %11  %233
-OpLine %3 62 40
-OpLine %3 62 23
-%235 = OpFAdd  %11  %234 %63
-OpLine %3 62 5
-%236 = OpAccessChain  %97  %202 %99
-OpStore %236 %235
-OpLine %3 1 1
-%237 = OpLoad  %12  %202
-%238 = OpCompositeExtract  %4  %237 0
-OpStore %191 %238
-%239 = OpCompositeExtract  %5  %237 1
-OpStore %192 %239
-%240 = OpCompositeExtract  %6  %237 2
-OpStore %193 %240
-%241 = OpCompositeExtract  %7  %237 3
-OpStore %194 %241
-%242 = OpCompositeExtract  %8  %237 4
-OpStore %195 %242
-%243 = OpCompositeExtract  %9  %237 5
-OpStore %196 %243
-%244 = OpCompositeExtract  %10  %237 6
-OpStore %197 %244
-%245 = OpCompositeExtract  %11  %237 7
-OpStore %198 %245
-OpReturn
-OpFunctionEnd
-%265 = OpFunction  %2  None %55
-%246 = OpLabel
-%267 = OpVariable  %65  Function %268
-%249 = OpLoad  %4  %248
-%251 = OpLoad  %5  %250
-%253 = OpLoad  %6  %252
-%255 = OpLoad  %7  %254
-%257 = OpLoad  %8  %256
-%259 = OpLoad  %9  %258
-%261 = OpLoad  %10  %260
-%263 = OpLoad  %11  %262
-%247 = OpCompositeConstruct  %12  %249 %251 %253 %255 %257 %259 %261 %263
-OpBranch %269
-%269 = OpLabel
-OpLine %3 68 5
-OpStore %267 %247
-OpLine %3 69 5
-OpLine %3 69 5
-%270 = OpAccessChain  %68  %267 %70
-OpStore %270 %266
-OpLine %3 70 12
-%271 = OpAccessChain  %68  %267 %70
-%272 = OpLoad  %4  %271
-OpStore %264 %272
-OpReturn
-OpFunctionEnd
-%299 = OpFunction  %2  None %55
-%273 = OpLabel
-%300 = OpVariable  %65  Function %301
-%276 = OpLoad  %4  %275
-%278 = OpLoad  %5  %277
-%280 = OpLoad  %6  %279
-%282 = OpLoad  %7  %281
-%284 = OpLoad  %8  %283
-%286 = OpLoad  %9  %285
-%288 = OpLoad  %10  %287
-%290 = OpLoad  %11  %289
-%274 = OpCompositeConstruct  %12  %276 %278 %280 %282 %284 %286 %288 %290
-OpBranch %302
-%302 = OpLabel
-OpLine %3 76 5
-%303 = OpCompositeExtract  %6  %274 2
-%304 = OpCompositeExtract  %4  %303 1
-OpLine %3 76 5
-%305 = OpAccessChain  %68  %300 %79 %70
-OpStore %305 %304
-OpLine %3 77 5
-%306 = OpCompositeExtract  %6  %274 2
-%307 = OpCompositeExtract  %4  %306 0
-OpLine %3 77 5
-%308 = OpAccessChain  %68  %300 %79 %75
-OpStore %308 %307
-OpLine %3 1 1
-%309 = OpLoad  %12  %300
-%310 = OpCompositeExtract  %4  %309 0
-OpStore %291 %310
-%311 = OpCompositeExtract  %5  %309 1
-OpStore %292 %311
-%312 = OpCompositeExtract  %6  %309 2
-OpStore %293 %312
-%313 = OpCompositeExtract  %7  %309 3
-OpStore %294 %313
-%314 = OpCompositeExtract  %8  %309 4
-OpStore %295 %314
-%315 = OpCompositeExtract  %9  %309 5
-OpStore %296 %315
-%316 = OpCompositeExtract  %10  %309 6
-OpStore %297 %316
-%317 = OpCompositeExtract  %11  %309 7
-OpStore %298 %317
-OpReturn
-OpFunctionEnd
+         %73 = OpString "void"
+         %79 = OpString "naga"
+         %80 = OpString ""
+        %155 = OpString "test_struct"
+        %158 = OpString "enable f16;
+
+@fragment
+fn test_direct(
+    @location(0) scalar_f16: f16,
+    @location(1) scalar_f32: f32,
+    @location(2) vec2_f16: vec2<f16>,
+    @location(3) vec2_f32: vec2<f32>,
+    @location(4) vec3_f16: vec3<f16>,
+    @location(5) vec3_f32: vec3<f32>,
+    @location(6) vec4_f16: vec4<f16>,
+    @location(7) vec4_f32: vec4<f32>,
+) -> F16IO {
+    var output: F16IO;
+    output.scalar_f16 = scalar_f16 + 1.0h;
+    output.scalar_f32 = scalar_f32 + 1.0;
+    output.vec2_f16 = vec2_f16 + vec2(1.0h);
+    output.vec2_f32 = vec2_f32 + vec2(1.0);
+    output.vec3_f16 = vec3_f16 + vec3(1.0h);
+    output.vec3_f32 = vec3_f32 + vec3(1.0);
+    output.vec4_f16 = vec4_f16 + vec4(1.0h);
+    output.vec4_f32 = vec4_f32 + vec4(1.0);
+    return output;
+}
+
+struct F16IO {
+    @location(0) scalar_f16: f16,
+    @location(1) scalar_f32: f32,
+    @location(2) vec2_f16: vec2<f16>,
+    @location(3) vec2_f32: vec2<f32>,
+    @location(4) vec3_f16: vec3<f16>,
+    @location(5) vec3_f32: vec3<f32>,
+    @location(6) vec4_f16: vec4<f16>,
+    @location(7) vec4_f32: vec4<f32>,
+}
+
+@fragment
+fn test_struct(input: F16IO) -> F16IO {
+    var output: F16IO;
+    output.scalar_f16 = input.scalar_f16 + 1.0h;
+    output.scalar_f32 = input.scalar_f32 + 1.0;
+    output.vec2_f16 = input.vec2_f16 + vec2(1.0h);
+    output.vec2_f32 = input.vec2_f32 + vec2(1.0);
+    output.vec3_f16 = input.vec3_f16 + vec3(1.0h);
+    output.vec3_f32 = input.vec3_f32 + vec3(1.0);
+    output.vec4_f16 = input.vec4_f16 + vec4(1.0h);
+    output.vec4_f32 = input.vec4_f32 + vec4(1.0);
+    return output;
+}
+
+@fragment
+fn test_copy_input(input_original: F16IO) -> F16IO {
+    var input = input_original;
+    var output: F16IO;
+    output.scalar_f16 = input.scalar_f16 + 1.0h;
+    output.scalar_f32 = input.scalar_f32 + 1.0;
+    output.vec2_f16 = input.vec2_f16 + vec2(1.0h);
+    output.vec2_f32 = input.vec2_f32 + vec2(1.0);
+    output.vec3_f16 = input.vec3_f16 + vec3(1.0h);
+    output.vec3_f32 = input.vec3_f32 + vec3(1.0);
+    output.vec4_f16 = input.vec4_f16 + vec4(1.0h);
+    output.vec4_f32 = input.vec4_f32 + vec4(1.0);
+    return output;
+}
+
+@fragment
+fn test_return_partial(input_original: F16IO) -> @location(0) f16 {
+    var input = input_original;
+    input.scalar_f16 = 0.0h;
+    return input.scalar_f16;
+}
+
+@fragment
+fn test_component_access(input: F16IO) -> F16IO {
+    var output: F16IO;
+    output.vec2_f16.x = input.vec2_f16.y;
+    output.vec2_f16.y = input.vec2_f16.x;
+    return output;
+}"
+        %162 = OpString "void"
+        %168 = OpString "naga"
+        %169 = OpString ""
+        %234 = OpString "test_copy_input"
+        %237 = OpString "enable f16;
+
+@fragment
+fn test_direct(
+    @location(0) scalar_f16: f16,
+    @location(1) scalar_f32: f32,
+    @location(2) vec2_f16: vec2<f16>,
+    @location(3) vec2_f32: vec2<f32>,
+    @location(4) vec3_f16: vec3<f16>,
+    @location(5) vec3_f32: vec3<f32>,
+    @location(6) vec4_f16: vec4<f16>,
+    @location(7) vec4_f32: vec4<f32>,
+) -> F16IO {
+    var output: F16IO;
+    output.scalar_f16 = scalar_f16 + 1.0h;
+    output.scalar_f32 = scalar_f32 + 1.0;
+    output.vec2_f16 = vec2_f16 + vec2(1.0h);
+    output.vec2_f32 = vec2_f32 + vec2(1.0);
+    output.vec3_f16 = vec3_f16 + vec3(1.0h);
+    output.vec3_f32 = vec3_f32 + vec3(1.0);
+    output.vec4_f16 = vec4_f16 + vec4(1.0h);
+    output.vec4_f32 = vec4_f32 + vec4(1.0);
+    return output;
+}
+
+struct F16IO {
+    @location(0) scalar_f16: f16,
+    @location(1) scalar_f32: f32,
+    @location(2) vec2_f16: vec2<f16>,
+    @location(3) vec2_f32: vec2<f32>,
+    @location(4) vec3_f16: vec3<f16>,
+    @location(5) vec3_f32: vec3<f32>,
+    @location(6) vec4_f16: vec4<f16>,
+    @location(7) vec4_f32: vec4<f32>,
+}
+
+@fragment
+fn test_struct(input: F16IO) -> F16IO {
+    var output: F16IO;
+    output.scalar_f16 = input.scalar_f16 + 1.0h;
+    output.scalar_f32 = input.scalar_f32 + 1.0;
+    output.vec2_f16 = input.vec2_f16 + vec2(1.0h);
+    output.vec2_f32 = input.vec2_f32 + vec2(1.0);
+    output.vec3_f16 = input.vec3_f16 + vec3(1.0h);
+    output.vec3_f32 = input.vec3_f32 + vec3(1.0);
+    output.vec4_f16 = input.vec4_f16 + vec4(1.0h);
+    output.vec4_f32 = input.vec4_f32 + vec4(1.0);
+    return output;
+}
+
+@fragment
+fn test_copy_input(input_original: F16IO) -> F16IO {
+    var input = input_original;
+    var output: F16IO;
+    output.scalar_f16 = input.scalar_f16 + 1.0h;
+    output.scalar_f32 = input.scalar_f32 + 1.0;
+    output.vec2_f16 = input.vec2_f16 + vec2(1.0h);
+    output.vec2_f32 = input.vec2_f32 + vec2(1.0);
+    output.vec3_f16 = input.vec3_f16 + vec3(1.0h);
+    output.vec3_f32 = input.vec3_f32 + vec3(1.0);
+    output.vec4_f16 = input.vec4_f16 + vec4(1.0h);
+    output.vec4_f32 = input.vec4_f32 + vec4(1.0);
+    return output;
+}
+
+@fragment
+fn test_return_partial(input_original: F16IO) -> @location(0) f16 {
+    var input = input_original;
+    input.scalar_f16 = 0.0h;
+    return input.scalar_f16;
+}
+
+@fragment
+fn test_component_access(input: F16IO) -> F16IO {
+    var output: F16IO;
+    output.vec2_f16.x = input.vec2_f16.y;
+    output.vec2_f16.y = input.vec2_f16.x;
+    return output;
+}"
+        %241 = OpString "void"
+        %247 = OpString "naga"
+        %248 = OpString ""
+        %316 = OpString "test_return_partial"
+        %319 = OpString "enable f16;
+
+@fragment
+fn test_direct(
+    @location(0) scalar_f16: f16,
+    @location(1) scalar_f32: f32,
+    @location(2) vec2_f16: vec2<f16>,
+    @location(3) vec2_f32: vec2<f32>,
+    @location(4) vec3_f16: vec3<f16>,
+    @location(5) vec3_f32: vec3<f32>,
+    @location(6) vec4_f16: vec4<f16>,
+    @location(7) vec4_f32: vec4<f32>,
+) -> F16IO {
+    var output: F16IO;
+    output.scalar_f16 = scalar_f16 + 1.0h;
+    output.scalar_f32 = scalar_f32 + 1.0;
+    output.vec2_f16 = vec2_f16 + vec2(1.0h);
+    output.vec2_f32 = vec2_f32 + vec2(1.0);
+    output.vec3_f16 = vec3_f16 + vec3(1.0h);
+    output.vec3_f32 = vec3_f32 + vec3(1.0);
+    output.vec4_f16 = vec4_f16 + vec4(1.0h);
+    output.vec4_f32 = vec4_f32 + vec4(1.0);
+    return output;
+}
+
+struct F16IO {
+    @location(0) scalar_f16: f16,
+    @location(1) scalar_f32: f32,
+    @location(2) vec2_f16: vec2<f16>,
+    @location(3) vec2_f32: vec2<f32>,
+    @location(4) vec3_f16: vec3<f16>,
+    @location(5) vec3_f32: vec3<f32>,
+    @location(6) vec4_f16: vec4<f16>,
+    @location(7) vec4_f32: vec4<f32>,
+}
+
+@fragment
+fn test_struct(input: F16IO) -> F16IO {
+    var output: F16IO;
+    output.scalar_f16 = input.scalar_f16 + 1.0h;
+    output.scalar_f32 = input.scalar_f32 + 1.0;
+    output.vec2_f16 = input.vec2_f16 + vec2(1.0h);
+    output.vec2_f32 = input.vec2_f32 + vec2(1.0);
+    output.vec3_f16 = input.vec3_f16 + vec3(1.0h);
+    output.vec3_f32 = input.vec3_f32 + vec3(1.0);
+    output.vec4_f16 = input.vec4_f16 + vec4(1.0h);
+    output.vec4_f32 = input.vec4_f32 + vec4(1.0);
+    return output;
+}
+
+@fragment
+fn test_copy_input(input_original: F16IO) -> F16IO {
+    var input = input_original;
+    var output: F16IO;
+    output.scalar_f16 = input.scalar_f16 + 1.0h;
+    output.scalar_f32 = input.scalar_f32 + 1.0;
+    output.vec2_f16 = input.vec2_f16 + vec2(1.0h);
+    output.vec2_f32 = input.vec2_f32 + vec2(1.0);
+    output.vec3_f16 = input.vec3_f16 + vec3(1.0h);
+    output.vec3_f32 = input.vec3_f32 + vec3(1.0);
+    output.vec4_f16 = input.vec4_f16 + vec4(1.0h);
+    output.vec4_f32 = input.vec4_f32 + vec4(1.0);
+    return output;
+}
+
+@fragment
+fn test_return_partial(input_original: F16IO) -> @location(0) f16 {
+    var input = input_original;
+    input.scalar_f16 = 0.0h;
+    return input.scalar_f16;
+}
+
+@fragment
+fn test_component_access(input: F16IO) -> F16IO {
+    var output: F16IO;
+    output.vec2_f16.x = input.vec2_f16.y;
+    output.vec2_f16.y = input.vec2_f16.x;
+    return output;
+}"
+        %323 = OpString "void"
+        %329 = OpString "naga"
+        %330 = OpString ""
+        %366 = OpString "test_component_access"
+        %369 = OpString "enable f16;
+
+@fragment
+fn test_direct(
+    @location(0) scalar_f16: f16,
+    @location(1) scalar_f32: f32,
+    @location(2) vec2_f16: vec2<f16>,
+    @location(3) vec2_f32: vec2<f32>,
+    @location(4) vec3_f16: vec3<f16>,
+    @location(5) vec3_f32: vec3<f32>,
+    @location(6) vec4_f16: vec4<f16>,
+    @location(7) vec4_f32: vec4<f32>,
+) -> F16IO {
+    var output: F16IO;
+    output.scalar_f16 = scalar_f16 + 1.0h;
+    output.scalar_f32 = scalar_f32 + 1.0;
+    output.vec2_f16 = vec2_f16 + vec2(1.0h);
+    output.vec2_f32 = vec2_f32 + vec2(1.0);
+    output.vec3_f16 = vec3_f16 + vec3(1.0h);
+    output.vec3_f32 = vec3_f32 + vec3(1.0);
+    output.vec4_f16 = vec4_f16 + vec4(1.0h);
+    output.vec4_f32 = vec4_f32 + vec4(1.0);
+    return output;
+}
+
+struct F16IO {
+    @location(0) scalar_f16: f16,
+    @location(1) scalar_f32: f32,
+    @location(2) vec2_f16: vec2<f16>,
+    @location(3) vec2_f32: vec2<f32>,
+    @location(4) vec3_f16: vec3<f16>,
+    @location(5) vec3_f32: vec3<f32>,
+    @location(6) vec4_f16: vec4<f16>,
+    @location(7) vec4_f32: vec4<f32>,
+}
+
+@fragment
+fn test_struct(input: F16IO) -> F16IO {
+    var output: F16IO;
+    output.scalar_f16 = input.scalar_f16 + 1.0h;
+    output.scalar_f32 = input.scalar_f32 + 1.0;
+    output.vec2_f16 = input.vec2_f16 + vec2(1.0h);
+    output.vec2_f32 = input.vec2_f32 + vec2(1.0);
+    output.vec3_f16 = input.vec3_f16 + vec3(1.0h);
+    output.vec3_f32 = input.vec3_f32 + vec3(1.0);
+    output.vec4_f16 = input.vec4_f16 + vec4(1.0h);
+    output.vec4_f32 = input.vec4_f32 + vec4(1.0);
+    return output;
+}
+
+@fragment
+fn test_copy_input(input_original: F16IO) -> F16IO {
+    var input = input_original;
+    var output: F16IO;
+    output.scalar_f16 = input.scalar_f16 + 1.0h;
+    output.scalar_f32 = input.scalar_f32 + 1.0;
+    output.vec2_f16 = input.vec2_f16 + vec2(1.0h);
+    output.vec2_f32 = input.vec2_f32 + vec2(1.0);
+    output.vec3_f16 = input.vec3_f16 + vec3(1.0h);
+    output.vec3_f32 = input.vec3_f32 + vec3(1.0);
+    output.vec4_f16 = input.vec4_f16 + vec4(1.0h);
+    output.vec4_f32 = input.vec4_f32 + vec4(1.0);
+    return output;
+}
+
+@fragment
+fn test_return_partial(input_original: F16IO) -> @location(0) f16 {
+    var input = input_original;
+    input.scalar_f16 = 0.0h;
+    return input.scalar_f16;
+}
+
+@fragment
+fn test_component_access(input: F16IO) -> F16IO {
+    var output: F16IO;
+    output.vec2_f16.x = input.vec2_f16.y;
+    output.vec2_f16.y = input.vec2_f16.x;
+    return output;
+}"
+        %373 = OpString "void"
+        %379 = OpString "naga"
+        %380 = OpString ""
+          %3 = OpString "f16-native.wgsl"
+               OpSource GLSL 0 %3 "enable f16;
+
+@fragment
+fn test_direct(
+    @location(0) scalar_f16: f16,
+    @location(1) scalar_f32: f32,
+    @location(2) vec2_f16: vec2<f16>,
+    @location(3) vec2_f32: vec2<f32>,
+    @location(4) vec3_f16: vec3<f16>,
+    @location(5) vec3_f32: vec3<f32>,
+    @location(6) vec4_f16: vec4<f16>,
+    @location(7) vec4_f32: vec4<f32>,
+) -> F16IO {
+    var output: F16IO;
+    output.scalar_f16 = scalar_f16 + 1.0h;
+    output.scalar_f32 = scalar_f32 + 1.0;
+    output.vec2_f16 = vec2_f16 + vec2(1.0h);
+    output.vec2_f32 = vec2_f32 + vec2(1.0);
+    output.vec3_f16 = vec3_f16 + vec3(1.0h);
+    output.vec3_f32 = vec3_f32 + vec3(1.0);
+    output.vec4_f16 = vec4_f16 + vec4(1.0h);
+    output.vec4_f32 = vec4_f32 + vec4(1.0);
+    return output;
+}
+
+struct F16IO {
+    @location(0) scalar_f16: f16,
+    @location(1) scalar_f32: f32,
+    @location(2) vec2_f16: vec2<f16>,
+    @location(3) vec2_f32: vec2<f32>,
+    @location(4) vec3_f16: vec3<f16>,
+    @location(5) vec3_f32: vec3<f32>,
+    @location(6) vec4_f16: vec4<f16>,
+    @location(7) vec4_f32: vec4<f32>,
+}
+
+@fragment
+fn test_struct(input: F16IO) -> F16IO {
+    var output: F16IO;
+    output.scalar_f16 = input.scalar_f16 + 1.0h;
+    output.scalar_f32 = input.scalar_f32 + 1.0;
+    output.vec2_f16 = input.vec2_f16 + vec2(1.0h);
+    output.vec2_f32 = input.vec2_f32 + vec2(1.0);
+    output.vec3_f16 = input.vec3_f16 + vec3(1.0h);
+    output.vec3_f32 = input.vec3_f32 + vec3(1.0);
+    output.vec4_f16 = input.vec4_f16 + vec4(1.0h);
+    output.vec4_f32 = input.vec4_f32 + vec4(1.0);
+    return output;
+}
+
+@fragment
+fn test_copy_input(input_original: F16IO) -> F16IO {
+    var input = input_original;
+    var output: F16IO;
+    output.scalar_f16 = input.scalar_f16 + 1.0h;
+    output.scalar_f32 = input.scalar_f32 + 1.0;
+    output.vec2_f16 = input.vec2_f16 + vec2(1.0h);
+    output.vec2_f32 = input.vec2_f32 + vec2(1.0);
+    output.vec3_f16 = input.vec3_f16 + vec3(1.0h);
+    output.vec3_f32 = input.vec3_f32 + vec3(1.0);
+    output.vec4_f16 = input.vec4_f16 + vec4(1.0h);
+    output.vec4_f32 = input.vec4_f32 + vec4(1.0);
+    return output;
+}
+
+@fragment
+fn test_return_partial(input_original: F16IO) -> @location(0) f16 {
+    var input = input_original;
+    input.scalar_f16 = 0.0h;
+    return input.scalar_f16;
+}
+
+@fragment
+fn test_component_access(input: F16IO) -> F16IO {
+    var output: F16IO;
+    output.vec2_f16.x = input.vec2_f16.y;
+    output.vec2_f16.y = input.vec2_f16.x;
+    return output;
+}"
+               OpMemberName %F16IO 0 "scalar_f16"
+               OpMemberName %F16IO 1 "scalar_f32"
+               OpMemberName %F16IO 2 "vec2_f16"
+               OpMemberName %F16IO 3 "vec2_f32"
+               OpMemberName %F16IO 4 "vec3_f16"
+               OpMemberName %F16IO 5 "vec3_f32"
+               OpMemberName %F16IO 6 "vec4_f16"
+               OpMemberName %F16IO 7 "vec4_f32"
+               OpName %F16IO "F16IO"
+               OpName %scalar_f16 "scalar_f16"
+               OpName %scalar_f32 "scalar_f32"
+               OpName %vec2_f16 "vec2_f16"
+               OpName %vec2_f32 "vec2_f32"
+               OpName %vec3_f16 "vec3_f16"
+               OpName %vec3_f32 "vec3_f32"
+               OpName %vec4_f16 "vec4_f16"
+               OpName %vec4_f32 "vec4_f32"
+               OpName %scalar_f16_0 "scalar_f16"
+               OpName %scalar_f32_0 "scalar_f32"
+               OpName %vec2_f16_0 "vec2_f16"
+               OpName %vec2_f32_0 "vec2_f32"
+               OpName %vec3_f16_0 "vec3_f16"
+               OpName %vec3_f32_0 "vec3_f32"
+               OpName %vec4_f16_0 "vec4_f16"
+               OpName %vec4_f32_0 "vec4_f32"
+               OpName %test_direct "test_direct"
+               OpName %output "output"
+               OpName %scalar_f16_1 "scalar_f16"
+               OpName %scalar_f32_1 "scalar_f32"
+               OpName %vec2_f16_1 "vec2_f16"
+               OpName %vec2_f32_1 "vec2_f32"
+               OpName %vec3_f16_1 "vec3_f16"
+               OpName %vec3_f32_1 "vec3_f32"
+               OpName %vec4_f16_1 "vec4_f16"
+               OpName %vec4_f32_1 "vec4_f32"
+               OpName %scalar_f16_2 "scalar_f16"
+               OpName %scalar_f32_2 "scalar_f32"
+               OpName %vec2_f16_2 "vec2_f16"
+               OpName %vec2_f32_2 "vec2_f32"
+               OpName %vec3_f16_2 "vec3_f16"
+               OpName %vec3_f32_2 "vec3_f32"
+               OpName %vec4_f16_2 "vec4_f16"
+               OpName %vec4_f32_2 "vec4_f32"
+               OpName %test_struct "test_struct"
+               OpName %output_0 "output"
+               OpName %scalar_f16_3 "scalar_f16"
+               OpName %scalar_f32_3 "scalar_f32"
+               OpName %vec2_f16_3 "vec2_f16"
+               OpName %vec2_f32_3 "vec2_f32"
+               OpName %vec3_f16_3 "vec3_f16"
+               OpName %vec3_f32_3 "vec3_f32"
+               OpName %vec4_f16_3 "vec4_f16"
+               OpName %vec4_f32_3 "vec4_f32"
+               OpName %scalar_f16_4 "scalar_f16"
+               OpName %scalar_f32_4 "scalar_f32"
+               OpName %vec2_f16_4 "vec2_f16"
+               OpName %vec2_f32_4 "vec2_f32"
+               OpName %vec3_f16_4 "vec3_f16"
+               OpName %vec3_f32_4 "vec3_f32"
+               OpName %vec4_f16_4 "vec4_f16"
+               OpName %vec4_f32_4 "vec4_f32"
+               OpName %test_copy_input "test_copy_input"
+               OpName %input "input"
+               OpName %output_1 "output"
+               OpName %scalar_f16_5 "scalar_f16"
+               OpName %scalar_f32_5 "scalar_f32"
+               OpName %vec2_f16_5 "vec2_f16"
+               OpName %vec2_f32_5 "vec2_f32"
+               OpName %vec3_f16_5 "vec3_f16"
+               OpName %vec3_f32_5 "vec3_f32"
+               OpName %vec4_f16_5 "vec4_f16"
+               OpName %vec4_f32_5 "vec4_f32"
+               OpName %test_return_partial "test_return_partial"
+               OpName %input_0 "input"
+               OpName %scalar_f16_6 "scalar_f16"
+               OpName %scalar_f32_6 "scalar_f32"
+               OpName %vec2_f16_6 "vec2_f16"
+               OpName %vec2_f32_6 "vec2_f32"
+               OpName %vec3_f16_6 "vec3_f16"
+               OpName %vec3_f32_6 "vec3_f32"
+               OpName %vec4_f16_6 "vec4_f16"
+               OpName %vec4_f32_6 "vec4_f32"
+               OpName %scalar_f16_7 "scalar_f16"
+               OpName %scalar_f32_7 "scalar_f32"
+               OpName %vec2_f16_7 "vec2_f16"
+               OpName %vec2_f32_7 "vec2_f32"
+               OpName %vec3_f16_7 "vec3_f16"
+               OpName %vec3_f32_7 "vec3_f32"
+               OpName %vec4_f16_7 "vec4_f16"
+               OpName %vec4_f32_7 "vec4_f32"
+               OpName %test_component_access "test_component_access"
+               OpName %output_2 "output"
+               OpMemberDecorate %F16IO 0 Offset 0
+               OpMemberDecorate %F16IO 1 Offset 4
+               OpMemberDecorate %F16IO 2 Offset 8
+               OpMemberDecorate %F16IO 3 Offset 16
+               OpMemberDecorate %F16IO 4 Offset 24
+               OpMemberDecorate %F16IO 5 Offset 32
+               OpMemberDecorate %F16IO 6 Offset 48
+               OpMemberDecorate %F16IO 7 Offset 64
+               OpDecorate %scalar_f16 Location 0
+               OpDecorate %scalar_f32 Location 1
+               OpDecorate %vec2_f16 Location 2
+               OpDecorate %vec2_f32 Location 3
+               OpDecorate %vec3_f16 Location 4
+               OpDecorate %vec3_f32 Location 5
+               OpDecorate %vec4_f16 Location 6
+               OpDecorate %vec4_f32 Location 7
+               OpDecorate %scalar_f16_0 Location 0
+               OpDecorate %scalar_f32_0 Location 1
+               OpDecorate %vec2_f16_0 Location 2
+               OpDecorate %vec2_f32_0 Location 3
+               OpDecorate %vec3_f16_0 Location 4
+               OpDecorate %vec3_f32_0 Location 5
+               OpDecorate %vec4_f16_0 Location 6
+               OpDecorate %vec4_f32_0 Location 7
+               OpDecorate %scalar_f16_1 Location 0
+               OpDecorate %scalar_f32_1 Location 1
+               OpDecorate %vec2_f16_1 Location 2
+               OpDecorate %vec2_f32_1 Location 3
+               OpDecorate %vec3_f16_1 Location 4
+               OpDecorate %vec3_f32_1 Location 5
+               OpDecorate %vec4_f16_1 Location 6
+               OpDecorate %vec4_f32_1 Location 7
+               OpDecorate %scalar_f16_2 Location 0
+               OpDecorate %scalar_f32_2 Location 1
+               OpDecorate %vec2_f16_2 Location 2
+               OpDecorate %vec2_f32_2 Location 3
+               OpDecorate %vec3_f16_2 Location 4
+               OpDecorate %vec3_f32_2 Location 5
+               OpDecorate %vec4_f16_2 Location 6
+               OpDecorate %vec4_f32_2 Location 7
+               OpDecorate %scalar_f16_3 Location 0
+               OpDecorate %scalar_f32_3 Location 1
+               OpDecorate %vec2_f16_3 Location 2
+               OpDecorate %vec2_f32_3 Location 3
+               OpDecorate %vec3_f16_3 Location 4
+               OpDecorate %vec3_f32_3 Location 5
+               OpDecorate %vec4_f16_3 Location 6
+               OpDecorate %vec4_f32_3 Location 7
+               OpDecorate %scalar_f16_4 Location 0
+               OpDecorate %scalar_f32_4 Location 1
+               OpDecorate %vec2_f16_4 Location 2
+               OpDecorate %vec2_f32_4 Location 3
+               OpDecorate %vec3_f16_4 Location 4
+               OpDecorate %vec3_f32_4 Location 5
+               OpDecorate %vec4_f16_4 Location 6
+               OpDecorate %vec4_f32_4 Location 7
+               OpDecorate %scalar_f16_5 Location 0
+               OpDecorate %scalar_f32_5 Location 1
+               OpDecorate %vec2_f16_5 Location 2
+               OpDecorate %vec2_f32_5 Location 3
+               OpDecorate %vec3_f16_5 Location 4
+               OpDecorate %vec3_f32_5 Location 5
+               OpDecorate %vec4_f16_5 Location 6
+               OpDecorate %vec4_f32_5 Location 7
+               OpDecorate %314 Location 0
+               OpDecorate %scalar_f16_6 Location 0
+               OpDecorate %scalar_f32_6 Location 1
+               OpDecorate %vec2_f16_6 Location 2
+               OpDecorate %vec2_f32_6 Location 3
+               OpDecorate %vec3_f16_6 Location 4
+               OpDecorate %vec3_f32_6 Location 5
+               OpDecorate %vec4_f16_6 Location 6
+               OpDecorate %vec4_f32_6 Location 7
+               OpDecorate %scalar_f16_7 Location 0
+               OpDecorate %scalar_f32_7 Location 1
+               OpDecorate %vec2_f16_7 Location 2
+               OpDecorate %vec2_f32_7 Location 3
+               OpDecorate %vec3_f16_7 Location 4
+               OpDecorate %vec3_f32_7 Location 5
+               OpDecorate %vec4_f16_7 Location 6
+               OpDecorate %vec4_f32_7 Location 7
+       %void = OpTypeVoid
+       %half = OpTypeFloat 16
+      %float = OpTypeFloat 32
+     %v2half = OpTypeVector %half 2
+    %v2float = OpTypeVector %float 2
+     %v3half = OpTypeVector %half 3
+    %v3float = OpTypeVector %float 3
+     %v4half = OpTypeVector %half 4
+    %v4float = OpTypeVector %float 4
+      %F16IO = OpTypeStruct %half %float %v2half %v2float %v3half %v3float %v4half %v4float
+%_ptr_Input_half = OpTypePointer Input %half
+ %scalar_f16 = OpVariable %_ptr_Input_half Input
+%_ptr_Input_float = OpTypePointer Input %float
+ %scalar_f32 = OpVariable %_ptr_Input_float Input
+%_ptr_Input_v2half = OpTypePointer Input %v2half
+   %vec2_f16 = OpVariable %_ptr_Input_v2half Input
+%_ptr_Input_v2float = OpTypePointer Input %v2float
+   %vec2_f32 = OpVariable %_ptr_Input_v2float Input
+%_ptr_Input_v3half = OpTypePointer Input %v3half
+   %vec3_f16 = OpVariable %_ptr_Input_v3half Input
+%_ptr_Input_v3float = OpTypePointer Input %v3float
+   %vec3_f32 = OpVariable %_ptr_Input_v3float Input
+%_ptr_Input_v4half = OpTypePointer Input %v4half
+   %vec4_f16 = OpVariable %_ptr_Input_v4half Input
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+   %vec4_f32 = OpVariable %_ptr_Input_v4float Input
+%_ptr_Output_half = OpTypePointer Output %half
+%scalar_f16_0 = OpVariable %_ptr_Output_half Output
+%_ptr_Output_float = OpTypePointer Output %float
+%scalar_f32_0 = OpVariable %_ptr_Output_float Output
+%_ptr_Output_v2half = OpTypePointer Output %v2half
+ %vec2_f16_0 = OpVariable %_ptr_Output_v2half Output
+%_ptr_Output_v2float = OpTypePointer Output %v2float
+ %vec2_f32_0 = OpVariable %_ptr_Output_v2float Output
+%_ptr_Output_v3half = OpTypePointer Output %v3half
+ %vec3_f16_0 = OpVariable %_ptr_Output_v3half Output
+%_ptr_Output_v3float = OpTypePointer Output %v3float
+ %vec3_f32_0 = OpVariable %_ptr_Output_v3float Output
+%_ptr_Output_v4half = OpTypePointer Output %v4half
+ %vec4_f16_0 = OpVariable %_ptr_Output_v4half Output
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+ %vec4_f32_0 = OpVariable %_ptr_Output_v4float Output
+         %56 = OpTypeFunction %void
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+     %uint_4 = OpConstant %uint 4
+     %uint_2 = OpConstant %uint 2
+    %uint_15 = OpConstant %uint 15
+     %uint_5 = OpConstant %uint 5
+     %uint_8 = OpConstant %uint 8
+     %uint_0 = OpConstant %uint 0
+     %uint_3 = OpConstant %uint 3
+     %uint_6 = OpConstant %uint 6
+%half_0x1p_0 = OpConstant %half 0x1p+0
+    %float_1 = OpConstant %float 1
+         %84 = OpConstantComposite %v2half %half_0x1p_0 %half_0x1p_0
+         %85 = OpConstantComposite %v2float %float_1 %float_1
+         %86 = OpConstantComposite %v3half %half_0x1p_0 %half_0x1p_0 %half_0x1p_0
+         %87 = OpConstantComposite %v3float %float_1 %float_1 %float_1
+         %88 = OpConstantComposite %v4half %half_0x1p_0 %half_0x1p_0 %half_0x1p_0 %half_0x1p_0
+         %89 = OpConstantComposite %v4float %float_1 %float_1 %float_1 %float_1
+%_ptr_Function_F16IO = OpTypePointer Function %F16IO
+         %92 = OpConstantNull %F16IO
+%_ptr_Function_half = OpTypePointer Function %half
+%_ptr_Function_float = OpTypePointer Function %float
+%_ptr_Function_v2half = OpTypePointer Function %v2half
+%_ptr_Function_v2float = OpTypePointer Function %v2float
+%_ptr_Function_v3half = OpTypePointer Function %v3half
+%_ptr_Function_v3float = OpTypePointer Function %v3float
+%_ptr_Function_v4half = OpTypePointer Function %v4half
+%_ptr_Function_v4float = OpTypePointer Function %v4float
+     %uint_7 = OpConstant %uint 7
+%scalar_f16_1 = OpVariable %_ptr_Input_half Input
+%scalar_f32_1 = OpVariable %_ptr_Input_float Input
+ %vec2_f16_1 = OpVariable %_ptr_Input_v2half Input
+ %vec2_f32_1 = OpVariable %_ptr_Input_v2float Input
+ %vec3_f16_1 = OpVariable %_ptr_Input_v3half Input
+ %vec3_f32_1 = OpVariable %_ptr_Input_v3float Input
+ %vec4_f16_1 = OpVariable %_ptr_Input_v4half Input
+ %vec4_f32_1 = OpVariable %_ptr_Input_v4float Input
+%scalar_f16_2 = OpVariable %_ptr_Output_half Output
+%scalar_f32_2 = OpVariable %_ptr_Output_float Output
+ %vec2_f16_2 = OpVariable %_ptr_Output_v2half Output
+ %vec2_f32_2 = OpVariable %_ptr_Output_v2float Output
+ %vec3_f16_2 = OpVariable %_ptr_Output_v3half Output
+ %vec3_f32_2 = OpVariable %_ptr_Output_v3float Output
+ %vec4_f16_2 = OpVariable %_ptr_Output_v4half Output
+ %vec4_f32_2 = OpVariable %_ptr_Output_v4float Output
+    %uint_40 = OpConstant %uint 40
+        %172 = OpConstantNull %F16IO
+%scalar_f16_3 = OpVariable %_ptr_Input_half Input
+%scalar_f32_3 = OpVariable %_ptr_Input_float Input
+ %vec2_f16_3 = OpVariable %_ptr_Input_v2half Input
+ %vec2_f32_3 = OpVariable %_ptr_Input_v2float Input
+ %vec3_f16_3 = OpVariable %_ptr_Input_v3half Input
+ %vec3_f32_3 = OpVariable %_ptr_Input_v3float Input
+ %vec4_f16_3 = OpVariable %_ptr_Input_v4half Input
+ %vec4_f32_3 = OpVariable %_ptr_Input_v4float Input
+%scalar_f16_4 = OpVariable %_ptr_Output_half Output
+%scalar_f32_4 = OpVariable %_ptr_Output_float Output
+ %vec2_f16_4 = OpVariable %_ptr_Output_v2half Output
+ %vec2_f32_4 = OpVariable %_ptr_Output_v2float Output
+ %vec3_f16_4 = OpVariable %_ptr_Output_v3half Output
+ %vec3_f32_4 = OpVariable %_ptr_Output_v3float Output
+ %vec4_f16_4 = OpVariable %_ptr_Output_v4half Output
+ %vec4_f32_4 = OpVariable %_ptr_Output_v4float Output
+    %uint_53 = OpConstant %uint 53
+        %251 = OpConstantNull %F16IO
+        %253 = OpConstantNull %F16IO
+%scalar_f16_5 = OpVariable %_ptr_Input_half Input
+%scalar_f32_5 = OpVariable %_ptr_Input_float Input
+ %vec2_f16_5 = OpVariable %_ptr_Input_v2half Input
+ %vec2_f32_5 = OpVariable %_ptr_Input_v2float Input
+ %vec3_f16_5 = OpVariable %_ptr_Input_v3half Input
+ %vec3_f32_5 = OpVariable %_ptr_Input_v3float Input
+ %vec4_f16_5 = OpVariable %_ptr_Input_v4half Input
+ %vec4_f32_5 = OpVariable %_ptr_Input_v4float Input
+        %314 = OpVariable %_ptr_Output_half Output
+    %uint_68 = OpConstant %uint 68
+%half_0x0p_0 = OpConstant %half 0x0p+0
+        %334 = OpConstantNull %F16IO
+%scalar_f16_6 = OpVariable %_ptr_Input_half Input
+%scalar_f32_6 = OpVariable %_ptr_Input_float Input
+ %vec2_f16_6 = OpVariable %_ptr_Input_v2half Input
+ %vec2_f32_6 = OpVariable %_ptr_Input_v2float Input
+ %vec3_f16_6 = OpVariable %_ptr_Input_v3half Input
+ %vec3_f32_6 = OpVariable %_ptr_Input_v3float Input
+ %vec4_f16_6 = OpVariable %_ptr_Input_v4half Input
+ %vec4_f32_6 = OpVariable %_ptr_Input_v4float Input
+%scalar_f16_7 = OpVariable %_ptr_Output_half Output
+%scalar_f32_7 = OpVariable %_ptr_Output_float Output
+ %vec2_f16_7 = OpVariable %_ptr_Output_v2half Output
+ %vec2_f32_7 = OpVariable %_ptr_Output_v2float Output
+ %vec3_f16_7 = OpVariable %_ptr_Output_v3half Output
+ %vec3_f32_7 = OpVariable %_ptr_Output_v3float Output
+ %vec4_f16_7 = OpVariable %_ptr_Output_v4half Output
+ %vec4_f32_7 = OpVariable %_ptr_Output_v4float Output
+    %uint_76 = OpConstant %uint 76
+        %383 = OpConstantNull %F16IO
+         %68 = OpExtInst %void %13 DebugInfoNone
+         %70 = OpExtInst %void %13 DebugSource %3 %69
+         %71 = OpExtInst %void %13 DebugCompilationUnit %uint_1 %uint_4 %70 %uint_2
+         %72 = OpExtInst %void %13 DebugExpression
+         %74 = OpExtInst %void %13 DebugTypeBasic %73 %uint_0 %uint_0 %uint_0
+         %75 = OpExtInst %void %13 DebugTypeFunction %uint_0 %74
+         %76 = OpExtInst %void %13 DebugFunction %57 %75 %70 %uint_15 %uint_5 %71 %57 %uint_8 %uint_15
+         %81 = OpExtInst %void %13 DebugEntryPoint %76 %71 %79 %80
+        %157 = OpExtInst %void %13 DebugInfoNone
+        %159 = OpExtInst %void %13 DebugSource %3 %158
+        %160 = OpExtInst %void %13 DebugCompilationUnit %uint_1 %uint_4 %159 %uint_2
+        %161 = OpExtInst %void %13 DebugExpression
+        %163 = OpExtInst %void %13 DebugTypeBasic %162 %uint_0 %uint_0 %uint_0
+        %164 = OpExtInst %void %13 DebugTypeFunction %uint_0 %163
+        %165 = OpExtInst %void %13 DebugFunction %155 %164 %159 %uint_40 %uint_5 %160 %155 %uint_8 %uint_40
+        %170 = OpExtInst %void %13 DebugEntryPoint %165 %160 %168 %169
+        %236 = OpExtInst %void %13 DebugInfoNone
+        %238 = OpExtInst %void %13 DebugSource %3 %237
+        %239 = OpExtInst %void %13 DebugCompilationUnit %uint_1 %uint_4 %238 %uint_2
+        %240 = OpExtInst %void %13 DebugExpression
+        %242 = OpExtInst %void %13 DebugTypeBasic %241 %uint_0 %uint_0 %uint_0
+        %243 = OpExtInst %void %13 DebugTypeFunction %uint_0 %242
+        %244 = OpExtInst %void %13 DebugFunction %234 %243 %238 %uint_53 %uint_5 %239 %234 %uint_8 %uint_53
+        %249 = OpExtInst %void %13 DebugEntryPoint %244 %239 %247 %248
+        %318 = OpExtInst %void %13 DebugInfoNone
+        %320 = OpExtInst %void %13 DebugSource %3 %319
+        %321 = OpExtInst %void %13 DebugCompilationUnit %uint_1 %uint_4 %320 %uint_2
+        %322 = OpExtInst %void %13 DebugExpression
+        %324 = OpExtInst %void %13 DebugTypeBasic %323 %uint_0 %uint_0 %uint_0
+        %325 = OpExtInst %void %13 DebugTypeFunction %uint_0 %324
+        %326 = OpExtInst %void %13 DebugFunction %316 %325 %320 %uint_68 %uint_5 %321 %316 %uint_8 %uint_68
+        %331 = OpExtInst %void %13 DebugEntryPoint %326 %321 %329 %330
+        %368 = OpExtInst %void %13 DebugInfoNone
+        %370 = OpExtInst %void %13 DebugSource %3 %369
+        %371 = OpExtInst %void %13 DebugCompilationUnit %uint_1 %uint_4 %370 %uint_2
+        %372 = OpExtInst %void %13 DebugExpression
+        %374 = OpExtInst %void %13 DebugTypeBasic %373 %uint_0 %uint_0 %uint_0
+        %375 = OpExtInst %void %13 DebugTypeFunction %uint_0 %374
+        %376 = OpExtInst %void %13 DebugFunction %366 %375 %370 %uint_76 %uint_5 %371 %366 %uint_8 %uint_76
+        %381 = OpExtInst %void %13 DebugEntryPoint %376 %371 %379 %380
+%test_direct = OpFunction %void None %56
+         %14 = OpLabel
+     %output = OpVariable %_ptr_Function_F16IO Function %92
+         %17 = OpLoad %half %scalar_f16
+         %20 = OpLoad %float %scalar_f32
+         %23 = OpLoad %v2half %vec2_f16
+         %26 = OpLoad %v2float %vec2_f32
+         %29 = OpLoad %v3half %vec3_f16
+         %32 = OpLoad %v3float %vec3_f32
+         %35 = OpLoad %v4half %vec4_f16
+         %38 = OpLoad %v4float %vec4_f32
+         %77 = OpExtInst %void %13 DebugScope %76
+         %78 = OpExtInst %void %13 DebugFunctionDefinition %76 %test_direct
+               OpBranch %93
+         %93 = OpLabel
+               OpLine %3 15 5
+               OpLine %3 15 25
+         %95 = OpFAdd %half %17 %half_0x1p_0
+               OpLine %3 15 5
+         %96 = OpAccessChain %_ptr_Function_half %output %uint_0
+               OpStore %96 %95
+               OpLine %3 16 5
+               OpLine %3 16 25
+         %98 = OpFAdd %float %20 %float_1
+               OpLine %3 16 5
+         %99 = OpAccessChain %_ptr_Function_float %output %uint_1
+               OpStore %99 %98
+               OpLine %3 17 5
+               OpLine %3 17 23
+        %101 = OpFAdd %v2half %23 %84
+               OpLine %3 17 5
+        %102 = OpAccessChain %_ptr_Function_v2half %output %uint_2
+               OpStore %102 %101
+               OpLine %3 18 5
+               OpLine %3 18 34
+               OpLine %3 18 23
+        %104 = OpFAdd %v2float %26 %85
+               OpLine %3 18 5
+        %105 = OpAccessChain %_ptr_Function_v2float %output %uint_3
+               OpStore %105 %104
+               OpLine %3 19 5
+               OpLine %3 19 23
+        %107 = OpFAdd %v3half %29 %86
+               OpLine %3 19 5
+        %108 = OpAccessChain %_ptr_Function_v3half %output %uint_4
+               OpStore %108 %107
+               OpLine %3 20 5
+               OpLine %3 20 34
+               OpLine %3 20 23
+        %110 = OpFAdd %v3float %32 %87
+               OpLine %3 20 5
+        %111 = OpAccessChain %_ptr_Function_v3float %output %uint_5
+               OpStore %111 %110
+               OpLine %3 21 5
+               OpLine %3 21 23
+        %113 = OpFAdd %v4half %35 %88
+               OpLine %3 21 5
+        %114 = OpAccessChain %_ptr_Function_v4half %output %uint_6
+               OpStore %114 %113
+               OpLine %3 22 5
+               OpLine %3 22 34
+               OpLine %3 22 23
+        %116 = OpFAdd %v4float %38 %89
+               OpLine %3 22 5
+        %118 = OpAccessChain %_ptr_Function_v4float %output %uint_7
+               OpStore %118 %116
+               OpLine %3 1 1
+        %119 = OpLoad %F16IO %output
+        %120 = OpCompositeExtract %half %119 0
+               OpStore %scalar_f16_0 %120
+        %121 = OpCompositeExtract %float %119 1
+               OpStore %scalar_f32_0 %121
+        %122 = OpCompositeExtract %v2half %119 2
+               OpStore %vec2_f16_0 %122
+        %123 = OpCompositeExtract %v2float %119 3
+               OpStore %vec2_f32_0 %123
+        %124 = OpCompositeExtract %v3half %119 4
+               OpStore %vec3_f16_0 %124
+        %125 = OpCompositeExtract %v3float %119 5
+               OpStore %vec3_f32_0 %125
+        %126 = OpCompositeExtract %v4half %119 6
+               OpStore %vec4_f16_0 %126
+        %127 = OpCompositeExtract %v4float %119 7
+               OpStore %vec4_f32_0 %127
+               OpReturn
+               OpFunctionEnd
+%test_struct = OpFunction %void None %56
+        %128 = OpLabel
+   %output_0 = OpVariable %_ptr_Function_F16IO Function %172
+        %131 = OpLoad %half %scalar_f16_1
+        %133 = OpLoad %float %scalar_f32_1
+        %135 = OpLoad %v2half %vec2_f16_1
+        %137 = OpLoad %v2float %vec2_f32_1
+        %139 = OpLoad %v3half %vec3_f16_1
+        %141 = OpLoad %v3float %vec3_f32_1
+        %143 = OpLoad %v4half %vec4_f16_1
+        %145 = OpLoad %v4float %vec4_f32_1
+        %129 = OpCompositeConstruct %F16IO %131 %133 %135 %137 %139 %141 %143 %145
+        %166 = OpExtInst %void %13 DebugScope %165
+        %167 = OpExtInst %void %13 DebugFunctionDefinition %165 %test_struct
+               OpBranch %173
+        %173 = OpLabel
+               OpLine %3 40 5
+        %174 = OpCompositeExtract %half %129 0
+               OpLine %3 40 25
+        %175 = OpFAdd %half %174 %half_0x1p_0
+               OpLine %3 40 5
+        %176 = OpAccessChain %_ptr_Function_half %output_0 %uint_0
+               OpStore %176 %175
+               OpLine %3 41 5
+        %177 = OpCompositeExtract %float %129 1
+               OpLine %3 41 25
+        %178 = OpFAdd %float %177 %float_1
+               OpLine %3 41 5
+        %179 = OpAccessChain %_ptr_Function_float %output_0 %uint_1
+               OpStore %179 %178
+               OpLine %3 42 5
+        %180 = OpCompositeExtract %v2half %129 2
+               OpLine %3 42 23
+        %181 = OpFAdd %v2half %180 %84
+               OpLine %3 42 5
+        %182 = OpAccessChain %_ptr_Function_v2half %output_0 %uint_2
+               OpStore %182 %181
+               OpLine %3 43 5
+        %183 = OpCompositeExtract %v2float %129 3
+               OpLine %3 43 40
+               OpLine %3 43 23
+        %184 = OpFAdd %v2float %183 %85
+               OpLine %3 43 5
+        %185 = OpAccessChain %_ptr_Function_v2float %output_0 %uint_3
+               OpStore %185 %184
+               OpLine %3 44 5
+        %186 = OpCompositeExtract %v3half %129 4
+               OpLine %3 44 23
+        %187 = OpFAdd %v3half %186 %86
+               OpLine %3 44 5
+        %188 = OpAccessChain %_ptr_Function_v3half %output_0 %uint_4
+               OpStore %188 %187
+               OpLine %3 45 5
+        %189 = OpCompositeExtract %v3float %129 5
+               OpLine %3 45 40
+               OpLine %3 45 23
+        %190 = OpFAdd %v3float %189 %87
+               OpLine %3 45 5
+        %191 = OpAccessChain %_ptr_Function_v3float %output_0 %uint_5
+               OpStore %191 %190
+               OpLine %3 46 5
+        %192 = OpCompositeExtract %v4half %129 6
+               OpLine %3 46 23
+        %193 = OpFAdd %v4half %192 %88
+               OpLine %3 46 5
+        %194 = OpAccessChain %_ptr_Function_v4half %output_0 %uint_6
+               OpStore %194 %193
+               OpLine %3 47 5
+        %195 = OpCompositeExtract %v4float %129 7
+               OpLine %3 47 40
+               OpLine %3 47 23
+        %196 = OpFAdd %v4float %195 %89
+               OpLine %3 47 5
+        %197 = OpAccessChain %_ptr_Function_v4float %output_0 %uint_7
+               OpStore %197 %196
+               OpLine %3 1 1
+        %198 = OpLoad %F16IO %output_0
+        %199 = OpCompositeExtract %half %198 0
+               OpStore %scalar_f16_2 %199
+        %200 = OpCompositeExtract %float %198 1
+               OpStore %scalar_f32_2 %200
+        %201 = OpCompositeExtract %v2half %198 2
+               OpStore %vec2_f16_2 %201
+        %202 = OpCompositeExtract %v2float %198 3
+               OpStore %vec2_f32_2 %202
+        %203 = OpCompositeExtract %v3half %198 4
+               OpStore %vec3_f16_2 %203
+        %204 = OpCompositeExtract %v3float %198 5
+               OpStore %vec3_f32_2 %204
+        %205 = OpCompositeExtract %v4half %198 6
+               OpStore %vec4_f16_2 %205
+        %206 = OpCompositeExtract %v4float %198 7
+               OpStore %vec4_f32_2 %206
+               OpReturn
+               OpFunctionEnd
+%test_copy_input = OpFunction %void None %56
+        %207 = OpLabel
+      %input = OpVariable %_ptr_Function_F16IO Function %251
+   %output_1 = OpVariable %_ptr_Function_F16IO Function %253
+        %210 = OpLoad %half %scalar_f16_3
+        %212 = OpLoad %float %scalar_f32_3
+        %214 = OpLoad %v2half %vec2_f16_3
+        %216 = OpLoad %v2float %vec2_f32_3
+        %218 = OpLoad %v3half %vec3_f16_3
+        %220 = OpLoad %v3float %vec3_f32_3
+        %222 = OpLoad %v4half %vec4_f16_3
+        %224 = OpLoad %v4float %vec4_f32_3
+        %208 = OpCompositeConstruct %F16IO %210 %212 %214 %216 %218 %220 %222 %224
+        %245 = OpExtInst %void %13 DebugScope %244
+        %246 = OpExtInst %void %13 DebugFunctionDefinition %244 %test_copy_input
+               OpBranch %254
+        %254 = OpLabel
+               OpLine %3 53 5
+               OpStore %input %208
+               OpLine %3 55 5
+        %255 = OpAccessChain %_ptr_Function_half %input %uint_0
+        %256 = OpLoad %half %255
+               OpLine %3 55 25
+        %257 = OpFAdd %half %256 %half_0x1p_0
+               OpLine %3 55 5
+        %258 = OpAccessChain %_ptr_Function_half %output_1 %uint_0
+               OpStore %258 %257
+               OpLine %3 56 5
+        %259 = OpAccessChain %_ptr_Function_float %input %uint_1
+        %260 = OpLoad %float %259
+               OpLine %3 56 25
+        %261 = OpFAdd %float %260 %float_1
+               OpLine %3 56 5
+        %262 = OpAccessChain %_ptr_Function_float %output_1 %uint_1
+               OpStore %262 %261
+               OpLine %3 57 5
+        %263 = OpAccessChain %_ptr_Function_v2half %input %uint_2
+        %264 = OpLoad %v2half %263
+               OpLine %3 57 23
+        %265 = OpFAdd %v2half %264 %84
+               OpLine %3 57 5
+        %266 = OpAccessChain %_ptr_Function_v2half %output_1 %uint_2
+               OpStore %266 %265
+               OpLine %3 58 5
+        %267 = OpAccessChain %_ptr_Function_v2float %input %uint_3
+        %268 = OpLoad %v2float %267
+               OpLine %3 58 40
+               OpLine %3 58 23
+        %269 = OpFAdd %v2float %268 %85
+               OpLine %3 58 5
+        %270 = OpAccessChain %_ptr_Function_v2float %output_1 %uint_3
+               OpStore %270 %269
+               OpLine %3 59 5
+        %271 = OpAccessChain %_ptr_Function_v3half %input %uint_4
+        %272 = OpLoad %v3half %271
+               OpLine %3 59 23
+        %273 = OpFAdd %v3half %272 %86
+               OpLine %3 59 5
+        %274 = OpAccessChain %_ptr_Function_v3half %output_1 %uint_4
+               OpStore %274 %273
+               OpLine %3 60 5
+        %275 = OpAccessChain %_ptr_Function_v3float %input %uint_5
+        %276 = OpLoad %v3float %275
+               OpLine %3 60 40
+               OpLine %3 60 23
+        %277 = OpFAdd %v3float %276 %87
+               OpLine %3 60 5
+        %278 = OpAccessChain %_ptr_Function_v3float %output_1 %uint_5
+               OpStore %278 %277
+               OpLine %3 61 5
+        %279 = OpAccessChain %_ptr_Function_v4half %input %uint_6
+        %280 = OpLoad %v4half %279
+               OpLine %3 61 23
+        %281 = OpFAdd %v4half %280 %88
+               OpLine %3 61 5
+        %282 = OpAccessChain %_ptr_Function_v4half %output_1 %uint_6
+               OpStore %282 %281
+               OpLine %3 62 5
+        %283 = OpAccessChain %_ptr_Function_v4float %input %uint_7
+        %284 = OpLoad %v4float %283
+               OpLine %3 62 40
+               OpLine %3 62 23
+        %285 = OpFAdd %v4float %284 %89
+               OpLine %3 62 5
+        %286 = OpAccessChain %_ptr_Function_v4float %output_1 %uint_7
+               OpStore %286 %285
+               OpLine %3 1 1
+        %287 = OpLoad %F16IO %output_1
+        %288 = OpCompositeExtract %half %287 0
+               OpStore %scalar_f16_4 %288
+        %289 = OpCompositeExtract %float %287 1
+               OpStore %scalar_f32_4 %289
+        %290 = OpCompositeExtract %v2half %287 2
+               OpStore %vec2_f16_4 %290
+        %291 = OpCompositeExtract %v2float %287 3
+               OpStore %vec2_f32_4 %291
+        %292 = OpCompositeExtract %v3half %287 4
+               OpStore %vec3_f16_4 %292
+        %293 = OpCompositeExtract %v3float %287 5
+               OpStore %vec3_f32_4 %293
+        %294 = OpCompositeExtract %v4half %287 6
+               OpStore %vec4_f16_4 %294
+        %295 = OpCompositeExtract %v4float %287 7
+               OpStore %vec4_f32_4 %295
+               OpReturn
+               OpFunctionEnd
+%test_return_partial = OpFunction %void None %56
+        %296 = OpLabel
+    %input_0 = OpVariable %_ptr_Function_F16IO Function %334
+        %299 = OpLoad %half %scalar_f16_5
+        %301 = OpLoad %float %scalar_f32_5
+        %303 = OpLoad %v2half %vec2_f16_5
+        %305 = OpLoad %v2float %vec2_f32_5
+        %307 = OpLoad %v3half %vec3_f16_5
+        %309 = OpLoad %v3float %vec3_f32_5
+        %311 = OpLoad %v4half %vec4_f16_5
+        %313 = OpLoad %v4float %vec4_f32_5
+        %297 = OpCompositeConstruct %F16IO %299 %301 %303 %305 %307 %309 %311 %313
+        %327 = OpExtInst %void %13 DebugScope %326
+        %328 = OpExtInst %void %13 DebugFunctionDefinition %326 %test_return_partial
+               OpBranch %335
+        %335 = OpLabel
+               OpLine %3 68 5
+               OpStore %input_0 %297
+               OpLine %3 69 5
+               OpLine %3 69 5
+        %336 = OpAccessChain %_ptr_Function_half %input_0 %uint_0
+               OpStore %336 %half_0x0p_0
+               OpLine %3 70 12
+        %337 = OpAccessChain %_ptr_Function_half %input_0 %uint_0
+        %338 = OpLoad %half %337
+               OpStore %314 %338
+               OpReturn
+               OpFunctionEnd
+%test_component_access = OpFunction %void None %56
+        %339 = OpLabel
+   %output_2 = OpVariable %_ptr_Function_F16IO Function %383
+        %342 = OpLoad %half %scalar_f16_6
+        %344 = OpLoad %float %scalar_f32_6
+        %346 = OpLoad %v2half %vec2_f16_6
+        %348 = OpLoad %v2float %vec2_f32_6
+        %350 = OpLoad %v3half %vec3_f16_6
+        %352 = OpLoad %v3float %vec3_f32_6
+        %354 = OpLoad %v4half %vec4_f16_6
+        %356 = OpLoad %v4float %vec4_f32_6
+        %340 = OpCompositeConstruct %F16IO %342 %344 %346 %348 %350 %352 %354 %356
+        %377 = OpExtInst %void %13 DebugScope %376
+        %378 = OpExtInst %void %13 DebugFunctionDefinition %376 %test_component_access
+               OpBranch %384
+        %384 = OpLabel
+               OpLine %3 76 5
+        %385 = OpCompositeExtract %v2half %340 2
+        %386 = OpCompositeExtract %half %385 1
+               OpLine %3 76 5
+        %387 = OpAccessChain %_ptr_Function_half %output_2 %uint_2 %uint_0
+               OpStore %387 %386
+               OpLine %3 77 5
+        %388 = OpCompositeExtract %v2half %340 2
+        %389 = OpCompositeExtract %half %388 0
+               OpLine %3 77 5
+        %390 = OpAccessChain %_ptr_Function_half %output_2 %uint_2 %uint_1
+               OpStore %390 %389
+               OpLine %3 1 1
+        %391 = OpLoad %F16IO %output_2
+        %392 = OpCompositeExtract %half %391 0
+               OpStore %scalar_f16_7 %392
+        %393 = OpCompositeExtract %float %391 1
+               OpStore %scalar_f32_7 %393
+        %394 = OpCompositeExtract %v2half %391 2
+               OpStore %vec2_f16_7 %394
+        %395 = OpCompositeExtract %v2float %391 3
+               OpStore %vec2_f32_7 %395
+        %396 = OpCompositeExtract %v3half %391 4
+               OpStore %vec3_f16_7 %396
+        %397 = OpCompositeExtract %v3float %391 5
+               OpStore %vec3_f32_7 %397
+        %398 = OpCompositeExtract %v4half %391 6
+               OpStore %vec4_f16_7 %398
+        %399 = OpCompositeExtract %v4float %391 7
+               OpStore %vec4_f32_7 %399
+               OpReturn
+               OpFunctionEnd

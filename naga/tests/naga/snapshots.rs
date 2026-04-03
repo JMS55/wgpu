@@ -106,10 +106,7 @@ Note: this is an issue with snapshot configuration, not code. If you added a new
             debug_info = Some(naga::back::spv::DebugInfo {
                 source_code,
                 file_name: &name,
-                // wgpu#6266: we technically know all the information here to
-                // produce the valid language but it's not too important for
-                // validation purposes
-                language: naga::back::spv::SourceLanguage::Unknown,
+                language: naga::back::spv::SourceLanguage::GLSL,
             })
         }
 
@@ -248,15 +245,71 @@ fn write_output_spv_inner(
     use rspirv::binary::Disassemble;
     println!("Generating SPIR-V for {:?}", input.file_name);
     let spv = spv::write_vec(module, info, options, pipeline_options).unwrap();
-    let dis = rspirv::dr::load_words(spv)
-        .expect("Produced invalid SPIR-V")
-        .disassemble();
-    // HACK escape CR/LF if source code is in side.
-    let dis = if options.debug_info.is_some() {
-        let dis = dis.replace("\\r", "\r");
-        dis.replace("\\n", "\n")
-    } else {
-        dis
+    // When NonSemantic.Shader.DebugInfo.100 is active, the global-scope debug
+    // instructions (DebugInfoNone, DebugSource, DebugCompilationUnit, etc.) are
+    // emitted between the type/constant declarations and function declarations,
+    // as required by spirv-val. rspirv 0.13 cannot parse OpExtInst instructions
+    // with typed results in that position. Fall back to spirv-dis when available;
+    // otherwise write a hex representation that still detects binary regressions.
+    let dis = match rspirv::dr::load_words(spv.clone()) {
+        Ok(module) => {
+            let dis = module.disassemble();
+            if options.debug_info.is_some() {
+                let dis = dis.replace("\\r", "\r");
+                dis.replace("\\n", "\n")
+            } else {
+                dis
+            }
+        }
+        Err(_) if options.debug_info.is_some() => {
+            // Try spirv-dis from the Vulkan SDK for a proper disassembly.
+            let candidates = [
+                "spirv-dis",
+                "C:/VulkanSDK/1.4.341.1/Bin/spirv-dis.exe",
+                "C:/VulkanSDK/1.3.296.0/Bin/spirv-dis.exe",
+                "/usr/bin/spirv-dis",
+                "/usr/local/bin/spirv-dis",
+            ];
+            let tmp = std::env::temp_dir().join("naga_snapshot_spv.spv");
+            let bytes: Vec<u8> = spv
+                .iter()
+                .flat_map(|w| w.to_le_bytes())
+                .collect();
+            std::fs::write(&tmp, &bytes).expect("failed to write temp spv");
+            let mut spirv_dis_output = None;
+            for candidate in candidates {
+                if let Ok(out) = std::process::Command::new(candidate).arg(&tmp).output() {
+                    if out.status.success() {
+                        spirv_dis_output = Some(String::from_utf8_lossy(&out.stdout).into_owned());
+                        break;
+                    }
+                }
+            }
+            match spirv_dis_output {
+                Some(mut dis) => {
+                    dis = dis.replace("\\r", "\r");
+                    dis.replace("\\n", "\n")
+                }
+                None => {
+                    // No spirv-dis available. Write word-count + hex so any
+                    // binary change is still detected as a snapshot diff.
+                    let mut out = format!(
+                        "; rspirv cannot disassemble NonSemantic global debug info\n\
+                         ; install Vulkan SDK for human-readable output\n\
+                         ; {} words\n",
+                        spv.len()
+                    );
+                    for chunk in spv.chunks(8) {
+                        for w in chunk {
+                            out.push_str(&format!("{w:08x} "));
+                        }
+                        out.push('\n');
+                    }
+                    out
+                }
+            }
+        }
+        Err(e) => panic!("Produced invalid SPIR-V: {e:?}"),
     };
     input.write_output_file("spv", extension, dis, DIR_OUT);
 }

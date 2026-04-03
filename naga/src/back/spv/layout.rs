@@ -62,6 +62,7 @@ impl LogicalLayout {
         sink.extend(self.debugs.iter().cloned());
         sink.extend(self.annotations.iter().cloned());
         sink.extend(self.declarations.iter().cloned());
+        sink.extend(self.global_debug.iter().cloned());
         sink.extend(self.function_declarations.iter().cloned());
         sink.extend(self.function_definitions.iter().cloned());
     }
@@ -79,6 +80,7 @@ impl super::reclaimable::Reclaimable for LogicalLayout {
             debugs: self.debugs.reclaim(),
             annotations: self.annotations.reclaim(),
             declarations: self.declarations.reclaim(),
+            global_debug: self.global_debug.reclaim(),
             function_declarations: self.function_declarations.reclaim(),
             function_definitions: self.function_definitions.reclaim(),
         }
