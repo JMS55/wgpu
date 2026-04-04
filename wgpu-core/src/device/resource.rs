@@ -2310,7 +2310,9 @@ impl Device {
                 })?;
                 (Cow::Owned(module), code.into_owned())
             }
-            pipeline::ShaderModuleSource::Naga(module) => (module, String::new()),
+            pipeline::ShaderModuleSource::Naga(module, source) => {
+                (module, source.unwrap_or_default())
+            }
             pipeline::ShaderModuleSource::Dummy(_) => panic!("found `ShaderModuleSource::Dummy`"),
         };
         for (_, var) in module.global_variables.iter() {

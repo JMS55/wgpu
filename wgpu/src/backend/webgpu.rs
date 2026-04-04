@@ -1854,7 +1854,7 @@ impl dispatch::DeviceInterface for WebDevice {
                 ))
             }
             #[cfg(feature = "naga-ir")]
-            crate::ShaderSource::Naga(ref module) => {
+            crate::ShaderSource::Naga(ref module, _) => {
                 validate_transformed_shader_module(module, "", &desc).map(|v| {
                     (
                         v,

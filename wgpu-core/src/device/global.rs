@@ -1024,7 +1024,7 @@ impl Global {
                     pipeline::ShaderModuleSource::SpirV(ref code, _) => {
                         trace.make_binary(DataKind::Spv, bytemuck::cast_slice::<u32, u8>(code))
                     }
-                    pipeline::ShaderModuleSource::Naga(ref module) => {
+                    pipeline::ShaderModuleSource::Naga(ref module, _) => {
                         let string =
                             ron::ser::to_string_pretty(module, ron::ser::PrettyConfig::default())
                                 .unwrap();

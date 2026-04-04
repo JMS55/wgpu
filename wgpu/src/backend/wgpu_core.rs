@@ -1071,7 +1071,9 @@ impl dispatch::DeviceInterface for CoreDevice {
             #[cfg(feature = "wgsl")]
             ShaderSource::Wgsl(ref code) => wgc::pipeline::ShaderModuleSource::Wgsl(Borrowed(code)),
             #[cfg(feature = "naga-ir")]
-            ShaderSource::Naga(module) => wgc::pipeline::ShaderModuleSource::Naga(module),
+            ShaderSource::Naga(module, source) => {
+                wgc::pipeline::ShaderModuleSource::Naga(module, source)
+            }
             ShaderSource::Dummy(_) => panic!("found `ShaderSource::Dummy`"),
         };
         let (id, error) =

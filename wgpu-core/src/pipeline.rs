@@ -42,7 +42,7 @@ pub enum ShaderModuleSource<'a> {
     Glsl(Cow<'a, str>, naga::front::glsl::Options),
     #[cfg(feature = "spirv")]
     SpirV(Cow<'a, [u32]>, naga::front::spv::Options),
-    Naga(Cow<'static, naga::Module>),
+    Naga(Cow<'static, naga::Module>, Option<String>),
     /// Dummy variant because `Naga` doesn't have a lifetime and without enough active features it
     /// could be the last one active.
     #[doc(hidden)]

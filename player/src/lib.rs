@@ -275,7 +275,7 @@ impl Player {
                     wgc::pipeline::ShaderModuleSource::Wgsl(code.clone())
                 } else if data.kind() == DataKind::Ron {
                     let module = ron::de::from_str(&code).unwrap();
-                    wgc::pipeline::ShaderModuleSource::Naga(module)
+                    wgc::pipeline::ShaderModuleSource::Naga(module, None)
                 } else {
                     panic!(
                         "Unknown data kind for CreateShaderModule: {:?}",

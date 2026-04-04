@@ -206,8 +206,12 @@ pub enum ShaderSource<'a> {
     #[cfg(feature = "wgsl")]
     Wgsl(alloc::borrow::Cow<'a, str>),
     /// Naga module.
+    ///
+    /// The optional `String` contains the combined source code whose byte offsets
+    /// correspond to the module's spans, used for debug info in the SPIR-V backend
+    /// (e.g. for tools like NVIDIA Nsight).
     #[cfg(feature = "naga-ir")]
-    Naga(alloc::borrow::Cow<'static, naga::Module>),
+    Naga(alloc::borrow::Cow<'static, naga::Module>, Option<String>),
     /// Dummy variant because `Naga` doesn't have a lifetime and without enough active features it
     /// could be the last one active.
     #[doc(hidden)]
