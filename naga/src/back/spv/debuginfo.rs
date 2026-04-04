@@ -15,6 +15,7 @@ pub(super) mod opcodes {
     pub const DEBUG_DECLARE: u32 = 28;
     pub const DEBUG_EXPRESSION: u32 = 31;
     pub const DEBUG_SOURCE: u32 = 35;
+    pub const DEBUG_SOURCE_CONTINUED: u32 = 102;
     pub const DEBUG_FUNCTION_DEFINITION: u32 = 101;
     #[allow(dead_code)]
     pub const DEBUG_LINE: u32 = 103;

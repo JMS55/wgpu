@@ -1602,9 +1602,24 @@ impl Writer {
                 // DebugSource — file name + source text.
                 // Including the source text lets NSight display the shader
                 // source inline without needing to locate the file on disk.
+                //
+                // SPIR-V limits literal strings to 65535 words per instruction.
+                // For large sources we split across the initial DebugSource and
+                // one or more DebugSourceContinued instructions (opcode 102).
+                // OpString overhead is 2 words, so max string bytes per
+                // instruction is (65535 - 2) * 4 - 1 (null terminator).
+                const MAX_STR_BYTES: usize = (65535 - 2) * 4 - 1;
+                let chunks = super::helpers::string_to_byte_chunks(
+                    naga_debug_info.source_code,
+                    MAX_STR_BYTES,
+                );
+
+                let first_chunk = chunks.first().map_or("", |c| {
+                    core::str::from_utf8(c).unwrap_or("")
+                });
                 let source_text_str_id = self.id_gen.next();
                 self.debug_strings.push(Instruction::string(
-                    naga_debug_info.source_code,
+                    first_chunk,
                     source_text_str_id,
                 ));
                 let debug_source = self.id_gen.next();
@@ -1616,6 +1631,25 @@ impl Writer {
                     &[file_name_str_id, source_text_str_id],
                 )
                 .to_words(&mut self.logical_layout.global_debug);
+
+                // Emit DebugSourceContinued for remaining chunks.
+                for chunk in chunks.iter().skip(1) {
+                    let chunk_str = core::str::from_utf8(chunk).unwrap_or("");
+                    let chunk_str_id = self.id_gen.next();
+                    self.debug_strings.push(Instruction::string(
+                        chunk_str,
+                        chunk_str_id,
+                    ));
+                    let continued_id = self.id_gen.next();
+                    Instruction::ext_inst(
+                        ext_id,
+                        opcodes::DEBUG_SOURCE_CONTINUED,
+                        void_type,
+                        continued_id,
+                        &[chunk_str_id],
+                    )
+                    .to_words(&mut self.logical_layout.global_debug);
+                }
 
                 // DebugCompilationUnit.
                 let compilation_unit = self.id_gen.next();
