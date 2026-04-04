@@ -50,16 +50,12 @@ pub(super) mod flags {
 pub(super) struct NonSemanticShaderDebugInfo {
     /// The `OpExtInstImport` result ID for `NonSemantic.Shader.DebugInfo.100`.
     pub ext_id: Word,
-    /// DebugInfoNone result ID.
-    pub debug_info_none: Word,
     /// DebugSource result ID.
     pub debug_source: Word,
     /// DebugCompilationUnit result ID.
     pub compilation_unit: Word,
     /// Empty DebugExpression result ID (used in DebugDeclare).
     pub empty_expression: Word,
-    /// DebugTypeBasic("void") result ID.
-    pub debug_type_void: Word,
     /// DebugTypeFunction(void->void) result ID (simplified; used for all functions).
     pub debug_type_function: Word,
 }

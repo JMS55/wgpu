@@ -4164,7 +4164,7 @@ impl Writer {
     /// Their IDs are stored in [`NonSemanticShaderDebugInfo`] for reuse by
     /// per-function DebugFunction/DebugScope/DebugFunctionDefinition.
     fn init_nonsemantic_shader_debug_info(&mut self, debug_info: &DebugInfoInner) {
-        use super::debuginfo::{encoding, flags, opcodes, source_language};
+        use super::debuginfo::{opcodes, source_language};
 
         self.use_extension("SPV_KHR_non_semantic_info");
         let ext_id = self.id_gen.next();
@@ -4230,11 +4230,9 @@ impl Writer {
 
         self.nonsemantic_shader_debug_info = Some(super::debuginfo::NonSemanticShaderDebugInfo {
             ext_id,
-            debug_info_none,
             debug_source,
             compilation_unit,
             empty_expression,
-            debug_type_void,
             debug_type_function,
         });
     }
