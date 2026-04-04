@@ -44,12 +44,22 @@ pub(super) mod flags {
 
 /// State for the `NonSemantic.Shader.DebugInfo.100` extended instruction set.
 ///
-/// The `OpExtInstImport` for this extension is registered in the module's
-/// `ext_inst_imports` section.  All other `DebugXxx` instructions are emitted
-/// into function bodies (prelude blocks), so that rspirv and other parsers that
-/// don't support non-semantic instructions in the global-declarations section
-/// can still consume the output.
+/// Shared instructions (DebugSource, DebugCompilationUnit, etc.) are emitted
+/// once in `write_logical_layout` and their IDs stored here for reuse across
+/// all functions.
 pub(super) struct NonSemanticShaderDebugInfo {
     /// The `OpExtInstImport` result ID for `NonSemantic.Shader.DebugInfo.100`.
     pub ext_id: Word,
+    /// DebugInfoNone result ID.
+    pub debug_info_none: Word,
+    /// DebugSource result ID.
+    pub debug_source: Word,
+    /// DebugCompilationUnit result ID.
+    pub compilation_unit: Word,
+    /// Empty DebugExpression result ID (used in DebugDeclare).
+    pub empty_expression: Word,
+    /// DebugTypeBasic("void") result ID.
+    pub debug_type_void: Word,
+    /// DebugTypeFunction(void->void) result ID (simplified; used for all functions).
+    pub debug_type_function: Word,
 }

@@ -1514,41 +1514,29 @@ impl Writer {
             self.global_variables[handle] = gv;
         }
 
-        // Emit NonSemantic.Shader.DebugInfo.100 per-function debug prologue.
-        //
-        // All DebugXxx OpExtInst instructions go into `prelude.body` (inside
-        // the function body) so that rspirv and other parsers that don't
-        // support non-semantic instructions in global scope can still parse the
-        // output.  OpString instructions go into `self.debug_strings` so that
-        // they appear in the SPIR-V debug section (before OpName/OpSource and
-        // before function bodies) and can be referenced by the per-function
-        // non-semantic instructions.
+        // Emit NonSemantic.Shader.DebugInfo.100 per-function debug instructions.
+        // Shared instructions (DebugInfoNone, DebugSource, DebugCompilationUnit,
+        // DebugExpression, DebugTypeBasic, DebugTypeFunction) were already emitted
+        // once in init_nonsemantic_shader_debug_info. Here we emit only the
+        // per-function DebugFunction, DebugScope, and DebugFunctionDefinition.
         let ns_debug_function_id =
             if let (Some(ref ns), Some(ref naga_debug_info)) =
                 (&self.nonsemantic_shader_debug_info, debug_info)
             {
-                use super::debuginfo::{encoding, flags, opcodes, source_language};
+                use super::debuginfo::{encoding, flags, opcodes};
 
                 let ext_id = ns.ext_id;
                 let void_type = self.void_type;
-
-                // -------- OpStrings (debug section) --------
-
-                // The file name OpString was already emitted in write_logical_layout;
-                // reuse its result ID from DebugInfoInner.
-                let file_name_str_id = naga_debug_info.source_file_id;
+                let debug_source = ns.debug_source;
+                let compilation_unit = ns.compilation_unit;
+                let empty_expression = ns.empty_expression;
+                let debug_type_function = ns.debug_type_function;
 
                 // Function name string.
                 let func_name = ir_function.name.as_deref().unwrap_or("unnamed");
                 let func_name_str_id = self.id_gen.next();
                 self.debug_strings
                     .push(Instruction::string(func_name, func_name_str_id));
-
-                // -------- Constant operands (declarations section) --------
-                let ver_1 = self.get_constant_scalar(crate::Literal::U32(1));
-                let ver_4 = self.get_constant_scalar(crate::Literal::U32(4));
-                let lang_glsl =
-                    self.get_constant_scalar(crate::Literal::U32(source_language::GLSL));
 
                 let (line, col) = ir_function
                     .body
@@ -1567,7 +1555,7 @@ impl Writer {
                 let col_id = self.get_constant_scalar(crate::Literal::U32(col));
                 let flags_def =
                     self.get_constant_scalar(crate::Literal::U32(flags::IS_DEFINITION));
-                let flags_zero = self.get_constant_scalar(crate::Literal::U32(0));
+
                 let enc_bool =
                     self.get_constant_scalar(crate::Literal::U32(encoding::BOOLEAN));
                 let enc_float =
@@ -1576,134 +1564,8 @@ impl Writer {
                     self.get_constant_scalar(crate::Literal::U32(encoding::SIGNED));
                 let enc_uint =
                     self.get_constant_scalar(crate::Literal::U32(encoding::UNSIGNED));
-                let _ = (enc_bool, enc_float, enc_sint, enc_uint); // used below
 
-                // -------- Global NonSemantic OpExtInst --------
-                // DebugInfoNone, DebugSource, DebugCompilationUnit,
-                // DebugExpression, DebugTypeFunction, and DebugFunction must
-                // live in the global declarations section (between section 9
-                // and section 10), NOT inside function bodies, per spirv-val.
-                // We emit them with `.to_words(&mut self.logical_layout.global_debug)`.
-                //
-                // DebugScope goes into the function body (prelude.body): it is
-                // one of the few debug instructions allowed inside functions.
-
-                // DebugInfoNone — placeholder for optional parameters.
-                let debug_info_none = self.id_gen.next();
-                Instruction::ext_inst(
-                    ext_id,
-                    opcodes::DEBUG_INFO_NONE,
-                    void_type,
-                    debug_info_none,
-                    &[],
-                )
-                .to_words(&mut self.logical_layout.global_debug);
-
-                // DebugSource — file name + source text.
-                // Including the source text lets NSight display the shader
-                // source inline without needing to locate the file on disk.
-                //
-                // SPIR-V limits literal strings to 65535 words per instruction.
-                // For large sources we split across the initial DebugSource and
-                // one or more DebugSourceContinued instructions (opcode 102).
-                // OpString overhead is 2 words, so max string bytes per
-                // instruction is (65535 - 2) * 4 - 1 (null terminator).
-                const MAX_STR_BYTES: usize = (65535 - 2) * 4 - 1;
-                let chunks = super::helpers::string_to_byte_chunks(
-                    naga_debug_info.source_code,
-                    MAX_STR_BYTES,
-                );
-
-                let first_chunk = chunks.first().map_or("", |c| {
-                    core::str::from_utf8(c).unwrap_or("")
-                });
-                let source_text_str_id = self.id_gen.next();
-                self.debug_strings.push(Instruction::string(
-                    first_chunk,
-                    source_text_str_id,
-                ));
-                let debug_source = self.id_gen.next();
-                Instruction::ext_inst(
-                    ext_id,
-                    opcodes::DEBUG_SOURCE,
-                    void_type,
-                    debug_source,
-                    &[file_name_str_id, source_text_str_id],
-                )
-                .to_words(&mut self.logical_layout.global_debug);
-
-                // Emit DebugSourceContinued for remaining chunks.
-                for chunk in chunks.iter().skip(1) {
-                    let chunk_str = core::str::from_utf8(chunk).unwrap_or("");
-                    let chunk_str_id = self.id_gen.next();
-                    self.debug_strings.push(Instruction::string(
-                        chunk_str,
-                        chunk_str_id,
-                    ));
-                    let continued_id = self.id_gen.next();
-                    Instruction::ext_inst(
-                        ext_id,
-                        opcodes::DEBUG_SOURCE_CONTINUED,
-                        void_type,
-                        continued_id,
-                        &[chunk_str_id],
-                    )
-                    .to_words(&mut self.logical_layout.global_debug);
-                }
-
-                // DebugCompilationUnit.
-                let compilation_unit = self.id_gen.next();
-                Instruction::ext_inst(
-                    ext_id,
-                    opcodes::DEBUG_COMPILATION_UNIT,
-                    void_type,
-                    compilation_unit,
-                    &[ver_1, ver_4, debug_source, lang_glsl],
-                )
-                .to_words(&mut self.logical_layout.global_debug);
-
-                // Empty DebugExpression (used in DebugDeclare).
-                let empty_expression = self.id_gen.next();
-                Instruction::ext_inst(
-                    ext_id,
-                    opcodes::DEBUG_EXPRESSION,
-                    void_type,
-                    empty_expression,
-                    &[],
-                )
-                .to_words(&mut self.logical_layout.global_debug);
-
-                // DebugTypeBasic("void") — used as Return Type in DebugTypeFunction.
-                // The spec allows DebugInfoNone for void returns, but spirv-val
-                // (SDK 1.4.341.1) rejects it, so we use a void DebugTypeBasic.
-                // Encoding=0 means "unspecified/none", which is correct for void.
-                let void_name_id = self.id_gen.next();
-                self.debug_strings
-                    .push(Instruction::string("void", void_name_id));
-                let size_zero = self.get_constant_scalar(crate::Literal::U32(0));
-                let enc_none = self.get_constant_scalar(crate::Literal::U32(0));
-                let debug_type_void = self.id_gen.next();
-                Instruction::ext_inst(
-                    ext_id,
-                    opcodes::DEBUG_TYPE_BASIC,
-                    void_type,
-                    debug_type_void,
-                    &[void_name_id, size_zero, enc_none, flags_zero],
-                )
-                .to_words(&mut self.logical_layout.global_debug);
-
-                // DebugTypeFunction — describes the function's type.
-                let debug_type_function = self.id_gen.next();
-                Instruction::ext_inst(
-                    ext_id,
-                    opcodes::DEBUG_TYPE_FUNCTION,
-                    void_type,
-                    debug_type_function,
-                    &[flags_zero, debug_type_void],
-                )
-                .to_words(&mut self.logical_layout.global_debug);
-
-                // DebugFunction.
+                // DebugFunction (per-function, in global debug section).
                 let debug_func_id = self.id_gen.next();
                 Instruction::ext_inst(
                     ext_id,
@@ -1720,9 +1582,6 @@ impl Writer {
                         func_name_str_id, // LinkageName (reuse name)
                         flags_def,
                         line_id, // ScopeLine
-                        // No optional Declaration operand: the OpFunction ID
-                        // is in section 11 and would be a forward reference
-                        // from the global_debug section (between sections 9-10).
                     ],
                 )
                 .to_words(&mut self.logical_layout.global_debug);
@@ -1749,7 +1608,6 @@ impl Writer {
                 ));
 
                 // DebugEntryPoint — emitted for entry-point functions only.
-                // Links the DebugFunction + CompilationUnit with compiler info.
                 if interface.is_some() {
                     let compiler_str_id = self.id_gen.next();
                     self.debug_strings
@@ -4029,10 +3887,13 @@ impl Writer {
                     source_code: debug_info.source_code,
                     source_file_id,
                 });
-                self.debugs.append(&mut Instruction::source_auto_continued(
+                // Source text is embedded via NonSemantic DebugSource (initialized
+                // below). Emit a minimal OpSource without the source text to
+                // avoid duplication, which confuses tools like RenderDoc.
+                self.debugs.push(Instruction::source(
                     debug_info.language,
                     0,
-                    &debug_info_inner,
+                    &None,
                 ));
             }
         }
@@ -4084,10 +3945,12 @@ impl Writer {
             self.global_variables.insert(handle, gvar);
         }
 
-        // Register the NonSemantic.Shader.DebugInfo.100 extension import.
-        // Per-function DebugXxx instructions are emitted inside function bodies.
-        if self.flags.contains(WriterFlags::DEBUG) && debug_info.is_some() {
-            self.init_nonsemantic_shader_debug_info();
+        // Register the NonSemantic.Shader.DebugInfo.100 extension and emit
+        // shared debug instructions once globally.
+        if self.flags.contains(WriterFlags::DEBUG) {
+            if let Some(ref di) = debug_info_inner {
+                self.init_nonsemantic_shader_debug_info(di);
+            }
         }
 
         // write all functions
@@ -4295,19 +4158,85 @@ impl Writer {
         Some(type_id)
     }
 
-    /// Register the `NonSemantic.Shader.DebugInfo.100` extension import.
-    ///
-    /// All `DebugXxx` instructions are emitted into function bodies rather
-    /// than the global declarations section, so that parsers that don't support
-    /// non-semantic instructions in global scope (e.g. rspirv) can still
-    /// consume the output.
-    fn init_nonsemantic_shader_debug_info(&mut self) {
+    /// Register the `NonSemantic.Shader.DebugInfo.100` extension and emit
+    /// shared debug instructions (DebugInfoNone, DebugSource, DebugCompilationUnit,
+    /// DebugExpression, DebugTypeBasic, DebugTypeFunction) once globally.
+    /// Their IDs are stored in [`NonSemanticShaderDebugInfo`] for reuse by
+    /// per-function DebugFunction/DebugScope/DebugFunctionDefinition.
+    fn init_nonsemantic_shader_debug_info(&mut self, debug_info: &DebugInfoInner) {
+        use super::debuginfo::{encoding, flags, opcodes, source_language};
+
         self.use_extension("SPV_KHR_non_semantic_info");
         let ext_id = self.id_gen.next();
         Instruction::ext_inst_import(ext_id, "NonSemantic.Shader.DebugInfo.100")
             .to_words(&mut self.logical_layout.ext_inst_imports);
-        self.nonsemantic_shader_debug_info =
-            Some(super::debuginfo::NonSemanticShaderDebugInfo { ext_id });
+
+        let void_type = self.void_type;
+        let file_name_str_id = debug_info.source_file_id;
+
+        // DebugInfoNone
+        let debug_info_none = self.id_gen.next();
+        Instruction::ext_inst(ext_id, opcodes::DEBUG_INFO_NONE, void_type, debug_info_none, &[])
+            .to_words(&mut self.logical_layout.global_debug);
+
+        // DebugSource (with chunked source text for large sources)
+        const MAX_STR_BYTES: usize = (65535 - 2) * 4 - 1;
+        let chunks = super::helpers::string_to_byte_chunks(debug_info.source_code, MAX_STR_BYTES);
+        let first_chunk = chunks.first().map_or("", |c| core::str::from_utf8(c).unwrap_or(""));
+        let source_text_str_id = self.id_gen.next();
+        self.debug_strings.push(Instruction::string(first_chunk, source_text_str_id));
+        let debug_source = self.id_gen.next();
+        Instruction::ext_inst(ext_id, opcodes::DEBUG_SOURCE, void_type, debug_source,
+            &[file_name_str_id, source_text_str_id])
+            .to_words(&mut self.logical_layout.global_debug);
+        for chunk in chunks.iter().skip(1) {
+            let chunk_str = core::str::from_utf8(chunk).unwrap_or("");
+            let chunk_str_id = self.id_gen.next();
+            self.debug_strings.push(Instruction::string(chunk_str, chunk_str_id));
+            let continued_id = self.id_gen.next();
+            Instruction::ext_inst(ext_id, opcodes::DEBUG_SOURCE_CONTINUED, void_type,
+                continued_id, &[chunk_str_id])
+                .to_words(&mut self.logical_layout.global_debug);
+        }
+
+        // DebugCompilationUnit
+        let ver_1 = self.get_constant_scalar(crate::Literal::U32(1));
+        let ver_4 = self.get_constant_scalar(crate::Literal::U32(4));
+        let lang_glsl = self.get_constant_scalar(crate::Literal::U32(source_language::GLSL));
+        let compilation_unit = self.id_gen.next();
+        Instruction::ext_inst(ext_id, opcodes::DEBUG_COMPILATION_UNIT, void_type,
+            compilation_unit, &[ver_1, ver_4, debug_source, lang_glsl])
+            .to_words(&mut self.logical_layout.global_debug);
+
+        // Empty DebugExpression
+        let empty_expression = self.id_gen.next();
+        Instruction::ext_inst(ext_id, opcodes::DEBUG_EXPRESSION, void_type, empty_expression, &[])
+            .to_words(&mut self.logical_layout.global_debug);
+
+        // DebugTypeBasic("void")
+        let void_name_id = self.id_gen.next();
+        self.debug_strings.push(Instruction::string("void", void_name_id));
+        let flags_zero = self.get_constant_scalar(crate::Literal::U32(0));
+        let debug_type_void = self.id_gen.next();
+        Instruction::ext_inst(ext_id, opcodes::DEBUG_TYPE_BASIC, void_type, debug_type_void,
+            &[void_name_id, flags_zero, flags_zero, flags_zero])
+            .to_words(&mut self.logical_layout.global_debug);
+
+        // DebugTypeFunction
+        let debug_type_function = self.id_gen.next();
+        Instruction::ext_inst(ext_id, opcodes::DEBUG_TYPE_FUNCTION, void_type,
+            debug_type_function, &[flags_zero, debug_type_void])
+            .to_words(&mut self.logical_layout.global_debug);
+
+        self.nonsemantic_shader_debug_info = Some(super::debuginfo::NonSemanticShaderDebugInfo {
+            ext_id,
+            debug_info_none,
+            debug_source,
+            compilation_unit,
+            empty_expression,
+            debug_type_void,
+            debug_type_function,
+        });
     }
 
     pub(super) fn write_debug_printf(
