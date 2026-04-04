@@ -1263,6 +1263,13 @@ impl PhysicalDeviceProperties {
             if self.supports_extension(khr::shader_integer_dot_product::NAME) {
                 extensions.push(khr::shader_integer_dot_product::NAME);
             }
+
+            // Optional `VK_KHR_shader_non_semantic_info`
+            // Required to preserve NonSemantic debug instructions (e.g. for NSight)
+            // through vkCreateShaderModule. Core in Vulkan 1.3.
+            if self.supports_extension(khr::shader_non_semantic_info::NAME) {
+                extensions.push(khr::shader_non_semantic_info::NAME);
+            }
         }
 
         // Optional `VK_KHR_swapchain_mutable_format`
