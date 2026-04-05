@@ -3892,13 +3892,18 @@ impl Writer {
                     source_file_id,
                 });
                 // Source text is embedded via NonSemantic DebugSource (initialized
-                // below). Emit a minimal OpSource without the source text to
-                // avoid duplication, which confuses tools like RenderDoc.
-                self.debugs.push(Instruction::source(
-                    debug_info.language,
-                    0,
-                    &None,
-                ));
+                // below). Emit OpSource with the file reference (so tools like
+                // NSight can identify the shader) but without the source text
+                // (to avoid duplication which confuses RenderDoc).
+                {
+                    let mut instruction = Instruction::new(spirv::Op::Source);
+                    instruction.add_operand(debug_info.language as u32);
+                    instruction.add_operands(super::helpers::bytes_to_words(
+                        &0u32.to_le_bytes(),
+                    ));
+                    instruction.add_operand(source_file_id);
+                    self.debugs.push(instruction);
+                }
             }
         }
 

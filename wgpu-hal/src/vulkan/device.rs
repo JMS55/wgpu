@@ -682,7 +682,7 @@ impl super::Device {
                         temp_options.debug_info = Some(naga::back::spv::DebugInfo {
                             source_code: &debug.source_code,
                             file_name: debug.file_name.as_ref(),
-                            language: naga::back::spv::SourceLanguage::WGSL,
+                            language: naga::back::spv::SourceLanguage::GLSL,
                         })
                     }
                     if !stage.zero_initialize_workgroup_memory {
@@ -715,6 +715,8 @@ impl super::Device {
                     naga::back::spv::write_vec(&module, &info, options, Some(&pipeline_options))
                 }
                 .map_err(|e| crate::PipelineError::Linkage(stage_flags, format!("{e}")))?;
+
+
                 self.create_shader_module_impl(&spv, &None)?
             }
         };
@@ -1749,7 +1751,7 @@ impl crate::Device for super::Device {
                         .map(|d| naga::back::spv::DebugInfo {
                             source_code: d.source_code.as_ref(),
                             file_name: d.file_name.as_ref(),
-                            language: naga::back::spv::SourceLanguage::WGSL,
+                            language: naga::back::spv::SourceLanguage::GLSL,
                         });
                 if !desc.runtime_checks.bounds_checks {
                     naga_options.bounds_check_policies = naga::proc::BoundsCheckPolicies {
