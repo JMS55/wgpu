@@ -1676,6 +1676,10 @@ impl Writer {
                 &ir_function.expressions,
             ),
             ray_query_tracker_expr: crate::FastHashMap::default(),
+            debug_info: debug_info.as_ref().map(|di| DebugInfoInner {
+                source_code: di.source_code,
+                source_file_id: di.source_file_id,
+            }),
         };
 
         // fill up the pre-emitted and const expressions

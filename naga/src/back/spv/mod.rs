@@ -850,6 +850,9 @@ struct BlockContext<'w> {
     /// Hash from an expression whose type is a ray query / pointer to a ray query to its tracker.
     /// Note: this is sparse, so can't be a handle vec
     ray_query_tracker_expr: crate::FastHashMap<Handle<crate::Expression>, RayQueryTrackers>,
+
+    /// Debug info for emitting OpLine on expressions, if available.
+    debug_info: Option<block::DebugInfoInner<'w>>,
 }
 
 #[derive(Clone, Copy)]

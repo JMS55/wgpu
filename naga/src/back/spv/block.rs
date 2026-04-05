@@ -714,6 +714,19 @@ impl BlockContext<'_> {
             return Ok(());
         }
 
+        // Emit OpLine for this expression using its span from the arena.
+        if let Some(ref debug_info) = self.debug_info {
+            let span = self.ir_function.expressions.get_span(expr_handle);
+            if span.is_defined() {
+                let loc = span.location(debug_info.source_code);
+                block.body.push(Instruction::line(
+                    debug_info.source_file_id,
+                    loc.line_number,
+                    loc.line_position,
+                ));
+            }
+        }
+
         let result_type_id = self.get_expression_type_id(&self.fun_info[expr_handle].ty);
         let id = match self.ir_function.expressions[expr_handle] {
             crate::Expression::Literal(literal) => self.writer.get_constant_scalar(literal),
