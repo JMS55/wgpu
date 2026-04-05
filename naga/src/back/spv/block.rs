@@ -3441,8 +3441,9 @@ impl BlockContext<'_> {
     ) -> Result<BlockExitDisposition, Error> {
         let mut block = Block::new(label_id);
         for (statement, span) in naga_block.span_iter() {
-            if let (Some(debug_info), false) = (
+            if let (Some(debug_info), true, false) = (
                 debug_info,
+                span.is_defined(),
                 matches!(
                     statement,
                     &(Statement::Block(..)
@@ -3667,12 +3668,15 @@ impl BlockContext<'_> {
                     // HACK the loop statement is begin with branch instruction,
                     // so we need to put `OpLine` debug info before merge instruction
                     if let Some(debug_info) = debug_info {
-                        let loc: crate::SourceLocation = span.location(debug_info.source_code);
-                        block.body.push(Instruction::line(
-                            debug_info.source_file_id,
-                            loc.line_number,
-                            loc.line_position,
-                        ))
+                        if span.is_defined() {
+                            let loc: crate::SourceLocation =
+                                span.location(debug_info.source_code);
+                            block.body.push(Instruction::line(
+                                debug_info.source_file_id,
+                                loc.line_number,
+                                loc.line_position,
+                            ));
+                        }
                     }
                     block.body.push(Instruction::loop_merge(
                         merge_id,
