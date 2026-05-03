@@ -42,6 +42,12 @@ Bottom level categories:
 
 ## Unreleased
 
+### Bug Fixes
+
+#### Vulkan
+
+- Add a memory-allocation fallback chain for Vulkan resource creation under memory pressure: dedicated `vkAllocateMemory` when `gpu-allocator`'s managed-block path is too fragmented to fit a fresh suballocator block, and an alternative memory type (e.g. system RAM when VRAM is exhausted) when the primary heap is full. Reduces rendering flicker on systems where memory is near capacity. By @JMS55.
+
 ## v29.0.3 (2026-05-01)
 
 ### Bug Fixes

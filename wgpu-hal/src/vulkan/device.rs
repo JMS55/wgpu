@@ -776,31 +776,80 @@ impl super::Device {
         &self.shared.instance
     }
 
-    /// Allocate memory via [`gpu_allocator`], falling back to a dedicated
-    /// allocation if suballocation fails because the heap is too fragmented to
-    /// fit a new managed block. The caller picks the dedicated scheme
-    /// ([`AllocationScheme::DedicatedBuffer`] or [`AllocationScheme::DedicatedImage`])
-    /// matching the resource being allocated for.
+    /// Allocate memory via [`gpu_allocator`] with a multi-step fallback chain
+    /// for use under memory pressure.
     ///
+    /// Attempts in order:
+    /// 1. Suballocation in the requested memory type ([`base`] as given).
+    /// 2. Dedicated allocation in the requested memory type — bypasses
+    ///    `gpu_allocator`'s fixed managed-block size, so it succeeds when
+    ///    fragmentation prevents a fresh managed block but a resource-sized
+    ///    direct `vkAllocateMemory` would still fit.
+    /// 3. Suballocation in `fallback_location`, if any — useful when the
+    ///    primary heap is exhausted but a different compatible heap (e.g.
+    ///    system RAM when VRAM is full) still has space. Seeds a managed
+    ///    block there so subsequent allocations don't all need dedicated
+    ///    [`vkAllocateMemory`] slots (which are limited by
+    ///    `maxMemoryAllocationCount`).
+    /// 4. Dedicated allocation in `fallback_location`.
+    ///
+    /// `dedicated_scheme` should be [`AllocationScheme::DedicatedBuffer`] or
+    /// [`AllocationScheme::DedicatedImage`] for the resource being allocated.
+    ///
+    /// [`base`]: gpu_allocator::vulkan::AllocationCreateDesc
     /// [`AllocationScheme::DedicatedBuffer`]: gpu_allocator::vulkan::AllocationScheme::DedicatedBuffer
     /// [`AllocationScheme::DedicatedImage`]: gpu_allocator::vulkan::AllocationScheme::DedicatedImage
+    /// [`vkAllocateMemory`]: https://registry.khronos.org/vulkan/specs/latest/man/html/vkAllocateMemory.html
     fn allocate_memory(
         &self,
         base: gpu_allocator::vulkan::AllocationCreateDesc<'_>,
         dedicated_scheme: gpu_allocator::vulkan::AllocationScheme,
+        fallback_location: Option<gpu_allocator::MemoryLocation>,
     ) -> Result<gpu_allocator::vulkan::Allocation, gpu_allocator::AllocationError> {
-        match self.mem_allocator.lock().allocate(&base) {
-            Ok(alloc) => Ok(alloc),
-            Err(gpu_allocator::AllocationError::OutOfMemory) => {
-                self.mem_allocator
-                    .lock()
-                    .allocate(&gpu_allocator::vulkan::AllocationCreateDesc {
-                        allocation_scheme: dedicated_scheme,
-                        ..base
-                    })
+        use gpu_allocator::vulkan::AllocationCreateDesc;
+        use gpu_allocator::AllocationError;
+
+        let primary_scheme = base.allocation_scheme;
+        let primary_location = base.location;
+
+        let mut attempts = [
+            (primary_scheme, primary_location),
+            (dedicated_scheme, primary_location),
+            (primary_scheme, primary_location),
+            (dedicated_scheme, primary_location),
+        ];
+        let attempt_count = match fallback_location {
+            Some(fallback) if fallback != primary_location => {
+                attempts[2].1 = fallback;
+                attempts[3].1 = fallback;
+                4
             }
-            Err(e) => Err(e),
+            _ => 2,
+        };
+
+        for &(scheme, location) in &attempts[..attempt_count] {
+            let desc = AllocationCreateDesc {
+                allocation_scheme: scheme,
+                location,
+                ..base.clone()
+            };
+            match self.mem_allocator.lock().allocate(&desc) {
+                Ok(alloc) => return Ok(alloc),
+                Err(AllocationError::OutOfMemory) => continue,
+                // The fallback memory location may not have any compatible
+                // memory type (e.g. host-visible optimal-tiled textures on a
+                // discrete GPU); skip past it rather than surfacing a
+                // misleading compatibility error.
+                Err(AllocationError::NoCompatibleMemoryTypeFound)
+                    if location != primary_location =>
+                {
+                    continue
+                }
+                Err(e) => return Err(e),
+            }
         }
+
+        Err(AllocationError::OutOfMemory)
     }
 
     fn error_if_would_oom_on_resource_allocation(
@@ -925,6 +974,19 @@ impl crate::Device for super::Device {
             (false, true) => gpu_allocator::MemoryLocation::CpuToGpu,
             (false, false) => gpu_allocator::MemoryLocation::GpuOnly,
         };
+        let fallback_location = match location {
+            // VRAM exhausted -> try BAR/system RAM.
+            gpu_allocator::MemoryLocation::GpuOnly => Some(gpu_allocator::MemoryLocation::CpuToGpu),
+            // `gpu_allocator` already retries BAR -> plain HOST_VISIBLE
+            // internally for `CpuToGpu`, so no further fallback is useful.
+            gpu_allocator::MemoryLocation::CpuToGpu => None,
+            // HOST_CACHED heap exhausted -> try plain HOST_VISIBLE (slower
+            // CPU readback, but functional).
+            gpu_allocator::MemoryLocation::GpuToCpu => {
+                Some(gpu_allocator::MemoryLocation::CpuToGpu)
+            }
+            gpu_allocator::MemoryLocation::Unknown => None,
+        };
 
         let needs_host_access = is_cpu_read || is_cpu_write;
 
@@ -959,6 +1021,7 @@ impl crate::Device for super::Device {
                     allocation_scheme: gpu_allocator::vulkan::AllocationScheme::GpuAllocatorManaged,
                 },
                 gpu_allocator::vulkan::AllocationScheme::DedicatedBuffer(raw),
+                fallback_location,
             )
             .inspect_err(|_| {
                 unsafe { self.shared.raw.destroy_buffer(raw, None) };
@@ -1106,6 +1169,11 @@ impl crate::Device for super::Device {
                     allocation_scheme: gpu_allocator::vulkan::AllocationScheme::GpuAllocatorManaged,
                 },
                 gpu_allocator::vulkan::AllocationScheme::DedicatedImage(image.raw),
+                // VRAM exhausted -> try BAR/system RAM. May land in slow memory
+                // or fail with `NoCompatibleMemoryTypeFound` if the texture's
+                // memory_type_bits forbids host-visible heaps; both are handled
+                // in `allocate_memory`.
+                Some(gpu_allocator::MemoryLocation::CpuToGpu),
             )
             .inspect_err(|_| {
                 unsafe { self.shared.raw.destroy_image(image.raw, None) };
@@ -2557,6 +2625,8 @@ impl crate::Device for super::Device {
                             gpu_allocator::vulkan::AllocationScheme::GpuAllocatorManaged,
                     },
                     gpu_allocator::vulkan::AllocationScheme::DedicatedBuffer(raw_buffer),
+                    // VRAM exhausted -> try BAR/system RAM.
+                    Some(gpu_allocator::MemoryLocation::CpuToGpu),
                 )
                 .inspect_err(|_| {
                     self.shared.raw.destroy_buffer(raw_buffer, None);
