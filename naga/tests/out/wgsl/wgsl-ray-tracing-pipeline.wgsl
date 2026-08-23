@@ -45,3 +45,10 @@ fn any_hit_main(@builtin(instance_custom_data) data: u32, @builtin(geometry_inde
 fn closest_hit_main(@builtin(object_ray_origin) origin_1: vec3<f32>, @builtin(object_ray_direction) dir_1: vec3<f32>, @builtin(object_to_world) obj_to_world: mat4x3<f32>, @builtin(world_to_object) world_to_obj: mat4x3<f32>) {
     return;
 }
+
+@closest_hit @incoming_payload(incoming_hit_num) 
+fn closest_hit_barycentrics(@builtin(hit_barycentrics) barycentrics: vec2<f32>) {
+    let weights = vec3<f32>(((1f - barycentrics.x) - barycentrics.y), barycentrics.x, barycentrics.y);
+    incoming_hit_num.selected_hit = u32(((weights.x + weights.y) + weights.z));
+    return;
+}

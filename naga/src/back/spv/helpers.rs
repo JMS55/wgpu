@@ -81,6 +81,24 @@ pub(super) const fn map_storage_class(space: crate::AddressSpace) -> spirv::Stor
     }
 }
 
+/// The storage class an entry point argument or result with this binding lives in.
+///
+/// Almost every binding is an ordinary `Input`/`Output` varying. The exception is
+/// [`BuiltIn::HitBarycentrics`], which is not a SPIR-V built-in at all but a variable in the
+/// `HitAttributeKHR` storage class, written by the built-in triangle intersection.
+///
+/// [`BuiltIn::HitBarycentrics`]: crate::BuiltIn::HitBarycentrics
+pub(super) const fn entry_point_binding_class(
+    binding: Option<&crate::Binding>,
+) -> spirv::StorageClass {
+    match binding {
+        Some(&crate::Binding::BuiltIn(crate::BuiltIn::HitBarycentrics)) => {
+            spirv::StorageClass::HitAttributeKHR
+        }
+        _ => spirv::StorageClass::Input,
+    }
+}
+
 pub(super) fn contains_builtin(
     binding: Option<&crate::Binding>,
     ty: Handle<crate::Type>,

@@ -502,6 +502,16 @@ pub enum BuiltIn {
     /// the intersection function if any, otherwise this is 254 (0xFE) for a
     /// front facing triangle and 255 (0xFF) for a back facing triangle
     HitKind,
+    /// Read in closest hit and any hit shaders, the barycentric coordinates of
+    /// the hit within the triangle, as written by the built-in triangle
+    /// intersection.
+    ///
+    /// These are the weights of the triangle's second and third vertex; the
+    /// weight of the first is `1.0 - hit_barycentrics.x - hit_barycentrics.y`.
+    ///
+    /// Unlike the other ray tracing built-ins this is not a SPIR-V built-in,
+    /// but a variable in the `HitAttributeKHR` storage class.
+    HitBarycentrics,
 }
 
 /// Number of bytes per scalar.

@@ -16,7 +16,9 @@ use super::{
 use crate::{
     arena::{Handle, HandleVec, UniqueArena},
     back::spv::{
-        helpers::{is_uniform_matcx2_struct_member_access, BindingDecorations},
+        helpers::{
+            entry_point_binding_class, is_uniform_matcx2_struct_member_access, BindingDecorations,
+        },
         BindingInfo, Std140CompatTypeInfo, WrappedFunction,
     },
     common::ForDebugWithTypes as _,
@@ -1289,7 +1291,7 @@ impl Writer {
         let mut local_invocation_index_id = None;
 
         for argument in ir_function.arguments.iter() {
-            let class = spirv::StorageClass::Input;
+            let class = entry_point_binding_class(argument.binding.as_ref());
             let handle_ty = ir_module.types[argument.ty].inner.is_handle();
             let argument_type_id = if handle_ty {
                 self.get_handle_pointer_type_id(argument.ty, spirv::StorageClass::UniformConstant)
@@ -1309,7 +1311,13 @@ impl Writer {
                         argument.ty,
                         binding,
                     )?;
-                    iface.varying_ids.push(varying_id);
+                    // Before SPIR-V 1.4 an entry point's interface may only list `Input` and
+                    // `Output` variables, so a `HitAttributeKHR` variable stays out of it.
+                    if class == spirv::StorageClass::Input
+                        || self.physical_layout.version >= 0x10400
+                    {
+                        iface.varying_ids.push(varying_id);
+                    }
                     let id = self.load_io_with_f16_polyfill(
                         &mut prelude.body,
                         varying_id,
@@ -3326,6 +3334,16 @@ impl Writer {
                     Bi::ObjectToWorld => BuiltIn::ObjectToWorldKHR,
                     Bi::WorldToObject => BuiltIn::WorldToObjectKHR,
                     Bi::HitKind => BuiltIn::HitKindKHR,
+                    // Not a SPIR-V built-in: this is a `HitAttributeKHR` variable, written by the
+                    // built-in triangle intersection. `entry_point_binding_class` gives it the
+                    // right storage class, and it takes no decoration.
+                    Bi::HitBarycentrics => {
+                        self.require_any(
+                            "`hit_barycentrics` built-in",
+                            &[spirv::Capability::RayTracingKHR],
+                        )?;
+                        return Ok(BindingDecorations::None);
+                    }
                 };
 
                 use crate::ScalarKind as Sk;
