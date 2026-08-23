@@ -132,6 +132,7 @@ By @sagudev in [#10109](https://github.com/gfx-rs/wgpu/pull/10109).
 - Fix invalid HLSL generated for `textureSampleLevel` with non-2D textures. By @mvanhorn in [#9717](https://github.com/gfx-rs/wgpu/issues/9717).
 - Reject return types on compute shader entrypoints. By @ErichDonGubler in [#10026](https://github.com/gfx-rs/wgpu/pull/10026).
 - Reject `@location(…)`s in compute shaders. By @ErichDonGubler in [#10026](https://github.com/gfx-rs/wgpu/pull/10026).
+- Stop requiring the SPIR-V `Geometry` capability for every `@builtin(primitive_index)`. `PrimitiveId` is also enabled by `RayTracingKHR` and `MeshShadingEXT`, so a ray tracing hit shader or a mesh shader no longer needs geometry shader support, and a fragment shader fed primitive IDs by a mesh pipeline now works on a mesh-only target. By @JMS55 in [#99999](https://github.com/gfx-rs/wgpu/pull/99999).
 
 #### DX12
 

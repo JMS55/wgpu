@@ -1,0 +1,15 @@
+capabilities = "MESH_SHADER | PRIMITIVE_INDEX"
+targets = "WGSL | SPIRV | HLSL | METAL"
+
+[spv]
+version = [1, 4]
+separate_entry_points = true
+# Deliberately does not include `Geometry`: `MeshShadingEXT` enables `PrimitiveId` by itself, both
+# for the mesh shader writing it and for the fragment shader reading it back.
+capabilities = ["MeshShadingEXT"]
+
+[msl]
+lang_version = [3, 0]
+
+[hlsl]
+shader_model = "V6_5"

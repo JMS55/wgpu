@@ -3226,11 +3226,30 @@ impl Writer {
                     Bi::PointCoord => BuiltIn::PointCoord,
                     Bi::FrontFacing => BuiltIn::FrontFacing,
                     Bi::PrimitiveIndex => {
-                        // Geometry shader capability is required for primitive index
-                        self.require_any(
-                            "`primitive_index` built-in",
-                            &[spirv::Capability::Geometry],
-                        )?;
+                        // `PrimitiveId` is enabled by any of `Geometry`, `Tessellation`,
+                        // `RayTracingKHR` and `MeshShadingEXT`, so which of them to ask for
+                        // depends on the stage. `require_any` picks the first one the target
+                        // allows, so a target that supports geometry shaders keeps using
+                        // `Geometry` as before.
+                        let enabled_by: &[spirv::Capability] = match stage {
+                            // The stage itself already requires `RayTracingKHR`.
+                            crate::ShaderStage::AnyHit | crate::ShaderStage::ClosestHit => &[],
+                            // The stage itself already requires `MeshShadingEXT`.
+                            crate::ShaderStage::Mesh => &[spirv::Capability::MeshShadingEXT],
+                            // A fragment shader can be fed primitive IDs by a geometry,
+                            // tessellation or mesh pipeline.
+                            crate::ShaderStage::Fragment => &[
+                                spirv::Capability::Geometry,
+                                spirv::Capability::Tessellation,
+                                spirv::Capability::MeshShadingEXT,
+                            ],
+                            crate::ShaderStage::Vertex
+                            | crate::ShaderStage::Task
+                            | crate::ShaderStage::Compute
+                            | crate::ShaderStage::RayGeneration
+                            | crate::ShaderStage::Miss => &[spirv::Capability::Geometry],
+                        };
+                        self.require_any("`primitive_index` built-in", enabled_by)?;
                         if stage == crate::ShaderStage::Mesh {
                             others.push(Decoration::PerPrimitiveEXT);
                         }

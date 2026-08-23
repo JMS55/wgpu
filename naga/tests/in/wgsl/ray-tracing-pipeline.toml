@@ -1,2 +1,8 @@
 capabilities = "RAY_TRACING_PIPELINE"
 targets = "WGSL | SPIRV"
+
+[spv]
+version = [1, 4]
+# Deliberately does not include `Geometry`: in a hit shader `PrimitiveId` is enabled by
+# `RayTracingKHR`, so requiring the geometry shader capability there would be wrong.
+capabilities = ["RayTracingKHR"]
