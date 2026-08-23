@@ -3210,7 +3210,15 @@ impl Writer {
                         )?;
                         BuiltIn::CullDistance
                     }
-                    Bi::InstanceIndex => BuiltIn::InstanceIndex,
+                    Bi::InstanceIndex => match stage {
+                        // `InstanceIndex` is only valid in the vertex stage. The equivalent in a
+                        // ray tracing hit shader - the index of the hit instance within the TLAS -
+                        // is `InstanceId`.
+                        crate::ShaderStage::AnyHit | crate::ShaderStage::ClosestHit => {
+                            BuiltIn::InstanceId
+                        }
+                        _ => BuiltIn::InstanceIndex,
+                    },
                     Bi::PointSize => BuiltIn::PointSize,
                     Bi::VertexIndex => BuiltIn::VertexIndex,
                     Bi::DrawIndex => {

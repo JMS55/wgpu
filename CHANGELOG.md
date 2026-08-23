@@ -132,6 +132,7 @@ By @sagudev in [#10109](https://github.com/gfx-rs/wgpu/pull/10109).
 - Fix invalid HLSL generated for `textureSampleLevel` with non-2D textures. By @mvanhorn in [#9717](https://github.com/gfx-rs/wgpu/issues/9717).
 - Reject return types on compute shader entrypoints. By @ErichDonGubler in [#10026](https://github.com/gfx-rs/wgpu/pull/10026).
 - Reject `@location(…)`s in compute shaders. By @ErichDonGubler in [#10026](https://github.com/gfx-rs/wgpu/pull/10026).
+- Lower `@builtin(instance_index)` in `@any_hit` and `@closest_hit` entry points to SPIR-V's `InstanceId` rather than `InstanceIndex`, which Vulkan only permits in the vertex stage. By @JMS55 in [#99999](https://github.com/gfx-rs/wgpu/pull/99999).
 
 #### DX12
 

@@ -34,3 +34,11 @@ fn any_hit_main(@builtin(instance_custom_data) data: u32, @builtin(geometry_inde
 @closest_hit
 @incoming_payload(incoming_hit_num)
 fn closest_hit_main(@builtin(object_ray_origin) origin: vec3<f32>, @builtin(object_ray_direction) dir: vec3<f32>, @builtin(object_to_world) obj_to_world: mat4x3<f32>, @builtin(world_to_object) world_to_obj: mat4x3<f32>) {}
+
+// `instance_index` is the hit instance's index within the TLAS, which is `InstanceId` rather than
+// the vertex stage's `InstanceIndex`.
+@closest_hit
+@incoming_payload(incoming_hit_num)
+fn closest_hit_instance(@builtin(instance_index) instance_index: u32) {
+    incoming_hit_num.hit_num = instance_index;
+}
